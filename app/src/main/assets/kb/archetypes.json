@@ -1,0 +1,130 @@
+[
+  {
+    "id": "standard-houseplant",
+    "displayName": "Standard Houseplant",
+    "shortDescription": "A balanced coir-based mix for general foliage plants with fibrous, terrestrial roots.",
+    "recipe": [
+      { "ingredient": "Coco coir", "proportionPct": 60, "notes": "Peat-free moisture reservoir; CEC 5.5–6.8." },
+      { "ingredient": "Perlite", "proportionPct": 30, "notes": "Drainage and aeration." },
+      { "ingredient": "Bark fines", "proportionPct": 10, "notes": "Structural openness, slow decomposition." }
+    ],
+    "rationaleTemplate": "A standard coir-based mix suits {species}: its terrestrial fibrous roots want even moisture with steady drainage, and the coir-perlite-bark balance gives container capacity around 65–80% without saturating the root zone.",
+    "citations": [
+      "Brief §4.4",
+      "Brief §4.5",
+      "Gemini-report:Substrate Component Analysis and Transition to Peat-Free Media"
+    ]
+  },
+  {
+    "id": "aroid-chunky",
+    "displayName": "Aroid Chunky",
+    "shortDescription": "Bark-dominant, fast-reaerating mix for hemi-epiphytic climbing aroids.",
+    "recipe": [
+      { "ingredient": "Pine or orchid bark", "proportionPct": 40, "notes": "Provides structure, mimics tree trunks." },
+      { "ingredient": "Coco coir", "proportionPct": 25, "notes": "Holds moisture and nutrients between waterings." },
+      { "ingredient": "Perlite or pumice", "proportionPct": 20, "notes": "Permanent air pathways; pumice preferred for weight." },
+      { "ingredient": "Long-fibre sphagnum", "proportionPct": 10, "notes": "Buffers humidity around aerial roots." },
+      { "ingredient": "Horticultural charcoal", "proportionPct": 5, "notes": "Adsorbs salts and keeps the mix fresh." }
+    ],
+    "rationaleTemplate": "A chunky aroid mix suits {species}: hemi-epiphytic climbers grow oxygen-hungry aerial roots that suffocate in peat-perlite blends, so a bark-led recipe with pumice and charcoal keeps air-filled porosity high and resists long-term compaction.",
+    "citations": [
+      "Brief §4.4",
+      "Gemini-report:Araceae and the \"Chunky Aroid Mix\"",
+      "Claude-report:Pillar A — ecological strategies"
+    ]
+  },
+  {
+    "id": "succulent-gritty",
+    "displayName": "Succulent Gritty",
+    "shortDescription": "Mineral-led, low-fertility mix for water-storing succulents and xerophytes.",
+    "recipe": [
+      { "ingredient": "Pumice or akadama", "proportionPct": 40, "notes": "Mineral aggregate with stable porosity." },
+      { "ingredient": "Coarse sand or perlite", "proportionPct": 30, "notes": "Drainage and AFP." },
+      { "ingredient": "Coco coir or pine fines", "proportionPct": 30, "notes": "Minimal organic component; just enough water-holding." }
+    ],
+    "rationaleTemplate": "A gritty, mineral-heavy mix suits {species}: water-storing tissues mean the plant draws on internal reserves between waterings, so the substrate must dry rapidly and never sit saturated — pumice plus coarse sand and a thin organic fraction delivers AFP in the 25–30% band that succulent roots tolerate.",
+    "citations": [
+      "Brief §4.4",
+      "Claude-report:Pillar A — ecological strategies",
+      "Gemini-report:Substrate Component Analysis and Transition to Peat-Free Media"
+    ]
+  },
+  {
+    "id": "cactus-pure-mineral",
+    "displayName": "Cactus Pure Mineral",
+    "shortDescription": "All-mineral mix for the most water-sensitive cacti and mesembs (declared for schema; no v1 species mapped).",
+    "recipe": [
+      { "ingredient": "Pumice", "proportionPct": 50, "notes": "Primary mineral aggregate." },
+      { "ingredient": "Akadama or lava rock", "proportionPct": 30, "notes": "Stable, fast-draining aggregate." },
+      { "ingredient": "Coarse sand", "proportionPct": 20, "notes": "Fills macropores selectively without compacting." }
+    ],
+    "rationaleTemplate": "A pure-mineral mix suits {species}: the absence of organic fines eliminates the slow-decomposition water-retention that demanding cacti and lithops cannot tolerate. This archetype is declared so the schema is exercised; no v1 species currently maps to it.",
+    "citations": [
+      "Brief §4.4",
+      "docs/sprints/PLANTPOTTING-0001.md §4.1"
+    ]
+  },
+  {
+    "id": "epiphytic-orchid-bark",
+    "displayName": "Epiphytic Orchid Bark",
+    "shortDescription": "Coarse bark-dominant medium for velamen-rooted epiphytic orchids.",
+    "recipe": [
+      { "ingredient": "Medium fir or orchiata bark", "proportionPct": 70, "notes": "Orchiata (Pinus radiata) decomposes over 18–24 months." },
+      { "ingredient": "Horticultural charcoal", "proportionPct": 15, "notes": "Keeps the mix sweet; long-term structural porosity." },
+      { "ingredient": "Perlite", "proportionPct": 15, "notes": "Drainage and aeration between bark pieces." }
+    ],
+    "rationaleTemplate": "A bark-dominant epiphytic mix suits {species}: velamen-coated aerial roots are evolved to absorb moisture quickly from rain, then dry within hours — coarse bark with charcoal and perlite reproduces the wet-then-dry rhythm an orchid's tree-branch habitat provides.",
+    "citations": [
+      "Brief §4.4",
+      "Gemini-report:Orchidaceae and the \"Epiphytic Bark Mix\"",
+      "Gemini-report:Organic Constituents"
+    ]
+  },
+  {
+    "id": "moisture-retentive",
+    "displayName": "Moisture-Retentive",
+    "shortDescription": "Coir-led mix with sphagnum for terrestrials that punish dry-back.",
+    "recipe": [
+      { "ingredient": "Coco coir", "proportionPct": 50, "notes": "Primary moisture reservoir; peat-free." },
+      { "ingredient": "Fine or composted bark", "proportionPct": 20, "notes": "Adds structure and slows compaction." },
+      { "ingredient": "Perlite", "proportionPct": 20, "notes": "Prevents waterlogging despite the high water-holding base." },
+      { "ingredient": "Long-fibre sphagnum", "proportionPct": 10, "notes": "Buffers nutrient concentration during cultivation." }
+    ],
+    "rationaleTemplate": "A moisture-retentive mix suits {species}: this terrestrial wants even, slightly above-standard humidity at the root zone, so a coir-led base with sphagnum gives the buffering capacity that prevents the rapid swings dry-back-intolerant taxa react badly to.",
+    "citations": [
+      "Brief §4.4",
+      "Claude-report:Pillar A — ecological strategies",
+      "Gemini-report:Organic Constituents"
+    ]
+  },
+  {
+    "id": "semi-hydro-inert",
+    "displayName": "Semi-Hydro Inert",
+    "shortDescription": "All-LECA passive-hydroponic substrate; requires hydroponic fertiliser.",
+    "recipe": [
+      { "ingredient": "LECA (lightweight expanded clay aggregate)", "proportionPct": 100, "notes": "Inert; wicks water by capillary action from a reservoir." }
+    ],
+    "rationaleTemplate": "An all-LECA semi-hydro setup suits {species}: the aggregate is chemically inert, so a complete hydroponic fertiliser is mandatory — without it the plant will starve regardless of how well the wicking reservoir is managed. This archetype is declared so the schema and recommendation engine support the future semi-hydro lane; no v1 species currently maps to it.",
+    "citations": [
+      "Brief §4.4",
+      "Brief §4.3"
+    ]
+  },
+  {
+    "id": "acidic-ericaceous",
+    "displayName": "Acidic / Ericaceous",
+    "shortDescription": "Low-pH, bark-amended mix for calcifuges like Saintpaulia.",
+    "recipe": [
+      { "ingredient": "Acidic coir or peat-free ericaceous base", "proportionPct": 45, "notes": "Target pH 4.5–5.5." },
+      { "ingredient": "Pine bark fines", "proportionPct": 35, "notes": "Acidifies through slow decomposition." },
+      { "ingredient": "Perlite", "proportionPct": 15, "notes": "Drainage; avoids root rot risk at high water-holding." },
+      { "ingredient": "Acidic amendment (composted pine needles or sulphur)", "proportionPct": 5, "notes": "Keeps the substrate inside the ericaceous pH band over time." }
+    ],
+    "rationaleTemplate": "An ericaceous acidic mix suits {species}: micronutrient availability collapses above pH 6.5 for calcifuges, so the recipe targets pH 4.5–5.5 with bark fines and an acidic amendment to defend that band against creeping calcareous water and fertiliser drift.",
+    "citations": [
+      "Brief §4.4",
+      "Brief §4.3",
+      "docs/sprints/PLANTPOTTING-0001.md §4.1"
+    ]
+  }
+]

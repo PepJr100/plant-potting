@@ -1,0 +1,214 @@
+[
+  {
+    "id": "monstera-deliciosa",
+    "scientificName": "Monstera deliciosa",
+    "commonNames": ["Swiss cheese plant", "Split-leaf philodendron"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Monstera deliciosa is a hemi-epiphytic climbing aroid; in nature it ascends rainforest trunks with thick adventitious aerial roots that demand air around them. A chunky bark-led mix mirrors the loose tree-bark substrate that suits it long-term.",
+    "citations": [
+      "Gemini-report:Araceae and the \"Chunky Aroid Mix\"",
+      "Claude-report:Pillar A — ecological strategies",
+      "Brief §3.2"
+    ]
+  },
+  {
+    "id": "monstera-adansonii",
+    "scientificName": "Monstera adansonii",
+    "commonNames": ["Swiss cheese vine", "Monkey mask"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Monstera adansonii is more thoroughly epiphytic than its larger cousin and tolerates an even higher bark fraction — the chunky aroid recipe lands well inside its substrate envelope.",
+    "citations": [
+      "Claude-report:Pillar A — cultivar granularity",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026",
+      "Brief §3.2"
+    ]
+  },
+  {
+    "id": "epipremnum-aureum",
+    "scientificName": "Epipremnum aureum",
+    "commonNames": ["Pothos", "Devil's ivy", "Golden pothos"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Epipremnum aureum is a hemi-epiphytic climbing aroid grouped with Monstera and Philodendron in the ecological-strategy literature; the same chunky bark-led recipe suits it. Trade tags are notoriously inconsistent (\"pothos\", \"devil's ivy\", sometimes confused with Scindapsus pictus), so the canonical scientific name is the safest key.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Claude-report:Pillar A — common-name chaos",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026"
+    ]
+  },
+  {
+    "id": "philodendron-hederaceum",
+    "scientificName": "Philodendron hederaceum",
+    "commonNames": ["Heartleaf philodendron"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Philodendron hederaceum is a hemi-epiphytic climbing aroid. Older horticultural references still synonymise it as P. scandens or P. oxycardium; the chunky aroid mix is the right recipe for all three under-the-current-name.",
+    "citations": [
+      "Claude-report:Pillar A — common-name chaos",
+      "Gemini-report:Araceae and the \"Chunky Aroid Mix\"",
+      "Brief §3.2"
+    ]
+  },
+  {
+    "id": "philodendron-pink-princess",
+    "scientificName": "Philodendron erubescens 'Pink Princess'",
+    "commonNames": ["Pink princess philodendron"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Philodendron erubescens 'Pink Princess' is a variegated cultivar whose pink, chlorophyll-deficient tissue transpires more slowly than its all-green sibling. The variegation literature recommends a more chunky, faster-drying mix to compensate for the slower water uptake — placing this cultivar squarely in the aroid-chunky archetype rather than a moisture-retentive one.",
+    "citations": [
+      "Gemini-report:Physiological Nuances: Cultivars and Variegation Management",
+      "Brief §1.3"
+    ]
+  },
+  {
+    "id": "spathiphyllum-wallisii",
+    "scientificName": "Spathiphyllum wallisii",
+    "commonNames": ["Peace lily"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Spathiphyllum wallisii is a terrestrial aroid native to the tropical Americas; the houseplant care literature groups it with the moisture-loving terrestrials and notes it tolerates boggy conditions without being truly aquatic. A coir-led, sphagnum-amended mix keeps its fibrous root system evenly moist.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Claude-report:Pillar A — commercial species list",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "ficus-lyrata",
+    "scientificName": "Ficus lyrata",
+    "commonNames": ["Fiddle-leaf fig"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Ficus lyrata is a terrestrial fig with a fibrous root system; despite sharing a genus with the rubber plant it sits at the drier end of Ficus moisture tolerance. The standard coir-perlite-bark mix gives the even drainage it needs without the moisture-retention that suits its tropical-rainforest relatives.",
+    "citations": [
+      "Brief §3.1",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "ficus-elastica",
+    "scientificName": "Ficus elastica",
+    "commonNames": ["Rubber plant", "Rubber fig"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Ficus elastica shares the fibrous, terrestrial root profile of its genus and the same standard houseplant substrate envelope. The literature flags watering cadence — not substrate archetype — as the per-species variable inside Ficus.",
+    "citations": [
+      "Brief §3.1",
+      "Claude-report:Pillar A — commercial species list",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "dracaena-trifasciata",
+    "scientificName": "Dracaena trifasciata",
+    "commonNames": ["Snake plant", "Mother-in-law's tongue"],
+    "aliases": ["Sansevieria trifasciata"],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Dracaena trifasciata (formerly Sansevieria trifasciata) is a stem-succulent grouped with the xerophytic taxa; the Byng et al. 2018 transfer into Dracaena is not yet reflected on most retail tags, so the Sansevieria name persists as an alias. A gritty mineral-led mix is required because saturated organic media rots its thick fleshy leaves at the base.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Claude-report:Pillar A — taxonomy and nomenclature",
+      "Brief §3.5"
+    ]
+  },
+  {
+    "id": "zamioculcas-zamiifolia",
+    "scientificName": "Zamioculcas zamiifolia",
+    "commonNames": ["ZZ plant", "Zanzibar gem"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Zamioculcas zamiifolia is a drought-adapted aroid that stores water in tuberous rhizomes; the brief lists it in the water-storing-tuberous-roots group. Despite its taxonomic home in Araceae, it sits with the succulents for substrate purposes — a gritty mineral mix avoids rotting the rhizome between waterings.",
+    "citations": [
+      "Brief §3.2",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "chlorophytum-comosum",
+    "scientificName": "Chlorophytum comosum",
+    "commonNames": ["Spider plant", "Airplane plant"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Chlorophytum comosum is a terrestrial monocot with thickened storage roots; the ecological-strategy literature groups it with the standard terrestrials, and the retail-trends data notes it as a revived 1970s favourite carrying significant volume. A coir-led standard mix matches its moderate-moisture preference.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "phalaenopsis",
+    "scientificName": "Phalaenopsis",
+    "commonNames": ["Moth orchid"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "epiphytic-orchid-bark" },
+    "speciesRationale": "Phalaenopsis is modelled at the genus rank because retail moth-orchids are uniformly hybrid grex plants with effectively indistinguishable substrate needs; species-level resolution adds no signal. Its velamen-coated aerial roots are evolved for fast wet-dry cycling on tree branches, so a coarse bark-charcoal-perlite epiphytic mix replicates the habitat.",
+    "citations": [
+      "Claude-report:Pillar A — cultivar granularity",
+      "Brief §3.2",
+      "Gemini-report:Orchidaceae and the \"Epiphytic Bark Mix\""
+    ]
+  },
+  {
+    "id": "goeppertia-orbifolia",
+    "scientificName": "Goeppertia orbifolia",
+    "commonNames": ["Round-leaf calathea", "Orbifolia"],
+    "aliases": ["Calathea orbifolia"],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Goeppertia orbifolia (transferred from Calathea by Borchsenius and corroborated in POWO) is a humidity-sensitive terrestrial that punishes substrate dry-back; the moisture-retentive coir-bark-sphagnum recipe holds the even moisture it requires. The Calathea name persists on retail tags and is carried as an alias.",
+    "citations": [
+      "Brief §3.5",
+      "Claude-report:Pillar A — ecological strategies",
+      "Gemini-report:Taxonomic Prevalence and Consumer Trends in 2025-2026"
+    ]
+  },
+  {
+    "id": "crassula-ovata",
+    "scientificName": "Crassula ovata",
+    "commonNames": ["Jade plant", "Money plant"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Crassula ovata is a classic Crassulaceae succulent with thick water-storing leaves and a CAM photosynthetic pathway. A gritty mineral-led mix is required; the houseplant-trade name confusion around \"jade plant\", \"money tree\", and \"lucky bamboo\" makes the canonical binomial the only reliable database key.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Claude-report:Pillar A — common-name chaos",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "saintpaulia-ionantha",
+    "scientificName": "Saintpaulia ionantha",
+    "commonNames": ["African violet"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "acidic-ericaceous" },
+    "speciesRationale": "Saintpaulia ionantha is a calcifuge that loses micronutrient access above pH 6.5; the ericaceous low-pH recipe is the only archetype in the corpus that defends the pH 4.5–5.5 band the species requires. This archetype was added to the v1 set specifically to support Saintpaulia per the GEMINI cross-critique.",
+    "citations": [
+      "Brief §4.4",
+      "docs/sprints/PLANTPOTTING-0001.md §4.1",
+      "Brief §3.3"
+    ]
+  },
+  {
+    "id": "hoya-carnosa",
+    "scientificName": "Hoya carnosa",
+    "commonNames": ["Wax plant", "Porcelain flower"],
+    "aliases": [],
+    "mapping": {
+      "kind": "blend",
+      "primaryArchetypeId": "aroid-chunky",
+      "secondaryArchetypeId": "succulent-gritty",
+      "primaryPct": 60
+    },
+    "speciesRationale": "Hoya carnosa is lithophytic / semi-terrestrial — neither purely epiphytic nor purely xerophytic. The literature documents real substrate-needs tension within the genus between predominantly epiphytic species (most Hoya, including H. carnosa) and the more terrestrial outliers. A 60/40 blend of aroid-chunky and succulent-gritty captures the airflow Hoya carnosa wants while keeping the mineral fraction high enough to dry between waterings.",
+    "citations": [
+      "Claude-report:Pillar A — ecological strategies",
+      "Claude-report:Pillar A — cultivar granularity",
+      "Brief §3.2"
+    ]
+  }
+]
