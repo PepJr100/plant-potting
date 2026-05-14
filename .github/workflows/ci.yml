@@ -47,6 +47,9 @@ jobs:
             ~/.android/adb*
           key: avd-pixel6Api34-aosp
 
+      - name: Stub identifier isolation guard
+        run: bash scripts/check-stub-isolation.sh
+
       - name: Build, lint, unit tests, ktlint, GMD, networking guard
         run: |
           ./gradlew --no-daemon \

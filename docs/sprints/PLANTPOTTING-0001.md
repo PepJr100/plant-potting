@@ -163,24 +163,24 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
 
 ### Phase 3 — Recommendation engine
 
-- [ ] **3.1** Define `recommend/RecommendationEngine.kt`: `interface RecommendationEngine { fun recommend(speciesId: String): Recommendation }` with `data class Recommendation(val archetypeName: String, val recipe: List<RecipeIngredient>, val rationale: String, val isBlend: Boolean)`.
-- [ ] **3.2 (test — RED before impl)** Add `KbRecommendationEngineTest` with hand-built `KnowledgeBase` fixtures:
+- [x] **3.1** Define `recommend/RecommendationEngine.kt`: `interface RecommendationEngine { fun recommend(speciesId: String): Recommendation }` with `data class Recommendation(val archetypeName: String, val recipe: List<RecipeIngredient>, val rationale: String, val isBlend: Boolean)`.
+- [x] **3.2 (test — RED before impl)** Add `KbRecommendationEngineTest` with hand-built `KnowledgeBase` fixtures:
     - `Single`-mapped species returns the exact archetype recipe and a rationale containing the scientific name.
     - `Blend`-mapped species returns a recipe whose proportions sum to exactly 100 (integer rounding) and `isBlend = true`.
     - Unknown `speciesId` raises `IllegalArgumentException("unknown species: <id>")`.
-- [ ] **3.3** Implement `KbRecommendationEngine(kb: KnowledgeBase) : RecommendationEngine`:
+- [x] **3.3** Implement `KbRecommendationEngine(kb: KnowledgeBase) : RecommendationEngine`:
     - For `Single`: return archetype recipe verbatim. Rationale = `archetype.rationaleTemplate` with `{species}` → `species.scientificName`, prefixed by `species.speciesRationale`.
     - For `Blend`: scale each contributor's percentages by primary/secondary ratio, sum per ingredient (matching by ingredient name), then re-normalise to integer percentages summing to 100 (allocate remainder to the largest-proportion ingredient deterministically). `archetypeName` = `"${primary.displayName} / ${secondary.displayName} blend"`. Rationale includes both archetypes and the species' rationale.
-- [ ] **3.4 (test)** Add `RecommendationGoldenTest`: for every species in the *real bundled KB*, call `engine.recommend(speciesId)` and assert `recipe` sums to exactly 100, rationale contains the species' scientific name, and rationale contains none of `TODO`, `stub`, `lorem`, or `placeholder`. This catches editorial drift on every push.
-- [ ] **3.5** Wire engine into Hilt as `@Singleton` in `RecommendModule`.
+- [x] **3.4 (test)** Add `RecommendationGoldenTest`: for every species in the *real bundled KB*, call `engine.recommend(speciesId)` and assert `recipe` sums to exactly 100, rationale contains the species' scientific name, and rationale contains none of `TODO`, `stub`, `lorem`, or `placeholder`. This catches editorial drift on every push.
+- [x] **3.5** Wire engine into Hilt as `@Singleton` in `RecommendModule`.
 
 ### Phase 4 — Identification: the stub behind the seam
 
-- [ ] **4.1** Define `identify/PlantIdentifier.kt`: `interface PlantIdentifier { suspend fun identify(jpeg: ByteArray): IdentificationResult }` with `data class IdentificationResult(val speciesId: String, val displayName: String, val source: IdSource)` and `enum class IdSource { STUB_DETERMINISTIC, STUB_RANDOM, ON_DEVICE_MODEL, CLOUD }`. **This is the single point of replacement for the future ML model — keep the surface this small.**
-- [ ] **4.2 (test — RED first)** Add `StubPlantIdentifierTest`: deterministic mode with fixed seed produces stable species pick across runs; returned `speciesId` is always one of the KB species ids; `IdSource` is `STUB_DETERMINISTIC` by default; random mode (debug-only) only ever returns species present in the KB.
-- [ ] **4.3** Implement `StubPlantIdentifier(kb: KnowledgeBase, random: Random = Random(0L), mode: Mode = Mode.DETERMINISTIC) : PlantIdentifier`. Does **not** read JPEG bytes. Deterministic mode returns `Monstera deliciosa` (or first KB species). Random mode samples uniformly from KB species. KDoc on the class: single line, "Placeholder for PLANTPOTTING-000X to replace with real model — do not depend on this class outside the Hilt binding."
-- [ ] **4.4** Wire `PlantIdentifier` into Hilt as `@Singleton` bound to `StubPlantIdentifier` (deterministic mode for production wiring; instrumentation tests may swap via `@HiltAndroidTest`).
-- [ ] **4.5 (test)** Add a CI grep check: `grep -R "StubPlantIdentifier" app/src/main/` must return only paths under `identify/` (the binding module). No consumer outside `identify/` may reference the stub class by name.
+- [x] **4.1** Define `identify/PlantIdentifier.kt`: `interface PlantIdentifier { suspend fun identify(jpeg: ByteArray): IdentificationResult }` with `data class IdentificationResult(val speciesId: String, val displayName: String, val source: IdSource)` and `enum class IdSource { STUB_DETERMINISTIC, STUB_RANDOM, ON_DEVICE_MODEL, CLOUD }`. **This is the single point of replacement for the future ML model — keep the surface this small.**
+- [x] **4.2 (test — RED first)** Add `StubPlantIdentifierTest`: deterministic mode with fixed seed produces stable species pick across runs; returned `speciesId` is always one of the KB species ids; `IdSource` is `STUB_DETERMINISTIC` by default; random mode (debug-only) only ever returns species present in the KB.
+- [x] **4.3** Implement `StubPlantIdentifier(kb: KnowledgeBase, random: Random = Random(0L), mode: Mode = Mode.DETERMINISTIC) : PlantIdentifier`. Does **not** read JPEG bytes. Deterministic mode returns `Monstera deliciosa` (or first KB species). Random mode samples uniformly from KB species. KDoc on the class: single line, "Placeholder for PLANTPOTTING-000X to replace with real model — do not depend on this class outside the Hilt binding."
+- [x] **4.4** Wire `PlantIdentifier` into Hilt as `@Singleton` bound to `StubPlantIdentifier` (deterministic mode for production wiring; instrumentation tests may swap via `@HiltAndroidTest`).
+- [x] **4.5 (test)** Add a CI grep check: `grep -R "StubPlantIdentifier" app/src/main/` must return only paths under `identify/` (the binding module). No consumer outside `identify/` may reference the stub class by name.
 
 ### Phase 5 — App shell, navigation, permissions
 
