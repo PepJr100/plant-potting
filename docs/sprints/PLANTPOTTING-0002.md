@@ -169,13 +169,13 @@ Hotspot: `CameraScreen.kt:118-132`. `enabled = state is CameraUiState.Idle || st
 
 Hotspot: `CameraScreen.kt:74-86` binds CameraX inside the `AndroidView.factory` lambda, which fires once per Compose insertion. Re-entering the camera screen post-Retake re-inserts the composable, so the factory fires again — but the human reviewer could not reproduce the letterbox; only one Claude Code screenshot showed it. Treat as a guard test, not a forced refactor.
 
-- [ ] **5.1 (review)** Read `CameraScreen.kt:73-86` and `CameraScreen.kt:157-203` end-to-end. Confirm `bindCameraUseCases` is called only from the `AndroidView.factory` (insertion path), not also from `update`. Do **not** leave a speculative comment in production code about a potential race — if there is no reproducible bug, do not document a hypothetical in the source.
-- [ ] **5.2 (test, guard)** Add `CameraPreviewLayoutTest` under `app/src/androidTest/java/.../camera/`:
+- [x] **5.1 (review)** Read `CameraScreen.kt:73-86` and `CameraScreen.kt:157-203` end-to-end. Confirm `bindCameraUseCases` is called only from the `AndroidView.factory` (insertion path), not also from `update`. Do **not** leave a speculative comment in production code about a potential race — if there is no reproducible bug, do not document a hypothetical in the source. *(Confirmed: `bindCameraUseCases` is only invoked from `AndroidView.factory`. There is no `update` lambda. A factory lambda fires once per Compose insertion, so Retake → camera re-inserts the composable and fires it again with a fresh `PreviewView`. No production-code comment added.)*
+- [x] **5.2 (test, guard)** Add `CameraPreviewLayoutTest` under `app/src/androidTest/java/.../camera/`:
     - Launch `MainActivity` with permission granted (via `GrantPermissionRule`) and the fake identifier from `EndToEndFlowTest`'s Hilt swap.
     - Navigate camera → shutter → result → See potting mix → recommendation → Retake → camera.
-    - Wait for the `CameraScreenTags.PREVIEW` node and assert its measured `width > 0.8 * parent.width` and `height > 0.8 * parent.height` (use `SemanticsNodeInteraction.fetchSemanticsNode().boundsInRoot` against the root box bounds).
-- [ ] **5.3** Only if §5.2 fails: move the binding out of the factory lambda into a `LaunchedEffect(lifecycleOwner, previewView)` so re-entry deterministically re-binds. Keep the change minimal — do not refactor `bindCameraUseCases` beyond what the test requires.
-- [ ] **5.4** If §5.2 stays green without code changes, record Bug 2 as "not reproducible; covered by `CameraPreviewLayoutTest` as a regression guard" in `docs/sprints/results/PLANTPOTTING-0002.md`.
+    - Wait for the `CameraScreenTags.PREVIEW` node and assert its measured `width > 0.8 * parent.width` and `height > 0.8 * parent.height` (use `SemanticsNodeInteraction.fetchSemanticsNode().boundsInRoot` against the root box bounds). *(Asserts both first-entry and post-Retake. GMD run scheduled for §7.4.)*
+- [ ] **5.3** Only if §5.2 fails: move the binding out of the factory lambda into a `LaunchedEffect(lifecycleOwner, previewView)` so re-entry deterministically re-binds. Keep the change minimal — do not refactor `bindCameraUseCases` beyond what the test requires. *(N/A unless §5.2 fails on the GMD in §7.4.)*
+- [ ] **5.4** If §5.2 stays green without code changes, record Bug 2 as "not reproducible; covered by `CameraPreviewLayoutTest` as a regression guard" in `docs/sprints/results/PLANTPOTTING-0002.md`. *(Disposition recorded once §7.4 confirms green. Implementer note: the human reviewer could not reproduce in §0 of the feedback, so we expect green by default.)*
 
 ### Phase 6 — Optional backlog (UX 2: source-driven badge)
 
