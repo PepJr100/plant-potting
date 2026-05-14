@@ -18,16 +18,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.darkfactory.plantpotting.R
 
 /**
@@ -118,25 +123,60 @@ object PermissionScreenTags {
 }
 
 /**
- * Wires the real permission launcher around [PermissionScreen]. Re-reads
- * the platform permission state on every recomposition (cheap;
- * [ContextCompat.checkSelfPermission] is just a binder call).
+ * Wires the real permission launcher around [PermissionScreen].
+ *
+ * The platform permission state is *not* trustworthy from inline recomposition
+ * alone, because returning from `Settings.ACTION_APPLICATION_DETAILS_SETTINGS`
+ * fires `MainActivity.onResume` without otherwise invalidating composition.
+ * To recover from a Settings round-trip (Bug 4 / PLANTPOTTING-0002 §1), the
+ * host holds the last-seen grant in [mutableStateOf], registers a
+ * [LifecycleEventObserver], and re-invokes [CameraPermissionGuard.isGranted]
+ * on every `ON_RESUME` — clearing the local `permanentlyDenied` flag when the
+ * platform now reports granted.
+ *
+ * `onGranted` is invoked at most once per Granted transition. The
+ * `popUpTo(permission, inclusive = true)` in the caller is the
+ * back-stack-level safeguard; the `alreadyNavigated` flag here is the
+ * per-composition belt-and-braces guard.
+ *
+ * @param initialPermanentlyDenied for tests only — production callers leave
+ *   this at the default `false`. Tests use `true` to simulate the
+ *   "permanently denied" state without driving the system permission dialog.
  */
 @Composable
 fun PermissionScreenHost(
     guard: CameraPermissionGuard,
     onGranted: () -> Unit,
+    initialPermanentlyDenied: Boolean = false,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     var hasRequested by rememberSaveable { mutableStateOf(false) }
-    var permanentlyDenied by rememberSaveable { mutableStateOf(false) }
+    var permanentlyDenied by rememberSaveable { mutableStateOf(initialPermanentlyDenied) }
+    var isGrantedNow by remember { mutableStateOf(guard.isGranted()) }
+    var alreadyNavigated by rememberSaveable { mutableStateOf(false) }
+
+    DisposableEffect(lifecycleOwner, guard) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val granted = guard.isGranted()
+                    isGrantedNow = granted
+                    if (granted) {
+                        permanentlyDenied = false
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             hasRequested = true
+            isGrantedNow = granted
             if (granted) {
                 permanentlyDenied = false
-                onGranted()
             } else {
                 // If after a denial the system says no rationale is available, the
                 // user has selected "don't ask again".
@@ -147,14 +187,17 @@ fun PermissionScreenHost(
 
     val state: PermissionUiState =
         when {
-            guard.isGranted() -> PermissionUiState.Granted
+            isGrantedNow -> PermissionUiState.Granted
             permanentlyDenied -> PermissionUiState.PermanentlyDenied
             hasRequested -> PermissionUiState.Denied
             else -> PermissionUiState.NotYetAsked
         }
 
     LaunchedEffect(state) {
-        if (state is PermissionUiState.Granted) onGranted()
+        if (state is PermissionUiState.Granted && !alreadyNavigated) {
+            alreadyNavigated = true
+            onGranted()
+        }
     }
 
     PermissionScreen(

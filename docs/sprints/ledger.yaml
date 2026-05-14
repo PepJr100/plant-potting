@@ -7,6 +7,7 @@ sprints:
     updated: "2026-05-14T04:43:33+00:00"
   - id: PLANTPOTTING-0002
     title: Fix sprint for PLANTPOTTING-0001 review bugs
-    status: planned
+    status: in-progress
+    executor: opus
     created: "2026-05-14T14:39:10+00:00"
-    updated: "2026-05-14T14:39:10+00:00"
+    updated: "2026-05-14T15:16:52+00:00"
