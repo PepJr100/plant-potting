@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Simple leaf-shape placeholder; replace with a real icon in a later sprint. -->
+    <path
+        android:fillColor="#A5D6A7"
+        android:pathData="M54,18C30,30 26,58 38,80C50,72 70,58 78,40C70,38 60,28 54,18Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#00000000"
+        android:pathData="M54,30 C50,46 50,62 50,80" />
+</vector>

@@ -127,17 +127,17 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
 
 ### Phase 0 — Repository, toolchain, CI
 
-- [ ] **0.1** Add `.gitignore` covering `*.iml`, `.gradle/`, `build/`, `local.properties`, `.idea/`, `*.keystore`, `captures/`, `.cxx/`, `app/release/`, `artifacts/`.
-- [ ] **0.2** Scaffold an Android single-module app: `app/` with `applicationId = "com.darkfactory.plantpotting"`, Compose enabled, `minSdk = 26`, `targetSdk = 34`, `compileSdk = 34`, Kotlin JVM target 17. Use Gradle Kotlin DSL.
-- [ ] **0.3** Add `gradle/libs.versions.toml` with pinned entries for: Android Gradle Plugin, Kotlin, Compose BOM, CameraX, Hilt, Kotlinx Serialization, Kotlinx Coroutines, AndroidX Activity-Compose, Navigation-Compose, Material3, Lifecycle-ViewModel-Compose, JUnit4, Truth, MockK, Turbine, Robolectric, Compose UI Test, Espresso, AndroidX Test Runner/Rules, UI Automator, Hilt-testing.
-- [ ] **0.4** Configure Gradle wrapper (Gradle 8.x compatible with AGP). Verify `./gradlew --version` from a clean shell.
-- [ ] **0.5** Add ktlint via `org.jlleitschuh.gradle.ktlint` with the default profile. Wire `check` to depend on `ktlintCheck`. (No detekt this sprint.)
-- [ ] **0.6** Commit `AndroidManifest.xml` with `<uses-permission android:name="android.permission.CAMERA"/>` and `<uses-feature android:name="android.hardware.camera.any" android:required="false"/>` so emulators without a camera can still install.
-- [ ] **0.7** Add `.github/workflows/ci.yml` on `ubuntu-latest` with JDK 17, Gradle cache, running `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck pixel6Api34DebugAndroidTest`. Workflow fails on any task failure.
-- [ ] **0.8** Add `scripts/check-android.ps1` (PowerShell) wrapping the same command chain for local Windows runs. Mirrors CI; fails fast.
-- [ ] **0.9** Add a top-level `README.md` (≤40 lines): prerequisites (JDK 17, Android SDK 34), how to run `assembleDebug`, how to run unit + instrumentation tests, how to install on a device. No marketing copy.
-- [ ] **0.10** Configure `org.gradle.parallel=true`, `org.gradle.caching=true` in `gradle.properties`. Document Gradle JDK version (17) in `README.md`.
-- [ ] **0.11 (test)** Add a trivial smoke unit test in `app/src/test/` proving the JVM test runner is wired and `testDebugUnitTest` discovers tests.
+- [x] **0.1** Add `.gitignore` covering `*.iml`, `.gradle/`, `build/`, `local.properties`, `.idea/`, `*.keystore`, `captures/`, `.cxx/`, `app/release/`, `artifacts/`.
+- [x] **0.2** Scaffold an Android single-module app: `app/` with `applicationId = "com.darkfactory.plantpotting"`, Compose enabled, `minSdk = 26`, `targetSdk = 34`, `compileSdk = 34`, Kotlin JVM target 17. Use Gradle Kotlin DSL.
+- [x] **0.3** Add `gradle/libs.versions.toml` with pinned entries for: Android Gradle Plugin, Kotlin, Compose BOM, CameraX, Hilt, Kotlinx Serialization, Kotlinx Coroutines, AndroidX Activity-Compose, Navigation-Compose, Material3, Lifecycle-ViewModel-Compose, JUnit4, Truth, MockK, Turbine, Robolectric, Compose UI Test, Espresso, AndroidX Test Runner/Rules, UI Automator, Hilt-testing.
+- [x] **0.4** Configure Gradle wrapper (Gradle 8.x compatible with AGP). Verify `./gradlew --version` from a clean shell.
+- [x] **0.5** Add ktlint via `org.jlleitschuh.gradle.ktlint` with the default profile. Wire `check` to depend on `ktlintCheck`. (No detekt this sprint.)
+- [x] **0.6** Commit `AndroidManifest.xml` with `<uses-permission android:name="android.permission.CAMERA"/>` and `<uses-feature android:name="android.hardware.camera.any" android:required="false"/>` so emulators without a camera can still install.
+- [x] **0.7** Add `.github/workflows/ci.yml` on `ubuntu-latest` with JDK 17, Gradle cache, running `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck pixel6Api34DebugAndroidTest`. Workflow fails on any task failure.
+- [x] **0.8** Add `scripts/check-android.ps1` (PowerShell) wrapping the same command chain for local Windows runs. Mirrors CI; fails fast.
+- [x] **0.9** Add a top-level `README.md` (≤40 lines): prerequisites (JDK 17, Android SDK 34), how to run `assembleDebug`, how to run unit + instrumentation tests, how to install on a device. No marketing copy.
+- [x] **0.10** Configure `org.gradle.parallel=true`, `org.gradle.caching=true` in `gradle.properties`. Document Gradle JDK version (17) in `README.md`.
+- [x] **0.11 (test)** Add a trivial smoke unit test in `app/src/test/` proving the JVM test runner is wired and `testDebugUnitTest` discovers tests.
 - [ ] **0.12 (verify)** Run `./gradlew testDebugUnitTest assembleDebug ktlintCheck` locally and confirm green. Record the commands and result in sprint notes.
 
 ### Phase 1 — Research extraction and KB sourcing notes
