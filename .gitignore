@@ -1,0 +1,31 @@
+# Existing
+docs/reference/cache/
+
+# Android / Gradle
+.gradle/
+build/
+app/build/
+local.properties
+*.iml
+.cxx/
+captures/
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
+__MACOSX/
+._*
+
+# Sprint planner temp prompt files (regenerated each run)
+docs/sprints/drafts/_*.txt
+
+# Build/test artifacts produced by integration scripts
+artifacts/
