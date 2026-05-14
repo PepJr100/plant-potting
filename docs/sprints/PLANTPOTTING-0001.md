@@ -142,7 +142,7 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
 
 ### Phase 1 — Research extraction and KB sourcing notes
 
-- [ ] **1.1** Read `docs/Idea.md`, `docs/Research_brief.md` (especially §1.3, §3, §4.4), and the three reports under `docs/research/`. Write `docs/kb/plant-substrate-kb-notes.md` with: one source-backed paragraph per archetype (citing brief §/report section), one source-backed paragraph per species mapping, and an explicit note on alias decisions (`Sansevieria`/`Dracaena`, `Calathea`/`Goeppertia`, genus-level `Phalaenopsis`). This file is the editorial source of truth that JSON citations point back to.
+- [x] **1.1** Read `docs/Idea.md`, `docs/Research_brief.md` (especially §1.3, §3, §4.4), and the three reports under `docs/research/`. Write `docs/kb/plant-substrate-kb-notes.md` with: one source-backed paragraph per archetype (citing brief §/report section), one source-backed paragraph per species mapping, and an explicit note on alias decisions (`Sansevieria`/`Dracaena`, `Calathea`/`Goeppertia`, genus-level `Phalaenopsis`). This file is the editorial source of truth that JSON citations point back to.
 
 ### Phase 2 — Knowledge base: schema, validation tests, data
 
