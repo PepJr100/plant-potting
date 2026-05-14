@@ -1,11 +1,27 @@
-# Expected integration manifest for PLANTPOTTING-0001.
-# Lines starting with `#` are comments, blank lines ignored.
-# `scripts/integration-flow.ps1` writes a manifest at
-# `artifacts/PLANTPOTTING-0001/manifest.txt`; the script fails if any line
-# below is missing from the generated manifest. Extra lines in the
-# generated manifest are allowed (e.g. device-specific extras).
+# Expected device-aware integration manifest for PLANTPOTTING-0001
+# (default mode of scripts/integration-flow.ps1 after PLANTPOTTING-0002 §3).
+# Lines starting with `#` are comments, blank lines are ignored.
+# The script writes the generated manifest to
+# `artifacts/PLANTPOTTING-0001/manifest.txt` and fails if any line below is
+# missing from the generated manifest. Extra lines in the generated manifest
+# are allowed (e.g. device-specific extras).
+#
+# The four core build-only lines (`apk-exists`, `archetypes-asset-present`,
+# `species-asset-present`, `verify-no-networking-passed`) are still required.
+# The remaining lines are the device-aware coverage that Bug 3 silently
+# skipped before §3.2's adb fallback + §3.5's hard-fail rules landed.
+#
+# `archetype-name=aroid chunky` reflects the deterministic
+# StubPlantIdentifier pick (`Monstera deliciosa` → Aroid Chunky archetype).
+# `recipe-row-count=5` is the row count of the Aroid Chunky recipe in
+# `app/src/main/assets/kb/archetypes.json`. Both stay stable as long as the
+# stub identifier and KB are unchanged.
 
 apk-exists=true
 archetypes-asset-present=true
 species-asset-present=true
 verify-no-networking-passed=true
+manifest-mode=device-aware
+device-screenshot-count-at-least-1=true
+archetype-name=aroid chunky
+recipe-row-count=5

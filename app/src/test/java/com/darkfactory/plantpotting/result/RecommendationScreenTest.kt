@@ -2,6 +2,7 @@ package com.darkfactory.plantpotting.result
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -50,6 +51,15 @@ class RecommendationScreenTest {
         composeRule.onNodeWithText("Coco coir").assertIsDisplayed()
         composeRule.onNodeWithText("50%").assertIsDisplayed()
         composeRule.onNodeWithText("Long-fibre sphagnum").assertIsDisplayed()
+        // PLANTPOTTING-0002 §3.6: each recipe row carries a RECIPE_ROW tag
+        // so `scripts/integration-flow.ps1` can count rows via uiautomator
+        // dump rather than scraping ingredient text.
+        val rowCount =
+            composeRule
+                .onAllNodesWithTag(RecommendationScreenTags.RECIPE_ROW)
+                .fetchSemanticsNodes()
+                .size
+        assertThat(rowCount).isEqualTo(rec.recipe.size)
     }
 
     @Test

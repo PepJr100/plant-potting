@@ -1,0 +1,12 @@
+# Expected build-only integration manifest for PLANTPOTTING-0001.
+# Used when `scripts/integration-flow.ps1` is run with `-BuildOnly` —
+# a documented opt-out of device coverage. A build-only run satisfies
+# the four build-only lines plus the `manifest-mode=build-only`
+# discriminator, and explicitly does NOT satisfy any device-aware
+# acceptance gate (see PLANTPOTTING-0002 §3.1).
+
+apk-exists=true
+archetypes-asset-present=true
+species-asset-present=true
+verify-no-networking-passed=true
+manifest-mode=build-only

@@ -19,14 +19,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecommendationScreen(
     viewModel: RecommendationViewModel,
@@ -38,7 +42,12 @@ fun RecommendationScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(24.dp)
+                // Surface Compose testTags as `resource-id` in the
+                // AccessibilityNodeInfo tree so `adb shell uiautomator dump`
+                // (used by `scripts/integration-flow.ps1`) can locate the
+                // archetype name and count `recommendation.recipeRow` nodes.
+                .semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         when (val s = state) {
@@ -104,7 +113,8 @@ private fun ColumnScope.ReadyContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 4.dp)
+                        .testTag(RecommendationScreenTags.RECIPE_ROW),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -136,6 +146,7 @@ object RecommendationScreenTags {
     const val BLEND_CHIP = "recommendation.blendChip"
     const val RATIONALE = "recommendation.rationale"
     const val RECIPE_LIST = "recommendation.recipeList"
+    const val RECIPE_ROW = "recommendation.recipeRow"
     const val RETAKE = "recommendation.retake"
     const val LOADING = "recommendation.loading"
     const val NOT_FOUND = "recommendation.notFound"
