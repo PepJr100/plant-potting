@@ -215,8 +215,8 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
 
 ### Phase 8 — End-to-end integration and acceptance evidence
 
-- [ ] **8.1** Configure Gradle Managed Device `pixel6Api34` (AOSP system image) in `app/build.gradle.kts`. Wire `pixel6Api34DebugAndroidTest` into the CI workflow from §0.7.
-- [ ] **8.2 (integration test)** Add `EndToEndFlowTest` in `androidTest`: launches `MainActivity` with a Hilt test rule that binds `PlantIdentifier` to a `FakeFixedIdentifier` returning a deterministic species id. The test:
+- [x] **8.1** Configure Gradle Managed Device `pixel6Api34` (AOSP system image) in `app/build.gradle.kts`. Wire `pixel6Api34DebugAndroidTest` into the CI workflow from §0.7.
+- [x] **8.2 (integration test)** Add `EndToEndFlowTest` in `androidTest`: launches `MainActivity` with a Hilt test rule that binds `PlantIdentifier` to a `FakeFixedIdentifier` returning a deterministic species id. The test:
     1. Asserts the permission screen is shown.
     2. Grants camera permission via `GrantPermissionRule` (or `UiAutomator` against the system dialog).
     3. Asserts the camera screen is shown (preview view present, shutter button enabled).
@@ -225,12 +225,12 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
     6. Taps **See potting mix**.
     7. Asserts the recommendation screen shows expected archetype name, rationale containing scientific name, ≥3 recipe rows whose displayed proportions sum to 100.
     8. Taps **Retake** and asserts return to the camera screen.
-- [ ] **8.3 (integration test)** Add `PermissionDeniedFlowTest`: simulates camera-permission denial (including the "don't ask again" second-denial state) and asserts the **Open system settings** button is shown and emits the expected intent (verified via `Intents.intended(...)`).
-- [ ] **8.4** Add `scripts/integration-flow.ps1` (PowerShell): `assembleDebug`, install to a connected device/emulator, `adb pm grant <pkg> android.permission.CAMERA` for the happy path, launch app, drive the fake-camera test hook, capture screenshots and a UI-hierarchy dump under `artifacts/PLANTPOTTING-0001/`, then diff that artifact manifest against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. Script fails on diff.
-- [ ] **8.5** Commit the expected manifest at `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. Manifest enumerates the screenshot filenames and key UI-hierarchy substrings (e.g., `archetype-name=Aroid Chunky`, `recipe-row-count=5`).
-- [ ] **8.6** Confirm `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` does not surface networking transitive dependencies (no OkHttp, no Retrofit, no Firebase). Add a Gradle task `verifyNoNetworking` that greps the dependency report and fails on any networking library; wire into `check`.
+- [x] **8.3 (integration test)** Add `PermissionDeniedFlowTest`: simulates camera-permission denial (including the "don't ask again" second-denial state) and asserts the **Open system settings** button is shown and emits the expected intent (verified via `Intents.intended(...)`).
+- [x] **8.4** Add `scripts/integration-flow.ps1` (PowerShell): `assembleDebug`, install to a connected device/emulator, `adb pm grant <pkg> android.permission.CAMERA` for the happy path, launch app, drive the fake-camera test hook, capture screenshots and a UI-hierarchy dump under `artifacts/PLANTPOTTING-0001/`, then diff that artifact manifest against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. Script fails on diff.
+- [x] **8.5** Commit the expected manifest at `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. Manifest enumerates the screenshot filenames and key UI-hierarchy substrings (e.g., `archetype-name=Aroid Chunky`, `recipe-row-count=5`).
+- [x] **8.6** Confirm `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` does not surface networking transitive dependencies (no OkHttp, no Retrofit, no Firebase). Add a Gradle task `verifyNoNetworking` that greps the dependency report and fails on any networking library; wire into `check`.
 - [ ] **8.7 (optional, encouraged)** On a physical device (if the implementer has one), install the debug APK, run the §2.1 flow once with permission granted and once with permission denied, commit a screen recording or four screenshots to `docs/sprints/evidence/PLANTPOTTING-0001/`. This is *not* a hard acceptance gate — the GMD run is binding evidence — but it is the highest-signal manual check.
-- [ ] **8.8** Author `docs/sprints/results/PLANTPOTTING-0001.md` from a checked-in template. Required fields: build commands run + result, unit-test output summary, integration-script diff result, GMD test result, real-device model+Android version (or "no physical device available"), known limitations, link to the `PlantIdentifier` seam as the entry point for PLANTPOTTING-000X.
+- [x] **8.8** Author `docs/sprints/results/PLANTPOTTING-0001.md` from a checked-in template. Required fields: build commands run + result, unit-test output summary, integration-script diff result, GMD test result, real-device model+Android version (or "no physical device available"), known limitations, link to the `PlantIdentifier` seam as the entry point for PLANTPOTTING-000X.
 
 ---
 

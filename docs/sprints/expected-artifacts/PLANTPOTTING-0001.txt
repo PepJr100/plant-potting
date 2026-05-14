@@ -1,0 +1,11 @@
+# Expected integration manifest for PLANTPOTTING-0001.
+# Lines starting with `#` are comments, blank lines ignored.
+# `scripts/integration-flow.ps1` writes a manifest at
+# `artifacts/PLANTPOTTING-0001/manifest.txt`; the script fails if any line
+# below is missing from the generated manifest. Extra lines in the
+# generated manifest are allowed (e.g. device-specific extras).
+
+apk-exists=true
+archetypes-asset-present=true
+species-asset-present=true
+verify-no-networking-passed=true
