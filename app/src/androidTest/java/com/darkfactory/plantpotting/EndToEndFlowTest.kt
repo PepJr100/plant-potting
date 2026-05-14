@@ -7,8 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
-import com.darkfactory.plantpotting.camera.CameraViewModel
-import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
+import com.darkfactory.plantpotting.camera.CameraScreenTags
+import com.darkfactory.plantpotting.permission.FakeGuardStateRule
 import com.darkfactory.plantpotting.result.RecommendationScreenTags
 import com.darkfactory.plantpotting.result.ResultScreenTags
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -18,21 +18,34 @@ import org.junit.Test
 
 @HiltAndroidTest
 class EndToEndFlowTest {
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
 
-    @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
-    @get:Rule(order = 1) val composeRule = createAndroidComposeRule<MainActivity>()
-    @get:Rule(order = 2) val permissionRule: GrantPermissionRule =
+    // Force the fake guard to report granted *before* the activity launches.
+    @get:Rule(order = 1)
+    val forceGranted = FakeGuardStateRule(granted = true)
+
+    @get:Rule(order = 2)
+    val composeRule = createAndroidComposeRule<MainActivity>()
+
+    // Belt-and-braces: also grant the platform permission so any direct
+    // ContextCompat.checkSelfPermission call elsewhere succeeds.
+    @get:Rule(order = 3)
+    val permissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
     @Test
     fun grantedHappyPathReachesRecommendationScreen() {
         // Permission was granted at install time → host should navigate
-        // immediately to the camera screen. We can't actually take a real
-        // camera picture in the GMD; instead, the activity's CameraViewModel
-        // exposes onCaptureReady which the test hook drives directly.
-        composeRule.activityRule.scenario.onActivity { activity ->
-            val vm = ViewModelProbe.findCameraViewModel(activity)
-            vm?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
+        // immediately to the camera screen. Wait for the camera screen to
+        // compose before reaching for the view model, then drive
+        // onCaptureReady directly (the GMD AOSP image has no camera sensor).
+        composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            ViewModelProbe.findCameraViewModel() != null
+        }
+        composeRule.runOnIdle {
+            ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
         }
 
         // Result screen: stub badge visible + scientific name from FakeFixedIdentifier.
@@ -44,7 +57,9 @@ class EndToEndFlowTest {
 
         // Recommendation screen: archetype name + recipe rows whose proportions sum to 100.
         composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
-        composeRule.onAllNodesWithTag(RecommendationScreenTags.RECIPE_LIST).onFirst()
+        composeRule
+            .onAllNodesWithTag(RecommendationScreenTags.RECIPE_LIST)
+            .onFirst()
             .assertIsDisplayed()
 
         // Retake returns to the camera.
@@ -52,5 +67,4 @@ class EndToEndFlowTest {
     }
 }
 
-private fun androidx.compose.ui.test.SemanticsNodeInteractionCollection.onFirst() =
-    this[0]
+private fun androidx.compose.ui.test.SemanticsNodeInteractionCollection.onFirst() = this[0]

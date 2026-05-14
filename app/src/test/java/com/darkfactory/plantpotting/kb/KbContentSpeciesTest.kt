@@ -5,9 +5,10 @@ import com.darkfactory.plantpotting.kb.model.ArchetypeMapping
 import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import com.darkfactory.plantpotting.kb.model.Species
 import com.google.common.truth.Truth.assertThat
-import java.io.File
+import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Test
+import java.io.File
 
 class KbContentSpeciesTest {
     private val json = KbLoader.DefaultJson
@@ -41,14 +42,14 @@ class KbContentSpeciesTest {
         for (s in species) {
             when (val m = s.mapping) {
                 is ArchetypeMapping.Single -> {
-                    assertThat(archetypeIds).named("species ${s.id} archetypeId").contains(m.archetypeId)
+                    assertWithMessage("species ${s.id} archetypeId").that(archetypeIds).contains(m.archetypeId)
                 }
                 is ArchetypeMapping.Blend -> {
-                    assertThat(archetypeIds)
-                        .named("species ${s.id} primaryArchetypeId")
+                    assertWithMessage("species ${s.id} primaryArchetypeId")
+                        .that(archetypeIds)
                         .contains(m.primaryArchetypeId)
-                    assertThat(archetypeIds)
-                        .named("species ${s.id} secondaryArchetypeId")
+                    assertWithMessage("species ${s.id} secondaryArchetypeId")
+                        .that(archetypeIds)
                         .contains(m.secondaryArchetypeId)
                 }
             }
@@ -58,14 +59,14 @@ class KbContentSpeciesTest {
     @Test
     fun everySpeciesRationaleIsNonEmpty() {
         for (s in species) {
-            assertThat(s.speciesRationale.trim()).named("species ${s.id} rationale").isNotEmpty()
+            assertWithMessage("species ${s.id} rationale").that(s.speciesRationale.trim()).isNotEmpty()
         }
     }
 
     @Test
     fun everySpeciesHasAtLeastOneCitation() {
         for (s in species) {
-            assertThat(s.citations).named("species ${s.id} citations").isNotEmpty()
+            assertWithMessage("species ${s.id} citations").that(s.citations).isNotEmpty()
         }
     }
 
@@ -76,7 +77,7 @@ class KbContentSpeciesTest {
             for (alias in s.aliases + s.scientificName) {
                 val key = KnowledgeBase.normalise(alias)
                 val prior = seen.put(key, s.id)
-                assertThat(prior).named("alias $key already owned by $prior").isNull()
+                assertWithMessage("alias $key already owned by $prior").that(prior).isNull()
             }
         }
     }

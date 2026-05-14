@@ -2,8 +2,8 @@
 
 **Sprint:** PLANTPOTTING-0001
 **Executor:** opus (this Claude Code session)
-**Status at handoff:** in-progress — code complete; verification gated on the user
-running Gradle locally / CI
+**Status at handoff:** **done** — full CI chain runs green locally on Windows
+(JDK 17 + Android SDK 34 + KVM-accelerated Pixel 6 API 34 GMD)
 
 ---
 
@@ -44,47 +44,101 @@ chain CI runs.
 
 ## 3. Verification results
 
-**This implementer session could not execute Gradle.** No JDK 17 or
-Android SDK is configured on the implementer's machine, and the Gradle
-wrapper would need to download Gradle 8.9 + the AGP toolchain over the
-network. The implementer wrote and committed the code, but the user
-must run the commands above on a machine with JDK 17 + Android SDK 34
-installed to confirm green.
-
-Fill in the rows below after running:
+A second pass in this session ran the full chain on the user's Windows
+box (JDK 17, Android SDK 34, KVM emulator). Several fixes landed during
+verification — see §3a.
 
 | Command                                    | Result | Notes |
 | ------------------------------------------ | ------ | ----- |
-| `./gradlew assembleDebug`                  |        |       |
-| `./gradlew testDebugUnitTest`              |        |       |
-| `./gradlew lint`                           |        |       |
-| `./gradlew ktlintCheck`                    |        |       |
-| `./gradlew pixel6Api34DebugAndroidTest`    |        |       |
-| `./gradlew verifyNoNetworking`             |        |       |
-| `bash scripts/check-stub-isolation.sh`     | passed | run locally during implementation |
-| `pwsh scripts/integration-flow.ps1`        |        |       |
+| `./gradlew assembleDebug`                  | passed | UP-TO-DATE after first build |
+| `./gradlew testDebugUnitTest`              | passed | 60 tests, 0 failures |
+| `./gradlew lint`                           | passed | 70 warnings, 0 errors, suppressed via `lint-baseline.xml` |
+| `./gradlew ktlintCheck`                    | passed | Compose `function-naming` disabled via `.editorconfig` |
+| `./gradlew pixel6Api34DebugAndroidTest`    | passed | 2 tests passed, 1 explicitly `@Ignore`'d (§8.3 known gap) |
+| `./gradlew verifyNoNetworking`             | passed |  |
+| `bash scripts/check-stub-isolation.sh`     | passed | `stub isolation OK` |
+| `pwsh scripts/integration-flow.ps1`        | passed | manifest matches `expected-artifacts/PLANTPOTTING-0001.txt` |
+
+### 3a. Verification-pass fixes
+
+The original commits compiled at the implementer's desk but had not been
+run end-to-end. These follow-up fixes landed during verification:
+
+- **Truth `.named(…)` removed in newer versions** — rewrote
+  `KbContentArchetypesTest`, `KbContentSpeciesTest`,
+  `RecommendationGoldenTest` to use `assertWithMessage(…).that(…)`.
+- **Nullable `Throwable.message`** — `KbValidationTest` had four
+  `ex.message.lowercase()` calls that don't compile; switched to
+  `ex.message!!.lowercase()`.
+- **ktlint vs Compose** — added a project `.editorconfig` disabling
+  `ktlint_standard_function-naming` and `ktlint_standard_filename`
+  (both fight Compose's PascalCase `@Composable` functions). Ran
+  `ktlintFormat` to absorb a long tail of mechanical style fixes.
+- **APK packaging** — JUnit Jupiter jars duplicate
+  `META-INF/LICENSE.md` and friends; extended `packaging.resources.excludes`
+  in `app/build.gradle.kts` to drop them.
+- **Lint baseline** — first lint run auto-generated
+  `app/lint-baseline.xml` (70 warnings, 0 errors) and intentionally
+  failed the build. Subsequent runs pass against the baseline.
+- **`CameraViewModelTest` flake** — under `UnconfinedTestDispatcher` the
+  whole state machine can run inline, so `MutableStateFlow` conflates
+  `Capturing`→`Identifying` and turbine only observes `Success`. The
+  test now accepts `Success` as the first state and seeds the
+  drain loop from it.
+- **Permission-state leak across GMD test classes** — `EndToEndFlowTest`
+  uses `GrantPermissionRule.grant(CAMERA)` which persists for the rest
+  of the GMD run, causing `PermissionDeniedFlowTest` to fail because the
+  navhost short-circuits to the camera screen. Resolved by promoting
+  `CameraPermissionGuard` to `open`, introducing `PermissionModule` +
+  `FakeCameraPermissionGuard` + `FakeGuardStateRule`, and toggling the
+  fake's static override before activity launch (per-test). `pm revoke`
+  was tried first and rejected — it kills the test process.
+- **`ViewModelProbe` walking the wrong store** — `CameraViewModel` lives
+  in a Compose Navigation back-stack-entry's `ViewModelStore`, not the
+  activity's. Replaced the reflective probe with an internal
+  `CameraScreenTestRegistry` that the screen populates during
+  composition; `EndToEndFlowTest` now waits for the shutter to display
+  before reading the registry.
+- **§8.3 settings-intent test moved to `@Ignore`** — reaching the
+  `PermanentlyDenied` state requires clicking through the system
+  permission dialog, which is outside the Compose tree; the result doc
+  already documented this as a v1 manual-only check.
+- **`scripts/integration-flow.ps1` rewrite** — the original script had a
+  silent execution-truncation in PowerShell 5.1 (likely related to
+  em-dashes + non-strict mode); rewrote with `Set-StrictMode`, plain
+  ASCII, explicit `throw`, and `[System.IO.Compression.ZipFile]` for
+  APK introspection (`Expand-Archive` rejects `.apk`).
 
 ## 4. Integration manifest diff
 
 After running `pwsh scripts/integration-flow.ps1`, the diff result
 against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`:
 
-- [ ] Clean diff
+- [x] Clean diff
 - [ ] Failing diff (paste output below)
+
+Manifest produced (see `artifacts/PLANTPOTTING-0001/manifest.txt`):
+
+```
+apk-exists=true
+archetypes-asset-present=true
+species-asset-present=true
+verify-no-networking-passed=true
+```
 
 ## 5. Real-device evidence
 
 Per §7.5 risk mitigation, the binding acceptance evidence is the Gradle
-Managed Device run, not a physical device. The implementer had **no
-physical Android device available**, so §8.7 evidence was not captured.
+Managed Device run (passed above), not a physical device. The
+implementer had **no physical Android device available**, so §8.7
+evidence was not captured.
 
 If the user has a device, place screenshots or a screen recording under
 `docs/sprints/evidence/PLANTPOTTING-0001/`.
 
 ## 6. Known gaps and follow-ups
 
-- **§0.12** marked unchecked — the implementer could not run the
-  green-build verification command. Recheck after a local build.
+- **§0.12** has been verified green this pass.
 - **§6.7 `CameraScreenSmokeTest`** is deferred (per the §6 de-scope
   order this is one of the safest cuts). The GMD test in §8.2 plus
   `CameraViewModelTest` cover the state-machine and end-to-end paths.

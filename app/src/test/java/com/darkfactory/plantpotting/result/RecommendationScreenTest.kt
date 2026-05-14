@@ -20,29 +20,31 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [34])
 class RecommendationScreenTest {
-
     @get:Rule val composeRule = createComposeRule()
 
     @Test
     fun rendersArchetypeNameRationaleAndRecipeForSingleMapping() {
-        val rec = Recommendation(
-            archetypeName = "Moisture-Retentive",
-            recipe = listOf(
-                RecipeIngredient("Coco coir", 50),
-                RecipeIngredient("Fine bark", 20),
-                RecipeIngredient("Perlite", 20),
-                RecipeIngredient("Long-fibre sphagnum", 10),
-            ),
-            rationale = "Suits Spathiphyllum wallisii: terrestrial aroid.",
-            isBlend = false,
-        )
+        val rec =
+            Recommendation(
+                archetypeName = "Moisture-Retentive",
+                recipe =
+                    listOf(
+                        RecipeIngredient("Coco coir", 50),
+                        RecipeIngredient("Fine bark", 20),
+                        RecipeIngredient("Perlite", 20),
+                        RecipeIngredient("Long-fibre sphagnum", 10),
+                    ),
+                rationale = "Suits Spathiphyllum wallisii: terrestrial aroid.",
+                isBlend = false,
+            )
         val vm = makeVm(speciesId = "spathiphyllum-wallisii", recommendation = rec)
         composeRule.setContent {
             RecommendationScreen(viewModel = vm, onRetake = {})
         }
         composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
         composeRule.onNodeWithText("Moisture-Retentive").assertIsDisplayed()
-        composeRule.onNodeWithText("Suits Spathiphyllum wallisii: terrestrial aroid.")
+        composeRule
+            .onNodeWithText("Suits Spathiphyllum wallisii: terrestrial aroid.")
             .assertIsDisplayed()
         // Recipe rows: ingredient and integer percent both visible.
         composeRule.onNodeWithText("Coco coir").assertIsDisplayed()
@@ -52,17 +54,19 @@ class RecommendationScreenTest {
 
     @Test
     fun rendersBlendChipForBlendMapping() {
-        val rec = Recommendation(
-            archetypeName = "Aroid Chunky / Succulent Gritty blend",
-            recipe = listOf(
-                RecipeIngredient("Pine or orchid bark", 24),
-                RecipeIngredient("Coco coir", 15),
-                RecipeIngredient("Perlite or pumice", 12),
-                RecipeIngredient("Pumice or akadama", 16),
-            ),
-            rationale = "Suits Hoya carnosa: lithophytic/semi-terrestrial.",
-            isBlend = true,
-        )
+        val rec =
+            Recommendation(
+                archetypeName = "Aroid Chunky / Succulent Gritty blend",
+                recipe =
+                    listOf(
+                        RecipeIngredient("Pine or orchid bark", 24),
+                        RecipeIngredient("Coco coir", 15),
+                        RecipeIngredient("Perlite or pumice", 12),
+                        RecipeIngredient("Pumice or akadama", 16),
+                    ),
+                rationale = "Suits Hoya carnosa: lithophytic/semi-terrestrial.",
+                isBlend = true,
+            )
         val vm = makeVm(speciesId = "hoya-carnosa", recommendation = rec)
         composeRule.setContent {
             RecommendationScreen(viewModel = vm, onRetake = {})
@@ -72,12 +76,13 @@ class RecommendationScreenTest {
 
     @Test
     fun retakeButtonEmitsCallback() {
-        val rec = Recommendation(
-            archetypeName = "Standard Houseplant",
-            recipe = listOf(RecipeIngredient("Coir", 100)),
-            rationale = "Suits Ficus lyrata.",
-            isBlend = false,
-        )
+        val rec =
+            Recommendation(
+                archetypeName = "Standard Houseplant",
+                recipe = listOf(RecipeIngredient("Coir", 100)),
+                rationale = "Suits Ficus lyrata.",
+                isBlend = false,
+            )
         val vm = makeVm("ficus-lyrata", rec)
         var retook = false
         composeRule.setContent {
@@ -87,10 +92,14 @@ class RecommendationScreenTest {
         assertThat(retook).isTrue()
     }
 
-    private fun makeVm(speciesId: String, recommendation: Recommendation): RecommendationViewModel {
-        val engine = object : RecommendationEngine {
-            override fun recommend(id: String): Recommendation = recommendation
-        }
+    private fun makeVm(
+        speciesId: String,
+        recommendation: Recommendation,
+    ): RecommendationViewModel {
+        val engine =
+            object : RecommendationEngine {
+                override fun recommend(speciesId: String): Recommendation = recommendation
+            }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to speciesId))
         return RecommendationViewModel(savedStateHandle = saved, engine = engine)
     }

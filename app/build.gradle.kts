@@ -54,6 +54,9 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+            excludes += "/META-INF/NOTICE.md"
         }
     }
 
@@ -149,27 +152,28 @@ tasks.register("verifyNoNetworking") {
     group = "verification"
     description = "Fails if any production runtime dependency includes a networking library."
     doLast {
-        val forbidden = listOf(
-            "okhttp",
-            "retrofit",
-            "okio",
-            "ktor",
-            "volley",
-            "google-http-client",
-            "firebase",
-            "play-services-base",
-            "play-services-tasks",
-        )
+        val forbidden =
+            listOf(
+                "okhttp",
+                "retrofit",
+                "okio",
+                "ktor",
+                "volley",
+                "google-http-client",
+                "firebase",
+                "play-services-base",
+                "play-services-tasks",
+            )
         val config = configurations.getByName("releaseRuntimeClasspath")
-        val matches = config.resolvedConfiguration.resolvedArtifacts
-            .map { "${it.moduleVersion.id.group}:${it.moduleVersion.id.name}" }
-            .filter { coord ->
-                forbidden.any { needle ->
-                    coord.lowercase().contains(needle)
-                }
-            }
-            .sorted()
-            .distinct()
+        val matches =
+            config.resolvedConfiguration.resolvedArtifacts
+                .map { "${it.moduleVersion.id.group}:${it.moduleVersion.id.name}" }
+                .filter { coord ->
+                    forbidden.any { needle ->
+                        coord.lowercase().contains(needle)
+                    }
+                }.sorted()
+                .distinct()
         if (matches.isNotEmpty()) {
             throw GradleException(
                 "verifyNoNetworking: forbidden networking deps in releaseRuntimeClasspath:\n  - " +

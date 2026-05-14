@@ -4,10 +4,10 @@ import com.darkfactory.plantpotting.kb.KbLoader
 import com.darkfactory.plantpotting.kb.KbValidator
 import com.darkfactory.plantpotting.kb.model.Archetype
 import com.darkfactory.plantpotting.kb.model.Species
-import com.google.common.truth.Truth.assertThat
-import java.io.File
+import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Test
+import java.io.File
 
 /**
  * Runs the engine against the real bundled KB for every species. Fails on any
@@ -41,16 +41,16 @@ class RecommendationGoldenTest {
         val engine = KbRecommendationEngine(kb)
         for (s in kb.species) {
             val rec = engine.recommend(s.id)
-            assertThat(rec.recipe.sumOf { it.proportionPct })
-                .named("species ${s.id} recipe sum")
+            assertWithMessage("species ${s.id} recipe sum")
+                .that(rec.recipe.sumOf { it.proportionPct })
                 .isEqualTo(100)
-            assertThat(rec.rationale)
-                .named("species ${s.id} rationale mentions scientific name")
+            assertWithMessage("species ${s.id} rationale mentions scientific name")
+                .that(rec.rationale)
                 .contains(s.scientificName)
             val lowered = rec.rationale.lowercase()
             for (token in forbidden) {
-                assertThat(lowered)
-                    .named("species ${s.id} rationale has forbidden token '$token'")
+                assertWithMessage("species ${s.id} rationale has forbidden token '$token'")
+                    .that(lowered)
                     .doesNotContain(token.lowercase())
             }
         }

@@ -4,7 +4,9 @@ import com.darkfactory.plantpotting.kb.model.RecipeIngredient
 
 sealed interface RecommendationUiState {
     data object Loading : RecommendationUiState
+
     data object NotFound : RecommendationUiState
+
     data class Ready(
         val archetypeName: String,
         val rationale: String,

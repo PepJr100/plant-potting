@@ -16,13 +16,15 @@ import javax.inject.Singleton
  * [isGranted] on each screen launch.
  */
 @Singleton
-class CameraPermissionGuard @Inject constructor(
-    @ApplicationContext private val context: Context,
-) {
-    fun isGranted(): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-            PackageManager.PERMISSION_GRANTED
+open class CameraPermissionGuard
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        open fun isGranted(): Boolean =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
 
-    fun shouldShowRationale(activity: Activity): Boolean =
-        ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
-}
+        open fun shouldShowRationale(activity: Activity): Boolean =
+            ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+    }

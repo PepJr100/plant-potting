@@ -21,8 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -46,9 +44,10 @@ fun PermissionScreen(
     var whyExpanded by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when (state) {
@@ -132,25 +131,27 @@ fun PermissionScreenHost(
     var hasRequested by rememberSaveable { mutableStateOf(false) }
     var permanentlyDenied by rememberSaveable { mutableStateOf(false) }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        hasRequested = true
-        if (granted) {
-            permanentlyDenied = false
-            onGranted()
-        } else {
-            // If after a denial the system says no rationale is available, the
-            // user has selected "don't ask again".
-            val activity = context as? android.app.Activity
-            permanentlyDenied = activity != null && !guard.shouldShowRationale(activity)
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            hasRequested = true
+            if (granted) {
+                permanentlyDenied = false
+                onGranted()
+            } else {
+                // If after a denial the system says no rationale is available, the
+                // user has selected "don't ask again".
+                val activity = context as? android.app.Activity
+                permanentlyDenied = activity != null && !guard.shouldShowRationale(activity)
+            }
         }
-    }
 
-    val state: PermissionUiState = when {
-        guard.isGranted() -> PermissionUiState.Granted
-        permanentlyDenied -> PermissionUiState.PermanentlyDenied
-        hasRequested -> PermissionUiState.Denied
-        else -> PermissionUiState.NotYetAsked
-    }
+    val state: PermissionUiState =
+        when {
+            guard.isGranted() -> PermissionUiState.Granted
+            permanentlyDenied -> PermissionUiState.PermanentlyDenied
+            hasRequested -> PermissionUiState.Denied
+            else -> PermissionUiState.NotYetAsked
+        }
 
     LaunchedEffect(state) {
         if (state is PermissionUiState.Granted) onGranted()
@@ -160,10 +161,11 @@ fun PermissionScreenHost(
         state = state,
         onGrantClick = { launcher.launch(Manifest.permission.CAMERA) },
         onOpenSettingsClick = {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.fromParts("package", context.packageName, null)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val intent =
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
             context.startActivity(intent)
         },
     )

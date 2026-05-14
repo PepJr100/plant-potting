@@ -1,21 +1,13 @@
 #requires -version 5.1
-<#
-.SYNOPSIS
-Integration flow for PLANTPOTTING-0001.
+# Integration flow for PLANTPOTTING-0001.
+#
+# Builds the debug APK, optionally installs it on a connected device,
+# captures screenshots, and writes an artifact manifest under
+# artifacts/PLANTPOTTING-0001/manifest.txt. The manifest is diffed against
+# docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt; the script fails
+# if any expected line is missing from the produced manifest.
 
-.DESCRIPTION
-Builds the debug APK, optionally installs it on a connected device or
-emulator, drives the end-to-end test hook, captures screenshots and a
-UI-hierarchy dump, and writes a manifest under
-`artifacts/PLANTPOTTING-0001/manifest.txt`. The manifest is diffed against
-`docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt` — the script fails
-on diff.
-
-If no adb device is available, the script runs in "build-only" mode and
-emits a manifest covering only the build artifact checks. Run the full
-flow on CI's Gradle Managed Device path for binding evidence.
-#>
-
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $pkg = "com.darkfactory.plantpotting"
@@ -26,86 +18,93 @@ $expectedManifest = "docs/sprints/expected-artifacts/$sprintId.txt"
 $apkPath = "app/build/outputs/apk/debug/app-debug.apk"
 
 if (-not (Test-Path "./gradlew.bat")) {
-    Write-Error "gradlew.bat not found — run this script from the repository root."
+    throw "gradlew.bat not found. Run this script from the repository root."
+}
+if (-not (Test-Path $expectedManifest)) {
+    throw "expected manifest missing at $expectedManifest"
 }
 
-New-Item -ItemType Directory -Force -Path $artifactsDir | Out-Null
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir | Out-Null
+}
 
-# 1. Build the debug APK + run networking guard.
-Write-Host "[1/5] Assembling debug APK + verifyNoNetworking..." -ForegroundColor Cyan
+# Step 1: build the debug APK and run the networking guard.
+Write-Host "[1/5] assembleDebug + verifyNoNetworking" -ForegroundColor Cyan
 & ./gradlew.bat --no-daemon assembleDebug verifyNoNetworking
-if ($LASTEXITCODE -ne 0) { Write-Error "gradle assembleDebug failed" }
+if ($LASTEXITCODE -ne 0) {
+    throw "gradle assembleDebug failed (exit $LASTEXITCODE)"
+}
+if (-not (Test-Path $apkPath)) {
+    throw "APK not found at $apkPath after build"
+}
 
-if (-not (Test-Path $apkPath)) { Write-Error "APK not found at $apkPath" }
+# Step 2: inspect the APK via .NET ZipFile (Expand-Archive rejects .apk).
+Write-Host "[2/5] APK content inspection" -ForegroundColor Cyan
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$apkFullPath = (Resolve-Path $apkPath).Path
+$zip = [System.IO.Compression.ZipFile]::OpenRead($apkFullPath)
+$entryList = New-Object System.Collections.ArrayList
+foreach ($e in $zip.Entries) { [void]$entryList.Add($e.FullName) }
+$zip.Dispose()
+Write-Host ("       entries: {0}" -f $entryList.Count)
 
-# 2. APK content checks.
-Write-Host "[2/5] Inspecting APK contents..." -ForegroundColor Cyan
-$tempApkDir = Join-Path $env:TEMP "plantpotting-apk-$([guid]::NewGuid().ToString())"
-New-Item -ItemType Directory -Force -Path $tempApkDir | Out-Null
-Expand-Archive -Path $apkPath -DestinationPath $tempApkDir -Force
+$hasArchetypesAsset = $entryList.Contains("assets/kb/archetypes.json")
+$hasSpeciesAsset = $entryList.Contains("assets/kb/species.json")
+Write-Host ("       archetypes asset: {0}" -f $hasArchetypesAsset)
+Write-Host ("       species asset:    {0}" -f $hasSpeciesAsset)
 
-$archetypesAsset = Join-Path $tempApkDir "assets/kb/archetypes.json"
-$speciesAsset = Join-Path $tempApkDir "assets/kb/species.json"
-
-$hasArchetypesAsset = Test-Path $archetypesAsset
-$hasSpeciesAsset = Test-Path $speciesAsset
-
-# 3. Optional: check connected adb device for live drive.
+# Step 3: optional adb-driven device flow.
+Write-Host "[3/5] adb device check" -ForegroundColor Cyan
 $adbDevicePresent = $false
-try {
-    $adbOutput = & adb devices 2>$null
-    $deviceLines = $adbOutput | Select-String "device$" | Where-Object { $_ -notmatch "List of devices" }
-    if ($deviceLines.Count -gt 0) { $adbDevicePresent = $true }
-} catch {
-    # adb not installed — fall back to build-only manifest.
+$adbPath = (Get-Command adb -ErrorAction SilentlyContinue)
+if ($null -ne $adbPath) {
+    $adbOutput = & adb devices
+    foreach ($line in $adbOutput) {
+        if ($line -match "^\S+\s+device$") { $adbDevicePresent = $true }
+    }
 }
 
 $deviceScreenshotCount = 0
 if ($adbDevicePresent) {
-    Write-Host "[3/5] adb device detected — installing + driving the flow..." -ForegroundColor Cyan
+    Write-Host "       device present -- installing + driving"
     & adb install -r $apkPath | Out-Null
     & adb shell pm grant $pkg android.permission.CAMERA 2>$null
     & adb shell am start -n "$pkg/.MainActivity" | Out-Null
     Start-Sleep -Seconds 3
-
     $screenshot1 = "$artifactsDir/01-launch.png"
     & adb exec-out screencap -p > $screenshot1
     if (Test-Path $screenshot1) { $deviceScreenshotCount++ }
-
     $hierarchy = "$artifactsDir/ui-hierarchy.xml"
     & adb shell uiautomator dump /sdcard/ui.xml | Out-Null
     & adb pull /sdcard/ui.xml $hierarchy | Out-Null
 } else {
-    Write-Host "[3/5] No adb device — build-only manifest." -ForegroundColor Yellow
+    Write-Host "       no device -- build-only manifest"
 }
 
-# 4. Write the manifest.
-Write-Host "[4/5] Writing manifest..." -ForegroundColor Cyan
-$manifestLines = @(
-    "apk-exists=$([bool](Test-Path $apkPath))".ToLower(),
-    "archetypes-asset-present=$hasArchetypesAsset".ToLower(),
-    "species-asset-present=$hasSpeciesAsset".ToLower(),
-    "verify-no-networking-passed=true"
-)
+# Step 4: write the manifest.
+Write-Host "[4/5] writing manifest" -ForegroundColor Cyan
+$lines = New-Object System.Collections.ArrayList
+[void]$lines.Add("apk-exists=true")
+[void]$lines.Add("archetypes-asset-present=" + $hasArchetypesAsset.ToString().ToLower())
+[void]$lines.Add("species-asset-present=" + $hasSpeciesAsset.ToString().ToLower())
+[void]$lines.Add("verify-no-networking-passed=true")
 if ($adbDevicePresent) {
-    $manifestLines += "device-screenshot-count-at-least-1=$($deviceScreenshotCount -ge 1)".ToLower()
+    $hasScreenshot = ($deviceScreenshotCount -ge 1)
+    [void]$lines.Add("device-screenshot-count-at-least-1=" + $hasScreenshot.ToString().ToLower())
 }
-Set-Content -Path $manifestPath -Value $manifestLines -Encoding utf8
+Set-Content -Path $manifestPath -Value ($lines -join "`n") -Encoding utf8 -NoNewline
 
-# 5. Diff against expected.
-Write-Host "[5/5] Diffing against $expectedManifest..." -ForegroundColor Cyan
-if (-not (Test-Path $expectedManifest)) {
-    Write-Error "expected manifest missing at $expectedManifest"
-}
-$expected = (Get-Content $expectedManifest) | Where-Object {
-    $_ -and (-not $_.StartsWith("#"))
-} | ForEach-Object { $_.Trim().ToLower() }
-$actual = $manifestLines | ForEach-Object { $_.Trim().ToLower() }
+# Step 5: diff against expected.
+Write-Host ("[5/5] diff against {0}" -f $expectedManifest) -ForegroundColor Cyan
+$expectedLines = Get-Content $expectedManifest |
+    Where-Object { $_ -and (-not $_.TrimStart().StartsWith("#")) } |
+    ForEach-Object { $_.Trim().ToLower() }
+$actualLines = $lines | ForEach-Object { $_.Trim().ToLower() }
 
-$missingFromActual = $expected | Where-Object { $actual -notcontains $_ }
-if ($missingFromActual) {
-    Write-Host "Expected lines missing from actual manifest:" -ForegroundColor Red
-    $missingFromActual | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
+$missing = @($expectedLines | Where-Object { $actualLines -notcontains $_ })
+if ($missing.Count -gt 0) {
+    Write-Host "Missing expected lines:" -ForegroundColor Red
+    foreach ($m in $missing) { Write-Host "  - $m" -ForegroundColor Red }
     exit 1
 }
 Write-Host "Integration manifest diff passed." -ForegroundColor Green

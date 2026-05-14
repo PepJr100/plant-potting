@@ -1,7 +1,6 @@
-package com.darkfactory.plantpotting.di
+package com.darkfactory.plantpotting.permission
 
 import android.content.Context
-import androidx.camera.lifecycle.ProcessCameraProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,10 +10,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object CameraModule {
+object PermissionModule {
     @Provides
     @Singleton
-    fun provideCameraProviderFuture(
+    fun provideCameraPermissionGuard(
         @ApplicationContext context: Context,
-    ): com.google.common.util.concurrent.ListenableFuture<ProcessCameraProvider> = ProcessCameraProvider.getInstance(context)
+    ): CameraPermissionGuard = CameraPermissionGuard(context)
 }

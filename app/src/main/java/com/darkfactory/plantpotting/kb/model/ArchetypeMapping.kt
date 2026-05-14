@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
 sealed class ArchetypeMapping {
     @Serializable
     @SerialName("single")
-    data class Single(val archetypeId: String) : ArchetypeMapping()
+    data class Single(
+        val archetypeId: String,
+    ) : ArchetypeMapping()
 
     @Serializable
     @SerialName("blend")

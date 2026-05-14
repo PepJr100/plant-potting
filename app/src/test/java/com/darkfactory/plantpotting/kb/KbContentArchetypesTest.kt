@@ -2,9 +2,10 @@ package com.darkfactory.plantpotting.kb
 
 import com.darkfactory.plantpotting.kb.model.Archetype
 import com.google.common.truth.Truth.assertThat
-import java.io.File
+import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Test
+import java.io.File
 
 class KbContentArchetypesTest {
     private val archetypes: List<Archetype> by lazy {
@@ -27,15 +28,15 @@ class KbContentArchetypesTest {
     fun everyRecipeSumsToOneHundred() {
         for (a in archetypes) {
             val sum = a.recipe.sumOf { it.proportionPct }
-            assertThat(sum).named("archetype ${a.id} recipe sum").isEqualTo(100)
+            assertWithMessage("archetype ${a.id} recipe sum").that(sum).isEqualTo(100)
         }
     }
 
     @Test
     fun everyRationaleTemplateMentionsSpeciesPlaceholder() {
         for (a in archetypes) {
-            assertThat(a.rationaleTemplate)
-                .named("archetype ${a.id} rationaleTemplate")
+            assertWithMessage("archetype ${a.id} rationaleTemplate")
+                .that(a.rationaleTemplate)
                 .contains("{species}")
         }
     }
@@ -49,23 +50,24 @@ class KbContentArchetypesTest {
     @Test
     fun everyArchetypeHasAtLeastOneCitation() {
         for (a in archetypes) {
-            assertThat(a.citations).named("archetype ${a.id} citations").isNotEmpty()
+            assertWithMessage("archetype ${a.id} citations").that(a.citations).isNotEmpty()
         }
     }
 
     @Test
     fun mandatedArchetypeIdsArePresent() {
         val ids = archetypes.map { it.id }.toSet()
-        val required = setOf(
-            "standard-houseplant",
-            "aroid-chunky",
-            "succulent-gritty",
-            "cactus-pure-mineral",
-            "epiphytic-orchid-bark",
-            "moisture-retentive",
-            "semi-hydro-inert",
-            "acidic-ericaceous",
-        )
+        val required =
+            setOf(
+                "standard-houseplant",
+                "aroid-chunky",
+                "succulent-gritty",
+                "cactus-pure-mineral",
+                "epiphytic-orchid-bark",
+                "moisture-retentive",
+                "semi-hydro-inert",
+                "acidic-ericaceous",
+            )
         assertThat(ids).containsAtLeastElementsIn(required)
     }
 }

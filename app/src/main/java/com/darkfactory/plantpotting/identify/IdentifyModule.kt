@@ -9,7 +9,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class IdentifyModule {
-
     @Binds
     @Singleton
     abstract fun bindPlantIdentifier(impl: StubPlantIdentifier): PlantIdentifier

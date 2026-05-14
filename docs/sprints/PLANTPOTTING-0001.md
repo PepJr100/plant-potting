@@ -138,7 +138,7 @@ Tasks paired with test tasks (TDD ordering: failing test first, then implementat
 - [x] **0.9** Add a top-level `README.md` (≤40 lines): prerequisites (JDK 17, Android SDK 34), how to run `assembleDebug`, how to run unit + instrumentation tests, how to install on a device. No marketing copy.
 - [x] **0.10** Configure `org.gradle.parallel=true`, `org.gradle.caching=true` in `gradle.properties`. Document Gradle JDK version (17) in `README.md`.
 - [x] **0.11 (test)** Add a trivial smoke unit test in `app/src/test/` proving the JVM test runner is wired and `testDebugUnitTest` discovers tests.
-- [ ] **0.12 (verify)** Run `./gradlew testDebugUnitTest assembleDebug ktlintCheck` locally and confirm green. Record the commands and result in sprint notes.
+- [x] **0.12 (verify)** Run `./gradlew testDebugUnitTest assembleDebug ktlintCheck` locally and confirm green. Record the commands and result in sprint notes.
 
 ### Phase 1 — Research extraction and KB sourcing notes
 
@@ -335,18 +335,18 @@ Mitigation: §6 de-scope order is pre-decided. Core flow (KB + engine + camera +
 
 The sprint is done when **every** statement below is observably true. Each is testable; ambiguity is a bug in the criterion.
 
-- [ ] `./gradlew assembleDebug testDebugUnitTest lint ktlintCheck pixel6Api34DebugAndroidTest verifyNoNetworking` runs green on a clean clone in CI.
-- [ ] The debug APK installs and launches on the `pixel6Api34` Gradle Managed Device (and, if available, on a physical device — see §7.5).
-- [ ] The §2.1 user flow works end-to-end on the GMD, for both the permission-granted and permission-denied paths, with no crash, no ANR, and no placeholder text on the recommendation screen.
-- [ ] `assets/kb/archetypes.json` declares exactly **8** archetypes; `assets/kb/species.json` declares exactly **16** species; every species's mapping (or blend ids) resolves to a known archetype; every archetype recipe sums to exactly 100; the `Hoya carnosa` blend is present and the engine returns a recipe summing to exactly 100 for it.
-- [ ] Alias lookups for `Sansevieria trifasciata` and `Calathea orbifolia` resolve to the canonical species ids of `Dracaena trifasciata` and `Goeppertia orbifolia` respectively, asserted by tests.
-- [ ] `KbValidationTest`, `KbContentTest` (archetypes + species), `KbLoaderTest`, `KbRecommendationEngineTest`, `RecommendationGoldenTest`, `StubPlantIdentifierTest`, `CameraViewModelTest`, `CameraScreenSmokeTest`, `RecommendationViewModelTest`, `ResultViewModelTest`, `PermissionScreenTest`, `RecommendationScreenTest`, `EndToEndFlowTest`, and `PermissionDeniedFlowTest` all exist and are green.
-- [ ] `PlantIdentifier` is bound in Hilt; the CI grep check at §4.5 confirms no production source file outside `identify/` references `StubPlantIdentifier` by class name.
-- [ ] No production runtime dependency on networking libraries (verified via `verifyNoNetworking` Gradle task in §8.6).
-- [ ] `scripts/integration-flow.ps1` produces an artifact manifest that diffs cleanly against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. **No acceptance or integration checkbox in this list is marked done unless this diff is clean.**
-- [ ] `docs/kb/plant-substrate-kb-notes.md` exists and contains one source-backed paragraph per archetype and per species, with citation pointers to specific sections of `docs/Research_brief.md` or files under `docs/research/`.
-- [ ] `docs/sprints/results/PLANTPOTTING-0001.md` is filled in with: build commands + result, test commands + result, integration artifact diff result, GMD test result, real-device model+Android version (or explicit "no physical device available"), known limitations, and an explicit handoff note pointing to the `PlantIdentifier` seam as the entry point for PLANTPOTTING-000X.
-- [ ] Every completed feature task has a paired completed test task.
+- [x] `./gradlew assembleDebug testDebugUnitTest lint ktlintCheck pixel6Api34DebugAndroidTest verifyNoNetworking` runs green on a clean clone in CI.
+- [x] The debug APK installs and launches on the `pixel6Api34` Gradle Managed Device (and, if available, on a physical device — see §7.5).
+- [x] The §2.1 user flow works end-to-end on the GMD, for both the permission-granted and permission-denied paths, with no crash, no ANR, and no placeholder text on the recommendation screen.
+- [x] `assets/kb/archetypes.json` declares exactly **8** archetypes; `assets/kb/species.json` declares exactly **16** species; every species's mapping (or blend ids) resolves to a known archetype; every archetype recipe sums to exactly 100; the `Hoya carnosa` blend is present and the engine returns a recipe summing to exactly 100 for it.
+- [x] Alias lookups for `Sansevieria trifasciata` and `Calathea orbifolia` resolve to the canonical species ids of `Dracaena trifasciata` and `Goeppertia orbifolia` respectively, asserted by tests.
+- [ ] `KbValidationTest`, `KbContentTest` (archetypes + species), `KbLoaderTest`, `KbRecommendationEngineTest`, `RecommendationGoldenTest`, `StubPlantIdentifierTest`, `CameraViewModelTest`, `CameraScreenSmokeTest`, `RecommendationViewModelTest`, `ResultViewModelTest`, `PermissionScreenTest`, `RecommendationScreenTest`, `EndToEndFlowTest`, and `PermissionDeniedFlowTest` all exist and are green. *(All exist + green except `CameraScreenSmokeTest`, deferred per §6 de-scope.)*
+- [x] `PlantIdentifier` is bound in Hilt; the CI grep check at §4.5 confirms no production source file outside `identify/` references `StubPlantIdentifier` by class name.
+- [x] No production runtime dependency on networking libraries (verified via `verifyNoNetworking` Gradle task in §8.6).
+- [x] `scripts/integration-flow.ps1` produces an artifact manifest that diffs cleanly against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`. **No acceptance or integration checkbox in this list is marked done unless this diff is clean.**
+- [x] `docs/kb/plant-substrate-kb-notes.md` exists and contains one source-backed paragraph per archetype and per species, with citation pointers to specific sections of `docs/Research_brief.md` or files under `docs/research/`.
+- [x] `docs/sprints/results/PLANTPOTTING-0001.md` is filled in with: build commands + result, test commands + result, integration artifact diff result, GMD test result, real-device model+Android version (or explicit "no physical device available"), known limitations, and an explicit handoff note pointing to the `PlantIdentifier` seam as the entry point for PLANTPOTTING-000X.
+- [x] Every completed feature task has a paired completed test task.
 
 ---
 

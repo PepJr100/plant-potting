@@ -14,7 +14,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [34])
 class PermissionScreenTest {
-
     @get:Rule val composeRule = createComposeRule()
 
     @Test

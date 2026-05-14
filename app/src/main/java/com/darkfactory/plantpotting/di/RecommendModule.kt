@@ -11,7 +11,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RecommendModule {
-
     @Binds
     @Singleton
     abstract fun bindRecommendationEngine(impl: KbRecommendationEngine): RecommendationEngine

@@ -5,12 +5,9 @@ data class KnowledgeBase(
     val species: List<Species>,
     val speciesIndex: Map<String, Species>,
 ) {
-    fun findSpecies(idOrAlias: String): Species? {
-        return speciesIndex[normalise(idOrAlias)]
-    }
+    fun findSpecies(idOrAlias: String): Species? = speciesIndex[normalise(idOrAlias)]
 
     companion object {
-        fun normalise(s: String): String =
-            s.trim().lowercase().replace('’', '\'')
+        fun normalise(s: String): String = s.trim().lowercase().replace('’', '\'')
     }
 }

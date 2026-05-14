@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.darkfactory.plantpotting.R
+import kotlinx.coroutines.flow.collectLatest
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executor
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CameraScreen(
@@ -58,6 +58,15 @@ fun CameraScreen(
     LaunchedEffect(viewModel) {
         viewModel.navigate.collectLatest { speciesId ->
             onSpeciesIdentified(speciesId)
+        }
+    }
+
+    DisposableEffect(viewModel) {
+        CameraScreenTestRegistry.current = viewModel
+        onDispose {
+            if (CameraScreenTestRegistry.current === viewModel) {
+                CameraScreenTestRegistry.current = null
+            }
         }
     }
 
@@ -78,9 +87,10 @@ fun CameraScreen(
 
         if (state is CameraUiState.Identifying || state is CameraUiState.Capturing) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator()
@@ -97,10 +107,11 @@ fun CameraScreen(
             Text(
                 text = (state as CameraUiState.Failure).reason,
                 color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp)
-                    .testTag(CameraScreenTags.ERROR),
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(16.dp)
+                        .testTag(CameraScreenTags.ERROR),
             )
         }
 
@@ -110,11 +121,12 @@ fun CameraScreen(
                 takeJpegPicture(capture, executor, viewModel)
             },
             enabled = state is CameraUiState.Idle || state is CameraUiState.Failure,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 48.dp)
-                .size(72.dp)
-                .testTag(CameraScreenTags.SHUTTER),
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 48.dp)
+                    .size(72.dp)
+                    .testTag(CameraScreenTags.SHUTTER),
         ) {
             Text(stringResource(id = R.string.camera_shutter_label).first().toString())
         }
@@ -131,6 +143,17 @@ object CameraScreenTags {
     const val ERROR = "camera.error"
 }
 
+/**
+ * Test-only handle on the active [CameraViewModel]. Populated by
+ * [CameraScreen] during composition because the view model is created in the
+ * Compose Navigation back-stack-entry's `ViewModelStore`, which an
+ * instrumentation test cannot reach from `MainActivity` alone.
+ */
+internal object CameraScreenTestRegistry {
+    @Volatile
+    var current: CameraViewModel? = null
+}
+
 private fun bindCameraUseCases(
     context: Context,
     previewView: PreviewView,
@@ -141,17 +164,23 @@ private fun bindCameraUseCases(
     providerFuture.addListener(
         {
             val provider = providerFuture.get()
-            val selector = ResolutionSelector.Builder()
-                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
-                .build()
-            val preview = Preview.Builder()
-                .setResolutionSelector(selector)
-                .build()
-                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
-            val capture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setResolutionSelector(selector)
-                .build()
+            val selector =
+                ResolutionSelector
+                    .Builder()
+                    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                    .build()
+            val preview =
+                Preview
+                    .Builder()
+                    .setResolutionSelector(selector)
+                    .build()
+                    .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+            val capture =
+                ImageCapture
+                    .Builder()
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .setResolutionSelector(selector)
+                    .build()
             try {
                 provider.unbindAll()
                 provider.bindToLifecycle(

@@ -126,7 +126,10 @@ object KbValidator {
         return index
     }
 
-    private fun assertNoPlaceholderText(text: String, label: String) {
+    private fun assertNoPlaceholderText(
+        text: String,
+        label: String,
+    ) {
         val lowered = text.lowercase()
         for (token in FORBIDDEN_PLACEHOLDERS) {
             if (lowered.contains(token.lowercase())) {

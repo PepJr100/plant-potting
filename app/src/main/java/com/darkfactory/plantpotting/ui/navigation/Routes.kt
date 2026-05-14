@@ -7,8 +7,8 @@ object Routes {
     const val RECOMMENDATION = "recommendation/{speciesId}"
 
     fun result(speciesId: String): String = "result/${java.net.URLEncoder.encode(speciesId, "UTF-8")}"
-    fun recommendation(speciesId: String): String =
-        "recommendation/${java.net.URLEncoder.encode(speciesId, "UTF-8")}"
+
+    fun recommendation(speciesId: String): String = "recommendation/${java.net.URLEncoder.encode(speciesId, "UTF-8")}"
 
     const val ARG_SPECIES_ID = "speciesId"
 }

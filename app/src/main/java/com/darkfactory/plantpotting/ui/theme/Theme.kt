@@ -6,21 +6,23 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-private val LightColors = lightColorScheme(
-    primary = LeafGreen,
-    onPrimary = Cream,
-    secondary = Bark,
-    onSecondary = Cream,
-    background = Cream,
-    onBackground = LeafGreenDark,
-)
+private val LightColors =
+    lightColorScheme(
+        primary = LeafGreen,
+        onPrimary = Cream,
+        secondary = Bark,
+        onSecondary = Cream,
+        background = Cream,
+        onBackground = LeafGreenDark,
+    )
 
-private val DarkColors = darkColorScheme(
-    primary = LeafGreenLight,
-    onPrimary = LeafGreenDark,
-    secondary = Bark,
-    onSecondary = Cream,
-)
+private val DarkColors =
+    darkColorScheme(
+        primary = LeafGreenLight,
+        onPrimary = LeafGreenDark,
+        secondary = Bark,
+        onSecondary = Cream,
+    )
 
 @Composable
 fun PlantPottingTheme(

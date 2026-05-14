@@ -12,7 +12,6 @@ import javax.inject.Singleton
     replaces = [IdentifyModule::class],
 )
 object TestIdentifyModule {
-
     @Provides
     @Singleton
     fun providePlantIdentifier(): PlantIdentifier = FakeFixedIdentifier()

@@ -8,28 +8,30 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CaptureCacheCleaner @Inject constructor(
-    @ApplicationContext private val context: Context,
-) {
-    fun sweep(maxAge: Long = TimeUnit.MINUTES.toMillis(DEFAULT_MAX_AGE_MIN)) {
-        val dir = File(context.cacheDir, CAPTURE_DIR)
-        if (!dir.exists()) return
-        val cutoff = System.currentTimeMillis() - maxAge
-        dir.listFiles()?.forEach { file ->
-            if (file.isFile && file.lastModified() < cutoff) {
-                file.delete()
+class CaptureCacheCleaner
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        fun sweep(maxAge: Long = TimeUnit.MINUTES.toMillis(DEFAULT_MAX_AGE_MIN)) {
+            val dir = File(context.cacheDir, CAPTURE_DIR)
+            if (!dir.exists()) return
+            val cutoff = System.currentTimeMillis() - maxAge
+            dir.listFiles()?.forEach { file ->
+                if (file.isFile && file.lastModified() < cutoff) {
+                    file.delete()
+                }
             }
         }
-    }
 
-    fun captureDir(): File {
-        val dir = File(context.cacheDir, CAPTURE_DIR)
-        if (!dir.exists()) dir.mkdirs()
-        return dir
-    }
+        fun captureDir(): File {
+            val dir = File(context.cacheDir, CAPTURE_DIR)
+            if (!dir.exists()) dir.mkdirs()
+            return dir
+        }
 
-    companion object {
-        const val CAPTURE_DIR = "captures"
-        const val DEFAULT_MAX_AGE_MIN = 10L
+        companion object {
+            const val CAPTURE_DIR = "captures"
+            const val DEFAULT_MAX_AGE_MIN = 10L
+        }
     }
-}

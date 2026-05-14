@@ -11,33 +11,36 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class ResultViewModelTest {
-
-    private val kb = KnowledgeBase(
-        archetypes = mapOf(
-            "standard" to Archetype(
-                id = "standard",
-                displayName = "Standard",
-                shortDescription = "",
-                recipe = listOf(RecipeIngredient("coir", 100)),
-                rationaleTemplate = "Suits {species}.",
-                citations = listOf("Brief"),
-            ),
-        ),
-        species = listOf(
-            Species(
-                id = "ficus-lyrata",
-                scientificName = "Ficus lyrata",
-                commonNames = listOf("Fiddle-leaf fig"),
-                aliases = emptyList(),
-                mapping = ArchetypeMapping.Single("standard"),
-                speciesRationale = "Ficus lyrata is a fig.",
-                citations = listOf("Brief"),
-            ),
-        ),
-        speciesIndex = emptyMap(),
-    ).let { kb ->
-        kb.copy(speciesIndex = kb.species.associateBy { it.id })
-    }
+    private val kb =
+        KnowledgeBase(
+            archetypes =
+                mapOf(
+                    "standard" to
+                        Archetype(
+                            id = "standard",
+                            displayName = "Standard",
+                            shortDescription = "",
+                            recipe = listOf(RecipeIngredient("coir", 100)),
+                            rationaleTemplate = "Suits {species}.",
+                            citations = listOf("Brief"),
+                        ),
+                ),
+            species =
+                listOf(
+                    Species(
+                        id = "ficus-lyrata",
+                        scientificName = "Ficus lyrata",
+                        commonNames = listOf("Fiddle-leaf fig"),
+                        aliases = emptyList(),
+                        mapping = ArchetypeMapping.Single("standard"),
+                        speciesRationale = "Ficus lyrata is a fig.",
+                        citations = listOf("Brief"),
+                    ),
+                ),
+            speciesIndex = emptyMap(),
+        ).let { kb ->
+            kb.copy(speciesIndex = kb.species.associateBy { it.id })
+        }
 
     @Test
     fun knownIdPopulatesScientificAndCommonName() {

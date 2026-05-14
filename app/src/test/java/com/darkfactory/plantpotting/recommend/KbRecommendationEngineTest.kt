@@ -9,47 +9,51 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class KbRecommendationEngineTest {
+    private val standard =
+        Archetype(
+            id = "standard",
+            displayName = "Standard",
+            shortDescription = "standard mix",
+            recipe =
+                listOf(
+                    RecipeIngredient("coir", 60),
+                    RecipeIngredient("perlite", 30),
+                    RecipeIngredient("bark", 10),
+                ),
+            rationaleTemplate = "Standard mix suits {species}.",
+            citations = listOf("Brief §4.4"),
+        )
 
-    private val standard = Archetype(
-        id = "standard",
-        displayName = "Standard",
-        shortDescription = "standard mix",
-        recipe = listOf(
-            RecipeIngredient("coir", 60),
-            RecipeIngredient("perlite", 30),
-            RecipeIngredient("bark", 10),
-        ),
-        rationaleTemplate = "Standard mix suits {species}.",
-        citations = listOf("Brief §4.4"),
-    )
-
-    private val gritty = Archetype(
-        id = "gritty",
-        displayName = "Gritty",
-        shortDescription = "gritty mineral mix",
-        recipe = listOf(
-            RecipeIngredient("pumice", 50),
-            RecipeIngredient("sand", 30),
-            RecipeIngredient("bark", 20),
-        ),
-        rationaleTemplate = "Gritty mix suits {species}.",
-        citations = listOf("Brief §4.4"),
-    )
+    private val gritty =
+        Archetype(
+            id = "gritty",
+            displayName = "Gritty",
+            shortDescription = "gritty mineral mix",
+            recipe =
+                listOf(
+                    RecipeIngredient("pumice", 50),
+                    RecipeIngredient("sand", 30),
+                    RecipeIngredient("bark", 20),
+                ),
+            rationaleTemplate = "Gritty mix suits {species}.",
+            citations = listOf("Brief §4.4"),
+        )
 
     private fun species(
         id: String,
         scientificName: String,
         mapping: ArchetypeMapping,
         rationale: String = "$scientificName is a test fixture.",
-    ): Species = Species(
-        id = id,
-        scientificName = scientificName,
-        commonNames = listOf("common"),
-        aliases = emptyList(),
-        mapping = mapping,
-        speciesRationale = rationale,
-        citations = listOf("Brief §3"),
-    )
+    ): Species =
+        Species(
+            id = id,
+            scientificName = scientificName,
+            commonNames = listOf("common"),
+            aliases = emptyList(),
+            mapping = mapping,
+            speciesRationale = rationale,
+            citations = listOf("Brief §3"),
+        )
 
     private fun kb(species: List<Species>): KnowledgeBase {
         val archetypes = mapOf("standard" to standard, "gritty" to gritty)
@@ -73,15 +77,17 @@ class KbRecommendationEngineTest {
 
     @Test
     fun blendMappingReturnsRecipeSummingToOneHundred() {
-        val s = species(
-            id = "test-blend",
-            scientificName = "Testus blendix",
-            mapping = ArchetypeMapping.Blend(
-                primaryArchetypeId = "standard",
-                secondaryArchetypeId = "gritty",
-                primaryPct = 60,
-            ),
-        )
+        val s =
+            species(
+                id = "test-blend",
+                scientificName = "Testus blendix",
+                mapping =
+                    ArchetypeMapping.Blend(
+                        primaryArchetypeId = "standard",
+                        secondaryArchetypeId = "gritty",
+                        primaryPct = 60,
+                    ),
+            )
         val engine = KbRecommendationEngine(kb(listOf(s)))
         val rec = engine.recommend("test-blend")
         assertThat(rec.isBlend).isTrue()
@@ -93,15 +99,17 @@ class KbRecommendationEngineTest {
 
     @Test
     fun blendMergesMatchingIngredientNames() {
-        val s = species(
-            id = "test-merge",
-            scientificName = "Testus mergeus",
-            mapping = ArchetypeMapping.Blend(
-                primaryArchetypeId = "standard",
-                secondaryArchetypeId = "gritty",
-                primaryPct = 50,
-            ),
-        )
+        val s =
+            species(
+                id = "test-merge",
+                scientificName = "Testus mergeus",
+                mapping =
+                    ArchetypeMapping.Blend(
+                        primaryArchetypeId = "standard",
+                        secondaryArchetypeId = "gritty",
+                        primaryPct = 50,
+                    ),
+            )
         val engine = KbRecommendationEngine(kb(listOf(s)))
         val rec = engine.recommend("test-merge")
         // Both archetypes contain "bark"; expect a single merged row.
@@ -125,15 +133,17 @@ class KbRecommendationEngineTest {
     @Test
     fun blendWithFractionalSplitStillSumsToOneHundred() {
         // 33/67 split produces fractional intermediate values; verify rounding lands at 100.
-        val s = species(
-            id = "test-33",
-            scientificName = "Testus fractus",
-            mapping = ArchetypeMapping.Blend(
-                primaryArchetypeId = "standard",
-                secondaryArchetypeId = "gritty",
-                primaryPct = 33,
-            ),
-        )
+        val s =
+            species(
+                id = "test-33",
+                scientificName = "Testus fractus",
+                mapping =
+                    ArchetypeMapping.Blend(
+                        primaryArchetypeId = "standard",
+                        secondaryArchetypeId = "gritty",
+                        primaryPct = 33,
+                    ),
+            )
         val engine = KbRecommendationEngine(kb(listOf(s)))
         val rec = engine.recommend("test-33")
         assertThat(rec.recipe.sumOf { it.proportionPct }).isEqualTo(100)

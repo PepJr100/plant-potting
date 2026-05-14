@@ -9,16 +9,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import kotlinx.coroutines.runBlocking
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object KbModule {
-
     @Provides
     @Singleton
-    fun provideAssetManager(@ApplicationContext context: Context): AssetManager = context.assets
+    fun provideAssetManager(
+        @ApplicationContext context: Context,
+    ): AssetManager = context.assets
 
     @Provides
     @Singleton

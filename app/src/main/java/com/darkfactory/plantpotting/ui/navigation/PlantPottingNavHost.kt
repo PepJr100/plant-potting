@@ -20,12 +20,14 @@ import dagger.hilt.android.EntryPointAccessors
 fun PlantPottingNavHost() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val guard = remember(context) {
-        EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            AppEntryPoints::class.java,
-        ).cameraPermissionGuard()
-    }
+    val guard =
+        remember(context) {
+            EntryPointAccessors
+                .fromApplication(
+                    context.applicationContext,
+                    AppEntryPoints::class.java,
+                ).cameraPermissionGuard()
+        }
 
     NavHost(
         navController = navController,
@@ -51,9 +53,10 @@ fun PlantPottingNavHost() {
         }
         composable(
             route = Routes.RESULT,
-            arguments = listOf(
-                navArgument(Routes.ARG_SPECIES_ID) { type = NavType.StringType },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_SPECIES_ID) { type = NavType.StringType },
+                ),
         ) {
             ResultScreen(
                 viewModel = hiltViewModel(),
@@ -64,9 +67,10 @@ fun PlantPottingNavHost() {
         }
         composable(
             route = Routes.RECOMMENDATION,
-            arguments = listOf(
-                navArgument(Routes.ARG_SPECIES_ID) { type = NavType.StringType },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_SPECIES_ID) { type = NavType.StringType },
+                ),
         ) {
             RecommendationScreen(
                 viewModel = hiltViewModel(),

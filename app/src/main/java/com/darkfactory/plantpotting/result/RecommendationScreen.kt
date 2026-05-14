@@ -2,6 +2,7 @@ package com.darkfactory.plantpotting.result
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,9 +35,10 @@ fun RecommendationScreen(
     val state by viewModel.state.collectAsState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         when (val s = state) {
@@ -58,14 +60,18 @@ fun RecommendationScreen(
 }
 
 @Composable
-private fun ReadyContent(s: RecommendationUiState.Ready, onRetake: () -> Unit) {
+private fun ColumnScope.ReadyContent(
+    s: RecommendationUiState.Ready,
+    onRetake: () -> Unit,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = s.archetypeName,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier
-                .weight(1f)
-                .testTag(RecommendationScreenTags.ARCHETYPE_NAME),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .testTag(RecommendationScreenTags.ARCHETYPE_NAME),
         )
         if (s.isBlend) {
             AssistChip(
@@ -86,17 +92,19 @@ private fun ReadyContent(s: RecommendationUiState.Ready, onRetake: () -> Unit) {
         style = MaterialTheme.typography.titleMedium,
     )
     LazyColumn(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()
-            .testTag(RecommendationScreenTags.RECIPE_LIST),
+        modifier =
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .testTag(RecommendationScreenTags.RECIPE_LIST),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(s.recipe) { ingredient ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -114,9 +122,10 @@ private fun ReadyContent(s: RecommendationUiState.Ready, onRetake: () -> Unit) {
     }
     Button(
         onClick = onRetake,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(RecommendationScreenTags.RETAKE),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag(RecommendationScreenTags.RETAKE),
     ) {
         Text(stringResource(id = R.string.recommendation_retake))
     }
