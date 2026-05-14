@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PlantPotting</string>
+
+    <!-- Permission screen -->
+    <string name="permission_title">Camera access</string>
+    <string name="permission_rationale">We use the camera to photograph your plant. We never upload your photos.</string>
+    <string name="permission_grant">Grant camera access</string>
+    <string name="permission_why_we_ask">Why we ask</string>
+    <string name="permission_why_we_ask_body">The camera frames a single image of your plant. The image is processed on your device and discarded after use. Nothing leaves your phone.</string>
+    <string name="permission_denied_title">Camera access is blocked</string>
+    <string name="permission_denied_body">PlantPotting needs camera access to identify your plant. You can enable it from system settings.</string>
+    <string name="permission_open_settings">Open system settings</string>
+
+    <!-- Camera screen -->
+    <string name="camera_shutter_label">Capture plant photo</string>
+    <string name="camera_loading">Identifying…</string>
+    <string name="camera_capture_failed">Capture failed. Try again.</string>
+
+    <!-- Result screen -->
+    <string name="result_stub_badge">Stub identifier — replace in a later sprint</string>
+    <string name="result_see_potting_mix">See potting mix</string>
+    <string name="result_not_found">We couldn\'t find this plant in the knowledge base.</string>
+
+    <!-- Recommendation screen -->
+    <string name="recommendation_blend_chip">Blend recipe</string>
+    <string name="recommendation_recipe_heading">Recipe</string>
+    <string name="recommendation_proportion_header">%</string>
+    <string name="recommendation_retake">Retake</string>
+    <string name="recommendation_not_found">No recipe available for this plant.</string>
 </resources>
