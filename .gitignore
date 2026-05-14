@@ -1,6 +1,10 @@
 # Existing
 docs/reference/cache/
 
+# Claude Code project-local skills + leftover zip-extraction backup
+.claude/
+Claude/
+
 # Android / Gradle
 .gradle/
 build/
