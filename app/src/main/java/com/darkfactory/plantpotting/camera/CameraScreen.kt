@@ -113,6 +113,21 @@ fun CameraScreen(
                     modifier = Modifier.padding(top = 64.dp),
                 )
             }
+        } else if (imageCapture == null && state is CameraUiState.Idle) {
+            // CameraX bind-pending window: nothing to capture yet. Inform the
+            // user and keep the shutter disabled so taps aren't silently
+            // swallowed by `takeJpegPicture`'s early-return (UX 1).
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.testTag(CameraScreenTags.BIND_PROGRESS),
+                )
+            }
         }
 
         if (state is CameraUiState.Failure) {
@@ -128,7 +143,9 @@ fun CameraScreen(
         }
 
         val shutterLabel = stringResource(id = R.string.camera_shutter_label)
-        val shutterEnabled = state is CameraUiState.Idle || state is CameraUiState.Failure
+        val shutterEnabled =
+            (state is CameraUiState.Idle || state is CameraUiState.Failure) &&
+                imageCapture != null
         FloatingActionButton(
             onClick = {
                 if (!shutterEnabled) return@FloatingActionButton
@@ -160,6 +177,7 @@ object CameraScreenTags {
     const val PREVIEW = "camera.preview"
     const val SHUTTER = "camera.shutter"
     const val ERROR = "camera.error"
+    const val BIND_PROGRESS = "camera.bindProgress"
 }
 
 /**

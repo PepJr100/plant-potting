@@ -153,17 +153,17 @@ Hotspot: `scripts/integration-flow.ps1:56-65`. `Get-Command adb` returns `$null`
 
 Hotspot: `CameraScreen.kt:118-132`. `enabled = state is CameraUiState.Idle || state is CameraUiState.Failure` doesn't gate on `imageCapture != null`, so the shutter accepts taps that fall into the early-return path at line 120 and silently swallows them.
 
-- [ ] **4.1 (test, RED first)** Add `CameraScreenBindStateTest` (or extend `CameraScreenSmokeTest`) covering:
+- [x] **4.1 (test, RED first)** Add `CameraScreenBindStateTest` (or extend `CameraScreenSmokeTest`) covering:
     - Initial composition with `currentImageCapture = null`: shutter is disabled (`assertIsNotEnabled`) and a `CircularProgressIndicator` overlay tagged `CameraScreenTags.BIND_PROGRESS` is visible.
     - After flipping `currentImageCapture` to a non-null fake: the overlay disappears and the shutter is enabled.
-    - The capture/identify in-flight overlay still wins over the bind-progress overlay when both could apply.
-- [ ] **4.2** Add `CameraScreenTags.BIND_PROGRESS = "camera.bindProgress"` to the `CameraScreenTags` object in `CameraScreen.kt`.
-- [ ] **4.3** In `CameraScreen.kt`:
+    - The capture/identify in-flight overlay still wins over the bind-progress overlay when both could apply. *(Implementation note: the two overlays are mutually exclusive by construction — bind-progress only renders while `state is Idle`, in-flight only while `state is Capturing/Identifying` — so the precedence assertion is a static guarantee rather than a separate test case. The two states are covered by the two `CameraScreenBindStateTest` cases.)*
+- [x] **4.2** Add `CameraScreenTags.BIND_PROGRESS = "camera.bindProgress"` to the `CameraScreenTags` object in `CameraScreen.kt`.
+- [x] **4.3** In `CameraScreen.kt`:
     - Use the existing Compose-tracked `imageCapture` state (`var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }`) — already in place.
     - Render a centred `CircularProgressIndicator` (with `BIND_PROGRESS` tag) inside the existing `Box` while `imageCapture == null && state is CameraUiState.Idle`.
     - Update the FAB's `enabled` to `(state is CameraUiState.Idle || state is CameraUiState.Failure) && imageCapture != null`.
     - Ensure the capture/identify overlay still takes precedence over the bind-progress overlay so the two never render together.
-- [ ] **4.4 (verify)** Run `CameraScreenBindStateTest` on the GMD. Confirm `EndToEndFlowTest` still passes — it uses a test hook that injects a fake bound `ImageCapture`, so the new gate should be a no-op for that test.
+- [ ] **4.4 (verify)** Run `CameraScreenBindStateTest` on the GMD. Confirm `EndToEndFlowTest` still passes — it uses a test hook that injects a fake bound `ImageCapture`, so the new gate should be a no-op for that test. *(EndToEndFlowTest pre-existing flow does NOT inject `testImageCapture`; the test calls `viewModel.onCaptureReady` directly through `ViewModelProbe` and bypasses the shutter UI, so the new enable-gate is irrelevant to it. GMD run scheduled for §7.4.)*
 
 ### Phase 5 — Bug 2: guard test for transient preview letterboxing (should land, investigation-first)
 
