@@ -98,21 +98,21 @@ Hotspot: `app/src/main/java/com/darkfactory/plantpotting/permission/PermissionSc
 
 Hotspot: `app/src/main/java/com/darkfactory/plantpotting/camera/CameraScreen.kt:118-132`. The `Button` content is `Text(stringResource(R.string.camera_shutter_label).first().toString())` — the `.first().toString()` slice is the root cause.
 
-- [ ] **2.1 (test, RED first)** Add `CameraScreenSmokeTest` under `app/src/androidTest/java/com/darkfactory/plantpotting/camera/CameraScreenSmokeTest.kt`. This is §6.7 from PLANTPOTTING-0001 that was deferred. Required assertions:
+- [x] **2.1 (test, RED first)** Add `CameraScreenSmokeTest` under `app/src/androidTest/java/com/darkfactory/plantpotting/camera/CameraScreenSmokeTest.kt`. This is §6.7 from PLANTPOTTING-0001 that was deferred. Required assertions:
     - The shutter node identified by `CameraScreenTags.SHUTTER` exists in the semantics tree.
     - The shutter's content description equals the resolved string for `R.string.camera_shutter_label` ("Capture plant photo").
     - **No text node under the shutter is the literal `"C"` or any single-character substring of `camera_shutter_label`.** This is the direct regression check for Bug 1.
     - The shutter is enabled when `CameraViewModel` is `Idle` *and* a non-null `ImageCapture` is registered. *(Couples to UX 1; if Phase 4 slips, gate this assertion behind a fake-bound `ImageCapture` from the test registry.)*
     - Tapping the shutter while `Capturing`/`Identifying` does nothing (disabled).
-- [ ] **2.2 (test scaffold)** Extend the existing `CameraScreenTestRegistry` (in `CameraScreen.kt:152-155`) with a `currentImageCapture: ImageCapture?` slot (under `internal` visibility) so the smoke test can inject a fake bound state without instantiating CameraX. Re-use this scaffold in Phase 4 and Phase 5.
-- [ ] **2.3** Replace the shutter `Button` block in `CameraScreen.kt:118-132` with a `FloatingActionButton`:
+- [x] **2.2 (test scaffold)** Extend the existing `CameraScreenTestRegistry` (in `CameraScreen.kt:152-155`) with a `currentImageCapture: ImageCapture?` slot (under `internal` visibility) so the smoke test can inject a fake bound state without instantiating CameraX. Re-use this scaffold in Phase 4 and Phase 5. *(Landed as `testImageCapture` — CameraScreen reads it during composition and skips the real CameraX bind when set.)*
+- [x] **2.3** Replace the shutter `Button` block in `CameraScreen.kt:118-132` with a `FloatingActionButton`:
     - Use `androidx.compose.material3.FloatingActionButton` (already on the Material3 dep).
-    - Content: `Icon(Icons.Default.CameraAlt, contentDescription = stringResource(R.string.camera_shutter_label))`. If `CameraAlt` is not in the core Material icons set on this Compose version, prefer `Icons.Default.PhotoCamera` (also typically core) before reaching for the extended-icons dep — see risk §6.3.
+    - Content: `Icon(Icons.Default.CameraAlt, contentDescription = stringResource(R.string.camera_shutter_label))`. If `CameraAlt` is not in the core Material icons set on this Compose version, prefer `Icons.Default.PhotoCamera` (also typically core) before reaching for the extended-icons dep — see risk §6.3. *(Implementation note: neither `CameraAlt` nor `PhotoCamera` is in the core icon set on Compose BOM `2024.06.00` — both live in `material-icons-extended`. Per the no-new-deps rule of §3.4 / §6.3 we shipped a vector drawable at `app/src/main/res/drawable/ic_camera_shutter.xml` (Material camera path data, ASL-2.0) and use `painterResource` instead. Disabled state is rendered via 50 % alpha + `semantics { disabled() }`.)*
     - Preserve `CameraScreenTags.SHUTTER` on the clickable node and keep the 72 dp size + bottom-centre alignment.
     - Keep `enabled = state is CameraUiState.Idle || state is CameraUiState.Failure` for now; UX 1 (Phase 4) tightens it.
     - Remove the `Text(...first().toString())` line and any now-unused imports.
-- [ ] **2.4 (verify)** Run `CameraScreenSmokeTest` locally on `pixel6Api34DebugAndroidTest`; expect green. Confirm `EndToEndFlowTest` (`app/src/androidTest/.../EndToEndFlowTest.kt`) still passes — the FAB swap should be transparent to it.
-- [ ] **2.5 (lint)** Run `./gradlew ktlintCheck`; fix any import-order or naming churn introduced by the FAB swap.
+- [ ] **2.4 (verify)** Run `CameraScreenSmokeTest` locally on `pixel6Api34DebugAndroidTest`; expect green. Confirm `EndToEndFlowTest` (`app/src/androidTest/.../EndToEndFlowTest.kt`) still passes — the FAB swap should be transparent to it. *(Deferred to §7.4 GMD run.)*
+- [x] **2.5 (lint)** Run `./gradlew ktlintCheck`; fix any import-order or naming churn introduced by the FAB swap.
 
 ### Phase 3 — Bug 3: integration script adb fallback + device-aware manifest (must land)
 

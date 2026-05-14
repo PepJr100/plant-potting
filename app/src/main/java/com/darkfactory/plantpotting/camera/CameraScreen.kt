@@ -16,8 +16,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -53,7 +58,8 @@ fun CameraScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember(context) { ContextCompat.getMainExecutor(context) }
 
-    var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
+    val injectedImageCapture = CameraScreenTestRegistry.testImageCapture
+    var imageCapture by remember { mutableStateOf<ImageCapture?>(injectedImageCapture) }
 
     LaunchedEffect(viewModel) {
         viewModel.navigate.collectLatest { speciesId ->
@@ -75,12 +81,18 @@ fun CameraScreen(
             modifier = Modifier.fillMaxSize().testTag(CameraScreenTags.PREVIEW),
             factory = { ctx ->
                 val previewView = PreviewView(ctx)
-                bindCameraUseCases(
-                    context = ctx,
-                    previewView = previewView,
-                    lifecycleOwner = lifecycleOwner,
-                    onBound = { imageCapture = it },
-                )
+                // In production `injectedImageCapture` is null, so the real
+                // CameraX binding runs. Tests that pre-set
+                // `CameraScreenTestRegistry.testImageCapture` skip the
+                // binding entirely so the test's value isn't clobbered.
+                if (injectedImageCapture == null) {
+                    bindCameraUseCases(
+                        context = ctx,
+                        previewView = previewView,
+                        lifecycleOwner = lifecycleOwner,
+                        onBound = { imageCapture = it },
+                    )
+                }
                 previewView
             },
         )
@@ -115,20 +127,27 @@ fun CameraScreen(
             )
         }
 
-        Button(
+        val shutterLabel = stringResource(id = R.string.camera_shutter_label)
+        val shutterEnabled = state is CameraUiState.Idle || state is CameraUiState.Failure
+        FloatingActionButton(
             onClick = {
-                val capture = imageCapture ?: return@Button
+                if (!shutterEnabled) return@FloatingActionButton
+                val capture = imageCapture ?: return@FloatingActionButton
                 takeJpegPicture(capture, executor, viewModel)
             },
-            enabled = state is CameraUiState.Idle || state is CameraUiState.Failure,
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 48.dp)
                     .size(72.dp)
-                    .testTag(CameraScreenTags.SHUTTER),
+                    .testTag(CameraScreenTags.SHUTTER)
+                    .alpha(if (shutterEnabled) 1f else 0.5f)
+                    .semantics { if (!shutterEnabled) disabled() },
         ) {
-            Text(stringResource(id = R.string.camera_shutter_label).first().toString())
+            Icon(
+                painter = painterResource(id = R.drawable.ic_camera_shutter),
+                contentDescription = shutterLabel,
+            )
         }
     }
 
@@ -144,14 +163,24 @@ object CameraScreenTags {
 }
 
 /**
- * Test-only handle on the active [CameraViewModel]. Populated by
- * [CameraScreen] during composition because the view model is created in the
- * Compose Navigation back-stack-entry's `ViewModelStore`, which an
- * instrumentation test cannot reach from `MainActivity` alone.
+ * Test-only handle on the active [CameraViewModel] and an optional injected
+ * [ImageCapture]. The view-model field is populated by [CameraScreen] during
+ * composition because the view model is created in the Compose Navigation
+ * back-stack-entry's `ViewModelStore`, which an instrumentation test cannot
+ * reach from `MainActivity` alone.
+ *
+ * `testImageCapture`, when non-null, replaces the real CameraX-bound
+ * [ImageCapture] in [CameraScreen]. Tests use this to assert shutter
+ * enablement (and the §4 bind-loading state) without standing up a real
+ * camera — the AOSP GMD has no sensor, so the production binding code path
+ * silently leaves `imageCapture = null` there.
  */
 internal object CameraScreenTestRegistry {
     @Volatile
     var current: CameraViewModel? = null
+
+    @Volatile
+    var testImageCapture: ImageCapture? = null
 }
 
 private fun bindCameraUseCases(
