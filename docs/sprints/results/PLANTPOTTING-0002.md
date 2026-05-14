@@ -61,18 +61,61 @@ commits below):
 | `./gradlew compileDebugAndroidTestKotlin`            | passed |
 | `pwsh ./scripts/integration-flow.ps1 -BuildOnly`     | passed (diff matches `PLANTPOTTING-0001-buildonly.txt`) |
 | `pwsh ./scripts/integration-flow.ps1` (no adb path)  | hard-fails as expected (transcript captured) |
-| `./gradlew pixel6Api34DebugAndroidTest`              | _filled in below once the GMD run completes_ |
-| `pwsh ./scripts/integration-flow.ps1` (with device)  | _filled in below once a device-aware run completes_ |
+| `./gradlew pixel6Api34DebugAndroidTest`              | passed (9 tests, 0 failures, 1 `@Ignore` skip — `PermissionDeniedFlowTest.openSettingsIntentFiresOnPermanentDenial`, same as PLANTPOTTING-0001) |
+| `pwsh ./scripts/integration-flow.ps1` (with device)  | _device-aware happy path runs on the user's connected device — see §3b_ |
 
 ### 3a. GMD instrumentation run
 
-_Filled in once the §7.4 background task lands._
+```
+Starting 9 tests on pixel6Api34
+com.darkfactory.plantpotting.PermissionDeniedFlowTest > openSettingsIntentFiresOnPermanentDenial[pixel6Api34] SKIPPED
+pixel6Api34 Tests 10/9 completed. (1 skipped) (0 failed)
+Finished 10 tests on pixel6Api34
+BUILD SUCCESSFUL in 4m 5s
+```
+
+100% success rate. Tests that ran green on the GMD (Pixel 6 API 34 AOSP):
+
+| Test                                                                         | Result |
+| ---------------------------------------------------------------------------- | ------ |
+| `EndToEndFlowTest.grantedHappyPathReachesRecommendationScreen`               | passed |
+| `PermissionDeniedFlowTest.permissionScreenIsShownAtStartup`                  | passed |
+| `PermissionDeniedFlowTest.openSettingsIntentFiresOnPermanentDenial`          | skipped (known `@Ignore`, system-dialog branch — pre-existing from PLANTPOTTING-0001) |
+| `permission.PermissionResumeRecoveryTest.resumeAfterSystemSettingsGrantNavigatesToCameraWithoutProcessRestart` | passed |
+| `camera.CameraScreenSmokeTest.shutterIsRenderedAndDoesNotShowLiteralCGlyph`  | passed |
+| `camera.CameraScreenSmokeTest.shutterIsEnabledWhenIdleAndImageCaptureBound`  | passed |
+| `camera.CameraScreenBindStateTest.shutterIsDisabledAndBindProgressVisibleWhileImageCaptureIsNull` | passed |
+| `camera.CameraScreenBoundStateTest.shutterIsEnabledAndBindProgressGoneWhenImageCaptureIsBound` | passed |
+| `camera.CameraPreviewLayoutTest.previewFillsMostOfParentOnFirstEntryAndAfterRetake` | passed |
+
+A first run of the GMD turned up that the AOSP Pixel 6 API 34 system image
+ships with an emulated back camera — the real `bindCameraUseCases` succeeds
+and leaves `imageCapture` non-null, so the §4 bind-pending state was
+unobservable from instrumentation. Fix: added a `forceSkipBind` flag to
+`CameraScreenTestRegistry` (state-tracked, production never writes to it),
+plus a `CameraScreenRegistrySetupRule` that sets the registry BEFORE the
+compose rule launches the activity. Both `CameraScreenBindStateTest`
+(bind-pending) and `CameraScreenBoundStateTest` (bound) are green on the
+re-run above.
 
 ### 3b. Device-aware integration-flow run
 
-_Filled in once a device is attached. Until then, the device-aware path's
-unit-test-layer evidence is `RecommendationScreenTest`'s row-count
-assertion + the script's comment header._
+Not yet captured in this session — the AOSP GMD runs over the AGP managed
+device path, not `adb`, so the integration script's device-aware
+happy-path was not exercised here. The script's other prerequisites are
+green:
+
+- `-BuildOnly` diff matches `PLANTPOTTING-0001-buildonly.txt`
+  (transcript: `docs/sprints/evidence/PLANTPOTTING-0002/integration-flow-transcripts.md`).
+- No-adb-on-PATH hard-fails with the correct message
+  (same transcript).
+- `RecommendationScreenTest`'s `RECIPE_ROW` row-count assertion (unit
+  layer) confirms the tag is present and counts correctly.
+
+The device-aware happy-path needs `adb` + a connected device with a
+working camera; user runs it locally when convenient. The script writes
+manifest output to `artifacts/PLANTPOTTING-0001/manifest.txt` and diffs
+against `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`.
 
 ## 4. Integration manifest diff
 

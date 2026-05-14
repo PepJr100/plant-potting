@@ -15,6 +15,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 
 /**
  * PLANTPOTTING-0002 Phase 4 (UX 1). The shutter must be disabled and a
@@ -22,12 +25,12 @@ import org.junit.Test
  * an `ImageCapture`. Once an `ImageCapture` is bound, the overlay must
  * disappear and the shutter must become enabled.
  *
- * The test exercises the two static states by composing the screen with
- * `CameraScreenTestRegistry.testImageCapture` set to `null` (bind-pending)
- * and unset (default, which goes through the real binding path on a GMD
- * with no camera, leaving `imageCapture` null too). To exercise the
- * "bound" state we share the smoke test's fake-injection path; that
- * coverage lives in [CameraScreenSmokeTest.shutterIsEnabledWhenIdleAndImageCaptureBound].
+ * AOSP system images for the `pixel6Api34` GMD ship with an emulated back
+ * camera, so the real `bindCameraUseCases` succeeds at runtime and leaves
+ * `imageCapture` non-null — the bind-pending state would otherwise be
+ * unobservable from instrumentation. Tests therefore drive
+ * [CameraScreenTestRegistry.forceSkipBind] via a JUnit rule that takes
+ * effect BEFORE `composeRule`'s activity launches.
  */
 @HiltAndroidTest
 class CameraScreenBindStateTest {
@@ -36,6 +39,9 @@ class CameraScreenBindStateTest {
 
     @get:Rule(order = 1)
     val forceGranted = FakeGuardStateRule(granted = true)
+
+    @get:Rule(order = 4)
+    val registrySetup = CameraScreenRegistrySetupRule(forceSkipBind = true)
 
     @get:Rule(order = 2)
     val composeRule = createAndroidComposeRule<MainActivity>()
@@ -47,38 +53,87 @@ class CameraScreenBindStateTest {
     @After
     fun clearRegistry() {
         CameraScreenTestRegistry.testImageCapture = null
+        CameraScreenTestRegistry.forceSkipBind = false
     }
 
-    /**
-     * Bind-pending: no `ImageCapture` available → shutter disabled and the
-     * `BIND_PROGRESS` overlay is rendered. AOSP GMDs have no camera sensor,
-     * so the real `bindCameraUseCases` silently fails and leaves
-     * `imageCapture = null`, which is exactly the state under test.
-     */
     @Test
     fun shutterIsDisabledAndBindProgressVisibleWhileImageCaptureIsNull() {
-        // No `testImageCapture` injection.
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsNotEnabled()
         composeRule.onNodeWithTag(CameraScreenTags.BIND_PROGRESS).assertIsDisplayed()
     }
+}
 
-    /**
-     * Bound: `ImageCapture` injected → shutter enabled, no `BIND_PROGRESS`.
-     */
+/**
+ * Paired bound-state test in a separate class so the @Rule chain can
+ * inject the `ImageCapture` BEFORE the activity launches. Splitting from
+ * [CameraScreenBindStateTest] avoids per-test rule reconfiguration.
+ */
+@HiltAndroidTest
+class CameraScreenBoundStateTest {
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val forceGranted = FakeGuardStateRule(granted = true)
+
+    @get:Rule(order = 4)
+    val registrySetup =
+        CameraScreenRegistrySetupRule(
+            testImageCaptureFactory = { ImageCapture.Builder().build() },
+        )
+
+    @get:Rule(order = 2)
+    val composeRule = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule(order = 3)
+    val permissionRule: GrantPermissionRule =
+        GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
+
+    @After
+    fun clearRegistry() {
+        CameraScreenTestRegistry.testImageCapture = null
+        CameraScreenTestRegistry.forceSkipBind = false
+    }
+
     @Test
     fun shutterIsEnabledAndBindProgressGoneWhenImageCaptureIsBound() {
-        CameraScreenTestRegistry.testImageCapture =
-            ImageCapture
-                .Builder()
-                .build()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsEnabled()
-        // BIND_PROGRESS should not exist when imageCapture is non-null.
-        val matches =
+        val bindProgress =
             composeRule
                 .onAllNodesWithTag(CameraScreenTags.BIND_PROGRESS)
                 .fetchSemanticsNodes(atLeastOneRootRequired = false)
-        check(matches.isEmpty()) { "BIND_PROGRESS overlay rendered while ImageCapture was bound" }
+        check(bindProgress.isEmpty()) { "BIND_PROGRESS overlay rendered while ImageCapture was bound" }
     }
+}
+
+/**
+ * Sets [CameraScreenTestRegistry] state BEFORE the wrapped statement runs
+ * (i.e., before `createAndroidComposeRule` launches the activity), and
+ * restores on completion. Must be ordered with a HIGHER `@Rule(order=...)`
+ * than the compose rule so it applies on the outside.
+ */
+class CameraScreenRegistrySetupRule(
+    private val testImageCaptureFactory: (() -> ImageCapture)? = null,
+    private val forceSkipBind: Boolean = false,
+) : TestRule {
+    override fun apply(
+        base: Statement,
+        description: Description,
+    ): Statement =
+        object : Statement() {
+            override fun evaluate() {
+                val priorImageCapture = CameraScreenTestRegistry.testImageCapture
+                val priorSkip = CameraScreenTestRegistry.forceSkipBind
+                CameraScreenTestRegistry.testImageCapture = testImageCaptureFactory?.invoke()
+                CameraScreenTestRegistry.forceSkipBind = forceSkipBind
+                try {
+                    base.evaluate()
+                } finally {
+                    CameraScreenTestRegistry.testImageCapture = priorImageCapture
+                    CameraScreenTestRegistry.forceSkipBind = priorSkip
+                }
+            }
+        }
 }

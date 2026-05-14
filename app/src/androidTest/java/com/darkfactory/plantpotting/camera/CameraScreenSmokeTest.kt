@@ -1,7 +1,6 @@
 package com.darkfactory.plantpotting.camera
 
 import androidx.camera.core.ImageCapture
-import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -17,7 +16,6 @@ import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -27,14 +25,10 @@ import org.junit.Test
  * the shutter must not render the literal "C" glyph from
  * `R.string.camera_shutter_label.first()`.
  *
- * Notes:
- * - The AOSP GMD has no camera sensor, so the real CameraX bind in
- *   [bindCameraUseCases] would leave `imageCapture` null. The test injects a
- *   fake `ImageCapture` via [CameraScreenTestRegistry.testImageCapture] so
- *   the shutter's enabled-when-bound branch can be asserted without standing
- *   up CameraX.
- * - The fake `ImageCapture` is built via the public Builder; no camera is
- *   bound to it, which is fine because the test never taps the shutter.
+ * The shutter's enabled-state assertion is exercised via
+ * [CameraScreenRegistrySetupRule] which injects an [ImageCapture] BEFORE
+ * the activity launches; this avoids depending on whether the emulated
+ * back camera on the GMD happens to bind successfully or not.
  */
 @HiltAndroidTest
 class CameraScreenSmokeTest {
@@ -44,6 +38,12 @@ class CameraScreenSmokeTest {
     @get:Rule(order = 1)
     val forceGranted = FakeGuardStateRule(granted = true)
 
+    @get:Rule(order = 4)
+    val registrySetup =
+        CameraScreenRegistrySetupRule(
+            testImageCaptureFactory = { ImageCapture.Builder().build() },
+        )
+
     @get:Rule(order = 2)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
@@ -51,41 +51,28 @@ class CameraScreenSmokeTest {
     val permissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
-    private lateinit var fakeImageCapture: ImageCapture
-
-    @Before
-    fun injectFakeImageCapture() {
-        fakeImageCapture =
-            ImageCapture
-                .Builder()
-                .build()
-        CameraScreenTestRegistry.testImageCapture = fakeImageCapture
-    }
-
     @After
-    fun clearFakeImageCapture() {
+    fun clearRegistry() {
         CameraScreenTestRegistry.testImageCapture = null
+        CameraScreenTestRegistry.forceSkipBind = false
     }
 
     @Test
     fun shutterIsRenderedAndDoesNotShowLiteralCGlyph() {
-        // Wait until the camera screen composes.
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
 
-        // Bug 1 regression: no text node anywhere may equal "C" or any other
-        // single-character prefix of the shutter label.
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val label = context.getString(R.string.camera_shutter_label)
         val firstChar = label.first().toString()
 
+        // Bug 1 regression: no text node may equal the first character of
+        // `camera_shutter_label` (or the literal "C" even if the label is
+        // reworded). The full label is allowed only as a content
+        // description, not as visible text.
         assertNoTextNodeEquals(firstChar)
-        // Be defensive — also assert the literal "C" never appears as a
-        // standalone text node, even if `camera_shutter_label` is reworded later.
         if (firstChar != "C") {
             assertNoTextNodeEquals("C")
         }
-
-        // The shutter's content description equals the full string-resource label.
         composeRule.onNodeWithContentDescription(label).assertIsDisplayed()
     }
 
@@ -102,10 +89,4 @@ class CameraScreenSmokeTest {
                 .fetchSemanticsNodes(atLeastOneRootRequired = false)
         assertThat(matches).isEmpty()
     }
-
-    @Suppress("unused")
-    private fun shutterMatcher(): SemanticsMatcher =
-        SemanticsMatcher("has shutter test tag") { node ->
-            node.config.any { it.key.name == "TestTag" && it.value == CameraScreenTags.SHUTTER }
-        }
 }

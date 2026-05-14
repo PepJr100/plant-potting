@@ -1,13 +1,13 @@
 sprints:
   - id: PLANTPOTTING-0001
     title: Android scaffold + end-to-end stub flow with KB
-    status: in-progress
+    status: done
     executor: opus
     created: "2026-05-13T23:51:09+00:00"
-    updated: "2026-05-14T04:43:33+00:00"
+    updated: "2026-05-14T16:42:39+00:00"
   - id: PLANTPOTTING-0002
     title: Fix sprint for PLANTPOTTING-0001 review bugs
-    status: in-progress
+    status: done
     executor: opus
     created: "2026-05-14T14:39:10+00:00"
-    updated: "2026-05-14T15:16:52+00:00"
+    updated: "2026-05-14T16:42:40+00:00"

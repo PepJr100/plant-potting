@@ -58,8 +58,13 @@ fun CameraScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember(context) { ContextCompat.getMainExecutor(context) }
 
-    val injectedImageCapture = CameraScreenTestRegistry.testImageCapture
-    var imageCapture by remember { mutableStateOf<ImageCapture?>(injectedImageCapture) }
+    val injectedImageCapture by CameraScreenTestRegistry.testImageCaptureState
+    val forceSkipBind by CameraScreenTestRegistry.forceSkipBindState
+    var boundImageCapture by remember { mutableStateOf<ImageCapture?>(null) }
+    // Tests that inject an `ImageCapture` shadow the real-bind path; the
+    // skip-bind flag forces the bind-pending state on AVDs whose emulated
+    // back camera would otherwise let the bind succeed.
+    val imageCapture: ImageCapture? = injectedImageCapture ?: boundImageCapture
 
     LaunchedEffect(viewModel) {
         viewModel.navigate.collectLatest { speciesId ->
@@ -81,16 +86,18 @@ fun CameraScreen(
             modifier = Modifier.fillMaxSize().testTag(CameraScreenTags.PREVIEW),
             factory = { ctx ->
                 val previewView = PreviewView(ctx)
-                // In production `injectedImageCapture` is null, so the real
-                // CameraX binding runs. Tests that pre-set
-                // `CameraScreenTestRegistry.testImageCapture` skip the
-                // binding entirely so the test's value isn't clobbered.
-                if (injectedImageCapture == null) {
+                // Skip the real CameraX bind when a test has injected an
+                // ImageCapture (`testImageCapture` non-null) or has
+                // explicitly forced the bind-pending state via
+                // `forceSkipBind`. Production hits the `else` branch.
+                if (CameraScreenTestRegistry.testImageCapture == null &&
+                    !CameraScreenTestRegistry.forceSkipBind
+                ) {
                     bindCameraUseCases(
                         context = ctx,
                         previewView = previewView,
                         lifecycleOwner = lifecycleOwner,
-                        onBound = { imageCapture = it },
+                        onBound = { boundImageCapture = it },
                     )
                 }
                 previewView
@@ -181,24 +188,46 @@ object CameraScreenTags {
 }
 
 /**
- * Test-only handle on the active [CameraViewModel] and an optional injected
- * [ImageCapture]. The view-model field is populated by [CameraScreen] during
- * composition because the view model is created in the Compose Navigation
- * back-stack-entry's `ViewModelStore`, which an instrumentation test cannot
- * reach from `MainActivity` alone.
+ * Test-only handles for [CameraScreen]. The view-model field is populated
+ * by [CameraScreen] during composition because the view model is created
+ * in the Compose Navigation back-stack-entry's `ViewModelStore`, which an
+ * instrumentation test cannot reach from `MainActivity` alone.
  *
- * `testImageCapture`, when non-null, replaces the real CameraX-bound
- * [ImageCapture] in [CameraScreen]. Tests use this to assert shutter
- * enablement (and the §4 bind-loading state) without standing up a real
- * camera — the AOSP GMD has no sensor, so the production binding code path
- * silently leaves `imageCapture = null` there.
+ * - [testImageCapture] — when non-null, replaces the real CameraX-bound
+ *   [ImageCapture] in [CameraScreen]. Tests use this to assert shutter
+ *   enablement without standing up a real camera.
+ * - [forceSkipBind] — when true, [CameraScreen] skips the real
+ *   `bindCameraUseCases` call inside `AndroidView.factory`. Necessary
+ *   for the UX 1 "bind-pending" assertion on AVDs that ship with an
+ *   emulated back camera (`bindCameraUseCases` would otherwise succeed
+ *   on the GMD and leave `imageCapture` non-null, making the
+ *   bind-pending state unobservable).
+ *
+ * Both fields are held in Compose [androidx.compose.runtime.MutableState]
+ * so the screen recomposes when they change. Production never writes to
+ * them.
  */
 internal object CameraScreenTestRegistry {
     @Volatile
     var current: CameraViewModel? = null
 
-    @Volatile
-    var testImageCapture: ImageCapture? = null
+    val testImageCaptureState: androidx.compose.runtime.MutableState<ImageCapture?> =
+        androidx.compose.runtime.mutableStateOf(null)
+
+    val forceSkipBindState: androidx.compose.runtime.MutableState<Boolean> =
+        androidx.compose.runtime.mutableStateOf(false)
+
+    var testImageCapture: ImageCapture?
+        get() = testImageCaptureState.value
+        set(value) {
+            testImageCaptureState.value = value
+        }
+
+    var forceSkipBind: Boolean
+        get() = forceSkipBindState.value
+        set(value) {
+            forceSkipBindState.value = value
+        }
 }
 
 private fun bindCameraUseCases(
