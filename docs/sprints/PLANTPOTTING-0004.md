@@ -226,7 +226,7 @@ Phase 2 runs **fully in parallel** with Phase 1 — touches disjoint files (`Mai
   Add the imports: `androidx.compose.foundation.layout.Box`, `androidx.compose.ui.ExperimentalComposeUiApi`, `androidx.compose.ui.Modifier`, `androidx.compose.ui.semantics.semantics`, `androidx.compose.ui.semantics.testTagsAsResourceId`. No project-wide `freeCompilerArgs += "-opt-in=..."`.
 - [x] **2.2 (verify)** `MainActivityTestTagsAsResourceIdTest` (added at §0.6 RED) is now green.
 - [x] **2.3** Audit `app/src/main/java/com/darkfactory/plantpotting/` for redundant per-screen `testTagsAsResourceId` opt-ins. Known sites from prior sprint work: `RecommendationScreen.kt:22-27`, `:33`, `:46-50`. Remove these and their imports of `ExperimentalComposeUiApi` / `semantics` / `testTagsAsResourceId` where the only use is the removed code. Grep for `testTagsAsResourceId` in `app/src/main/` — exactly one hit remains (`MainActivity.kt`).
-- [ ] **2.4 (verify, must run against device)** With Phase 2 fix applied, `assembleDebug` + `adb install -r` complete, app launched: `adb shell uiautomator dump /sdcard/dump.xml && adb pull /sdcard/dump.xml ./tmp-dump.xml`. Inspect: at minimum, shutter node has `resource-id="camera.shutter"` non-empty AND `content-desc="Capture plant photo"` still present. Record the one-liner verification in the results doc. (Phase 4 transcripts are the formal evidence; §2.4 is the smoke check while Phase 1 is still in flight.)
+- [x] **2.4 (verify, must run against device)** With Phase 2 fix applied, `assembleDebug` + `adb install -r` complete, app launched: `adb shell uiautomator dump /sdcard/dump.xml && adb pull /sdcard/dump.xml ./tmp-dump.xml`. Inspect: at minimum, shutter node has `resource-id="camera.shutter"` non-empty AND `content-desc="Capture plant photo"` still present. Record the one-liner verification in the results doc. (Phase 4 transcripts are the formal evidence; §2.4 is the smoke check while Phase 1 is still in flight.)
 
 ### Phase 3 — Close the test gap: real-model instrumentation test
 
@@ -254,7 +254,7 @@ Phase 2 runs **fully in parallel** with Phase 1 — touches disjoint files (`Mai
   ```
   `@Inject lateinit var identifier: OnDevicePlantIdentifier` (the concrete class, not `PlantIdentifier` interface) sidesteps `TestIdentifyModule.replaces = [OnDeviceIdentifyModule]` per Decision §4.5.
 - [x] **3.3 (verify)** `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` green (compile-time check before §4 hits the GMD).
-- [ ] **3.4 (verify, fallback wiring if needed)** If the concrete-class injection assumption fails (Risk 7.8 fires), add a one-off `OnDeviceModelRealInterpreterModule.kt` in `app/src/androidTest/` annotated `@TestInstallIn(replaces = [TestIdentifyModule::class], components = [SingletonComponent::class])` that re-binds `OnDevicePlantIdentifier` to `PlantIdentifier`. Limit the scope of this module to the new test class (via a custom test-runner pattern if Hilt allows, or accept that this test class is the only consumer of the real binding for this sprint). Document the fallback in the results doc.
+- [x] **3.4 (verify, fallback wiring if needed — vacuously satisfied)** Concrete-class injection assumption (Risk 7.8) **held** — the §4.4 GMD run executed `OnDeviceModelRealInterpreterTest` against the real `OnDevicePlantIdentifier` without needing a per-test `@TestInstallIn(replaces = [TestIdentifyModule::class])` rebind. Documented as "not exercised" in `results/PLANTPOTTING-0004.md` §3. No new Hilt module added.
 
 ### Phase 4 — Device-aware transcripts + GMD final-verify
 
@@ -403,59 +403,59 @@ The sprint is done when **every** statement below is observably true.
 
 ### 8.1 Build + lint + gates
 
-- [ ] `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` green on a clean clone.
-- [ ] `bash scripts/check-stub-isolation.sh` green.
-- [ ] `./gradlew --no-daemon pixel6Api34DebugAndroidTest` green (including `OnDeviceModelRealInterpreterTest`).
+- [x] `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` green on a clean clone.
+- [x] `bash scripts/check-stub-isolation.sh` green.
+- [x] `./gradlew --no-daemon pixel6Api34DebugAndroidTest` green (including `OnDeviceModelRealInterpreterTest`).
 
 ### 8.2 Seam invariants (still locked from 0003 §4.4)
 
-- [ ] `PlantIdentifier` interface byte-for-byte unchanged from PLANTPOTTING-0003 close. `git diff ac120c9 HEAD -- app/src/main/java/com/darkfactory/plantpotting/identify/PlantIdentifier.kt` returns empty.
-- [ ] `IdentificationResult` field list unchanged (`speciesId, displayName, source, lowConfidence`).
-- [ ] `PlantIdentifierContractTest` (from PLANTPOTTING-0003 §0.4) still green.
-- [ ] `StubPlantIdentifier.kt` still under `app/src/main/java/com/darkfactory/plantpotting/identify/`. `grep -R "StubPlantIdentifier" app/src/main/` returns only paths under `app/src/main/.../identify/`.
+- [x] `PlantIdentifier` interface byte-for-byte unchanged from PLANTPOTTING-0003 close. `git diff ac120c9 HEAD -- app/src/main/java/com/darkfactory/plantpotting/identify/PlantIdentifier.kt` returns empty.
+- [x] `IdentificationResult` field list unchanged (`speciesId, displayName, source, lowConfidence`).
+- [x] `PlantIdentifierContractTest` (from PLANTPOTTING-0003 §0.4) still green.
+- [x] `StubPlantIdentifier.kt` still under `app/src/main/java/com/darkfactory/plantpotting/identify/`. `grep -R "StubPlantIdentifier" app/src/main/` returns only paths under `app/src/main/.../identify/`.
 
 ### 8.3 Bug 1 fix (UINT8 input + UINT8 output dequantization)
 
-- [ ] `app/src/main/assets/ml/aiy_plants_v1/model_manifest.json` declares `"input_dtype": "uint8"`.
-- [ ] `ModelManifestReader` parses `input_dtype` into `ModelDtype.UINT8`; `ModelManifestDtypeContractTest` green.
-- [ ] `ModelManifestReader` rejects `input_dtype` values outside `"uint8"` / `"float32"` and rejects missing values for the production manifest; `ManifestRejectsInvalidInputDtypeTest` green.
-- [ ] `model_manifest.json` no longer declares an active `normalization` stanza for the shipped UINT8 model.
-- [ ] `ImagePreprocessor.preprocess(jpeg)` for the shipped manifest returns `PreprocessedImage` whose `buffer.capacity() == 224 * 224 * 3` (UINT8, not 224*224*3*4).
-- [ ] `PreprocessedImage` declares `buffer: ByteBuffer`; `PreprocessedImageBufferShapeContractTest` green.
-- [ ] `TfLiteInterpreterFacade.loadInterpreter()` throws `IdentificationFailureException` if `interpreter.getInputTensor(0).dataType()` disagrees with `manifest.inputDtype`. Verified by the §3.2 instrumentation test (against the real interpreter) — manifest-vs-runtime agreement is observable on the GMD.
-- [ ] `TfLiteInterpreterFacade.runInference` dequantises the UINT8 output tensor via `interpreter.getOutputTensor(0).quantizationParams()` before returning a `FloatArray` to `ModelScoreMapper`. Inline comment explains *why*.
-- [ ] **On a live emulator:** shutter capture no longer surfaces the `Cannot convert between a TensorFlowLite tensor with type UINT8 …` failure. User reaches `ResultScreen` or `LowConfidencePicker` on every capture.
+- [x] `app/src/main/assets/ml/aiy_plants_v1/model_manifest.json` declares `"input_dtype": "uint8"`.
+- [x] `ModelManifestReader` parses `input_dtype` into `ModelDtype.UINT8`; `ModelManifestDtypeContractTest` green.
+- [x] `ModelManifestReader` rejects `input_dtype` values outside `"uint8"` / `"float32"` and rejects missing values for the production manifest; `ManifestRejectsInvalidInputDtypeTest` green.
+- [x] `model_manifest.json` no longer declares an active `normalization` stanza for the shipped UINT8 model.
+- [x] `ImagePreprocessor.preprocess(jpeg)` for the shipped manifest returns `PreprocessedImage` whose `buffer.capacity() == 224 * 224 * 3` (UINT8, not 224*224*3*4).
+- [x] `PreprocessedImage` declares `buffer: ByteBuffer`; `PreprocessedImageBufferShapeContractTest` green.
+- [x] `TfLiteInterpreterFacade.loadInterpreter()` throws `IdentificationFailureException` if `interpreter.getInputTensor(0).dataType()` disagrees with `manifest.inputDtype`. Verified by the §3.2 instrumentation test (against the real interpreter) — manifest-vs-runtime agreement is observable on the GMD.
+- [x] `TfLiteInterpreterFacade.runInference` dequantises the UINT8 output tensor via `interpreter.getOutputTensor(0).quantizationParams()` before returning a `FloatArray` to `ModelScoreMapper`. Inline comment explains *why*.
+- [x] **On a live emulator:** shutter capture no longer surfaces the `Cannot convert between a TensorFlowLite tensor with type UINT8 …` failure. User reaches `ResultScreen` or `LowConfidencePicker` on every capture.
 
 ### 8.4 Bug 2 fix (testTagsAsResourceId bridge + cleanup)
 
-- [ ] `MainActivity.onCreate` wraps `PlantPottingNavHost()` in `Box(modifier = Modifier.semantics { testTagsAsResourceId = true })` opted-into `ExperimentalComposeUiApi`.
-- [ ] `MainActivityTestTagsAsResourceIdTest` green (Robolectric).
-- [ ] `grep -R "testTagsAsResourceId" app/src/main/` returns exactly one hit: `MainActivity.kt`. Per-screen opt-ins in `RecommendationScreen.kt` removed.
-- [ ] **On a live emulator:** `adb shell uiautomator dump` of the camera screen surfaces `resource-id="camera.shutter"` non-empty, and `content-desc="Capture plant photo"` is preserved. Recorded in `transcript-A-cold.txt` (the script's `Wait-ForNode -resourceId "camera.shutter"` step passes without timing out).
-- [ ] `uiautomator dump`s of at least three screens (Camera, Result, Recommendation) expose populated `resource-id` attributes — broader than just the shutter.
+- [x] `MainActivity.onCreate` wraps `PlantPottingNavHost()` in `Box(modifier = Modifier.semantics { testTagsAsResourceId = true })` opted-into `ExperimentalComposeUiApi`.
+- [x] `MainActivityTestTagsAsResourceIdTest` green (Robolectric).
+- [x] `grep -R "testTagsAsResourceId" app/src/main/` returns exactly one hit: `MainActivity.kt`. Per-screen opt-ins in `RecommendationScreen.kt` removed.
+- [x] **On a live emulator:** `adb shell uiautomator dump` of the camera screen surfaces `resource-id="camera.shutter"` non-empty, and `content-desc="Capture plant photo"` is preserved. Recorded in `transcript-A-cold.txt` (the script's `Wait-ForNode -resourceId "camera.shutter"` step passes without timing out).
+- [x] `uiautomator dump`s of at least three screens (Camera, Result, Recommendation) expose populated `resource-id` attributes — broader than just the shutter.
 
 ### 8.5 Test gap closure (real-model instrumentation test)
 
-- [ ] `app/src/androidTest/java/com/darkfactory/plantpotting/identify/OnDeviceModelRealInterpreterTest.kt` exists; injects the concrete `OnDevicePlantIdentifier`; runs `identify(realJpegBytes)` against `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`; asserts `source == IdSource.ON_DEVICE_MODEL` without throwing.
-- [ ] Test green on `pixel6Api34DebugAndroidTest`.
-- [ ] **Falsifiability proof (§4.6):** reverting `ImagePreprocessor`'s `TensorImage` branch to FLOAT32 on a feature branch reproduces the exact Bug 1 error message in `OnDeviceModelRealInterpreterTest`. Documented in `docs/sprints/results/PLANTPOTTING-0004.md` §4.
-- [ ] If §3.4 fallback fires, the per-test `@TestInstallIn(replaces = [TestIdentifyModule::class])` module is the only added Hilt-module change in this sprint.
+- [x] `app/src/androidTest/java/com/darkfactory/plantpotting/identify/OnDeviceModelRealInterpreterTest.kt` exists; injects the concrete `OnDevicePlantIdentifier`; runs `identify(realJpegBytes)` against `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`; asserts `source == IdSource.ON_DEVICE_MODEL` without throwing.
+- [x] Test green on `pixel6Api34DebugAndroidTest`.
+- [x] **Falsifiability proof (§4.6):** reverting `ImagePreprocessor`'s `TensorImage` branch to FLOAT32 on a feature branch reproduces the exact Bug 1 error message in `OnDeviceModelRealInterpreterTest`. Documented in `docs/sprints/results/PLANTPOTTING-0004.md` §4.
+- [x] If §3.4 fallback fires, the per-test `@TestInstallIn(replaces = [TestIdentifyModule::class])` module is the only added Hilt-module change in this sprint.
 
 ### 8.6 §7.5 transcripts (the headline carry-forward from 0003)
 
-- [ ] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-A-cold.txt` captured from a cold-boot emulator run. Final line: `Integration manifest diff passed.`
-- [ ] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-B-warm.txt` captured from a warm re-run after `am force-stop`. Final line: `Integration manifest diff passed.`
-- [ ] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-C-buildonly.txt` captured. Build-only diff against `expected-artifacts/PLANTPOTTING-0001-buildonly.txt` passes.
-- [ ] `docs/sprints/evidence/PLANTPOTTING-0004/gmd-output.txt` captures `pixel6Api34DebugAndroidTest` green.
-- [ ] If `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt` is updated (e.g. badge string change), the change is justified in writing in the results doc and does **not** weaken the device-aware requirements (`source-badge=…`, `model-asset-present=true`, screenshot count, archetype, recipe row count all preserved or improved).
+- [x] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-A-cold.txt` captured from a cold-boot emulator run. Final line: `Integration manifest diff passed.`
+- [x] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-B-warm.txt` captured from a warm re-run after `am force-stop`. Final line: `Integration manifest diff passed.`
+- [x] `docs/sprints/evidence/PLANTPOTTING-0004/transcript-C-buildonly.txt` captured. Build-only diff against `expected-artifacts/PLANTPOTTING-0001-buildonly.txt` passes.
+- [x] `docs/sprints/evidence/PLANTPOTTING-0004/gmd-output.txt` captures `pixel6Api34DebugAndroidTest` green.
+- [x] If `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt` is updated (e.g. badge string change), the change is justified in writing in the results doc and does **not** weaken the device-aware requirements (`source-badge=…`, `model-asset-present=true`, screenshot count, archetype, recipe row count all preserved or improved).
 
 ### 8.7 Docs + ledger
 
-- [ ] `docs/sprints/results/PLANTPOTTING-0004.md` exists with §0 baseline / §1 Bug 1 / §2 Bug 2 / §3 real-model test / §4 transcripts + falsifiability / §5 carry-forward / §6 final-verify sections.
-- [ ] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0004` `status: done`, `updated` refreshed.
-- [ ] Every must-land §3.1 task `- [x]` in this file.
-- [ ] No edits to prior sprint plan documents (`PLANTPOTTING-0001.md`, `PLANTPOTTING-0002.md`, `PLANTPOTTING-0003.md`).
-- [ ] Carry-forward to PLANTPOTTING-0005 explicitly lists: full `TestIdentifyModule` removal + six-test `@BindValue` migration; confidence calibration; `CameraUiState.Failure` UI polish; `LowConfidenceFlowTest`; `PermissionDeniedFlowTest` un-`@Ignore`; INT8 stretch / GPU / NNAPI.
+- [x] `docs/sprints/results/PLANTPOTTING-0004.md` exists with §0 baseline / §1 Bug 1 / §2 Bug 2 / §3 real-model test / §4 transcripts + falsifiability / §5 carry-forward / §6 final-verify sections.
+- [x] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0004` `status: done`, `updated` refreshed.
+- [x] Every must-land §3.1 task `- [x]` in this file.
+- [x] No edits to prior sprint plan documents (`PLANTPOTTING-0001.md`, `PLANTPOTTING-0002.md`, `PLANTPOTTING-0003.md`).
+- [x] Carry-forward to PLANTPOTTING-0005 explicitly lists: full `TestIdentifyModule` removal + six-test `@BindValue` migration; confidence calibration; `CameraUiState.Failure` UI polish; `LowConfidenceFlowTest`; `PermissionDeniedFlowTest` un-`@Ignore`; INT8 stretch / GPU / NNAPI.
 
 ---
 
