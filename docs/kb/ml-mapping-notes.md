@@ -66,8 +66,8 @@ Direct rank-match. Hoya carnosa is the most widely sold Hoya in the West; we acc
 
 - The current `plant_class_map.json` contains **18 mappings** for the **16 KB species** (two species — Dracaena trifasciata and Goeppertia orbifolia — have alias entries for their pre-transfer scientific names).
 - Every KB species id appears as a `kbSpeciesId` value at least once. This is enforced by `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`.
-- Every mapping key appears in `labels.csv` so the runtime lookup against the predicted-class label succeeds. This is enforced by `ModelLabelMappingValidationTest.everyMappingKeyExistsInLabelsCsv`.
-- The labels.csv shipped today is an interim vocabulary scoped to the 18 keys above (see PLANTPOTTING-0003 §2 / Blockers). When the real AIY V1 `.tflite` (with its ~2,101-label vocabulary) is dropped in, replace `labels.csv` with the upstream label file. The mapping JSON does not need to grow — keys that are not in the upstream labels file will simply never be looked up; missing keys (the common case once the real labels arrive) route through `LowConfidencePicker`'s manual search.
+- The real AIY V1 vocabulary (extracted from the upstream `.tflite` as `probability-labels-en.txt`, 2101 scientific names) overlaps our retail-houseplant KB on just **2 of 18 mapping keys**: `Monstera deliciosa` and `Crassula ovata`. The remaining 14 species are not in the model's training set at the species rank, so high-confidence direct hits for them will never fire. This matches the §7.1 risk assessment, and the design's intended safety net is `LowConfidencePicker`'s manual search — every KB species is reachable from there.
+- The dormant 14 mapping entries are intentional editorial intent. They survive a future model variant that adds the species (e.g., a fine-tuned retail-focused checkpoint), and they document that we *would* map those labels if they appeared. `ModelLabelMappingValidationTest.mappingHasAtLeastOneKeyInUpstreamLabels` enforces the minimum-viable invariant (at least one mapping key actually matches the vocabulary, so at least one high-confidence path is reachable).
 
 ## When to update this file
 

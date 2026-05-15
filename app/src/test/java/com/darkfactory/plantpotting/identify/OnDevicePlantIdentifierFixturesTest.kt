@@ -109,16 +109,21 @@ class OnDevicePlantIdentifierFixturesTest {
         }
 
     @Test
-    fun ficusFixtureRoutesToFicusLyrataSpeciesId() =
+    fun crassulaFixtureRoutesToCrassulaOvataSpeciesId() =
         runBlocking {
+            // Crassula ovata is the second of two retail-houseplant species that
+            // overlap with AIY V1's 2102-label vocabulary (the other is Monstera
+            // deliciosa). The remaining 14 KB species are not in the model's
+            // training set; they route through LowConfidencePicker's manual
+            // search per PLANTPOTTING-0003 §4.3 / §7.1.
             val context = ApplicationProvider.getApplicationContext<Context>()
             val labelCount = ModelManifestReader(context.assets).read().labelCount
             val labels = ModelLabelsReader(context.assets).read()
-            val ficusIdx = labels.indexOf("Ficus lyrata")
-            assertThat(ficusIdx).isGreaterThan(-1)
-            val identifier = pipeline(scoresWithBest(ficusIdx, 0.72f, labelCount))
+            val crassulaIdx = labels.indexOf("Crassula ovata")
+            assertThat(crassulaIdx).isGreaterThan(-1)
+            val identifier = pipeline(scoresWithBest(crassulaIdx, 0.72f, labelCount))
             val result = identifier.identify(ficusLyrataJpeg())
-            assertThat(result.speciesId).isEqualTo("ficus-lyrata")
+            assertThat(result.speciesId).isEqualTo("crassula-ovata")
             assertThat(result.lowConfidence).isFalse()
         }
 
@@ -133,10 +138,12 @@ class OnDevicePlantIdentifierFixturesTest {
             val result = identifier.identify(blankGreyJpeg())
             assertThat(result.lowConfidence).isTrue()
             assertThat(result.speciesId).isEmpty()
-            // The 18 labels are all mapped today, so the up-to-3 list would normally fill;
-            // this fixture exists to prove the pipeline reaches the low-confidence emission
-            // path on a clearly uncertain distribution.
-            assertThat(identifier.mostRecentCandidates).hasSize(3)
+            // The mapping covers 18 keys but only 2 (Monstera deliciosa, Crassula
+            // ovata) overlap the real upstream vocabulary, so the up-to-3 mapped
+            // candidates list maxes out at 2. The fixture proves the pipeline reaches
+            // the low-confidence emission path on a clearly uncertain distribution
+            // and surfaces the mapped candidates that do resolve.
+            assertThat(identifier.mostRecentCandidates).hasSize(2)
         }
 
     @Test

@@ -1,17 +1,17 @@
 {
-  "_comment_top": "Manifest for the AIY Plants V1 on-device classifier. While the model.tflite asset is the placeholder committed by PLANTPOTTING-0003 (see the file header), `sha256` reflects the placeholder bytes; regenerate it when the real model is dropped in. All other fields target the real V1/3 FP16 variant.",
-  "source_url": "https://tfhub.dev/google/lite-model/aiy/vision/classifier/plants_V1",
+  "_comment_top": "Manifest for the AIY Plants V1 on-device classifier. The .tflite is the upstream INT8 / V1/3 variant extracted from the model.tar.gz bundle on Kaggle Models. Labels live alongside as labels.csv (the model's embedded probability-labels-en.txt, 2101 scientific names indexed 0..2100).",
+  "source_url": "https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-plants-v1/3",
   "variant": "V1/3",
-  "sha256": "65b4870462f76b7f212a19df2cbd808f244c8b3614cacda484f08c06c49358fb",
-  "placeholder": true,
+  "sha256": "9ff2cc02d066fc266045ce299f04fb76907d9313d576881b61c255aa19433521",
+  "placeholder": false,
   "input_size": 224,
   "color_order": "RGB",
   "normalization": {
     "mean": [127.5, 127.5, 127.5],
     "std": [127.5, 127.5, 127.5]
   },
-  "output_tensor_shape": [1, 18],
-  "label_count": 18,
+  "output_tensor_shape": [1, 2102],
+  "label_count": 2102,
   "acquisition_date": "2026-05-15",
   "license": "Apache-2.0",
   "license_file": "LICENSE-aiy-plants-v1.txt",
@@ -24,5 +24,5 @@
     "top_k_candidates": 3
   },
   "_comment_thresholds": "These mirror PLANTPOTTING-0003 §4.3 verbatim. They are the policy source-of-truth; the Kotlin ModelScoreMapper reads them at construction time, and ModelManifestTest sanity-checks they have not drifted.",
-  "_comment_swap_in": "When the real V1/3 .tflite is downloaded (~25 MB FP16), update `sha256` to match the new file, set `placeholder` to false, and re-run ModelManifestTest. The real model has 2101 labels; update `label_count` and `output_tensor_shape[1]` accordingly, and replace labels.csv with the upstream label vocabulary."
+  "_comment_coverage": "Of the 18 plant_class_map.json mapping entries, only 2 (Monstera deliciosa, Crassula ovata) are present verbatim in the upstream 2101-label vocabulary. The remaining 14 species are not in the model's training set — they will route through LowConfidencePicker's manual search (PLANTPOTTING-0003 §4.3 unmapped path). This matches the §7.1 risk assessment; the design treats unmapped predictions as user-facing uncertainty rather than silent fallback."
 }
