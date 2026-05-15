@@ -303,16 +303,16 @@ TDD ordering: paired test tasks land **RED first** where the spec permits. Test 
 
 ### Phase 8 — Documentation, ledger, acceptance evidence
 
-- [ ] **8.1** Author `docs/sprints/results/PLANTPOTTING-0003.md` (same shape as the PLANTPOTTING-0001/0002 results docs): build commands + outputs; model choice rationale (linked to §4.1); mapping coverage summary; Bug A transcript A/B/C links; source-driven-badge before/after notes; fixture-evaluation metrics (top-1, top-3 observed on the bundled fixtures); known gaps; one-line handoff note to PLANTPOTTING-0004 (likely topic: confidence calibration + UI polish).
-- [ ] **8.2** Confirm `docs/kb/ml-mapping-notes.md` (authored in §2.7) is complete — every mapping line in `plant_class_map.json` has a justification paragraph.
-- [ ] **8.3 (nice-to-have)** Author `docs/ml/model-card-aiy-plants-v1.md` — model source URL, asset sha256s, input contract, label count, mapping strategy, known weaknesses, low-confidence policy, APK size impact. Drop from must-land per §3.2 if time slips.
-- [ ] **8.4** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0003` `status: done`, refresh `updated`.
+- [x] **8.1** Author `docs/sprints/results/PLANTPOTTING-0003.md` (same shape as the PLANTPOTTING-0001/0002 results docs): build commands + outputs; model choice rationale (linked to §4.1); mapping coverage summary; Bug A transcript A/B/C links; source-driven-badge before/after notes; fixture-evaluation metrics (top-1, top-3 observed on the bundled fixtures); known gaps; one-line handoff note to PLANTPOTTING-0004 (likely topic: confidence calibration + UI polish).
+- [x] **8.2** Confirm `docs/kb/ml-mapping-notes.md` (authored in §2.7) is complete — every mapping line in `plant_class_map.json` has a justification paragraph.
+- [ ] **8.3 (nice-to-have)** Author `docs/ml/model-card-aiy-plants-v1.md` — model source URL, asset sha256s, input contract, label count, mapping strategy, known weaknesses, low-confidence policy, APK size impact. Drop from must-land per §3.2 if time slips. _Dropped per §6.3 de-scope; ml-mapping-notes.md + model_manifest.json cover the same material._
+- [x] **8.4** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0003` `status: done`, refresh `updated`. _Status remains `in-progress` per the executor-skill rule that any unchecked task or `## Blockers` section keeps the sprint open; B1 / B3 / §7.5 / §6.10 are unresolved. `updated` refreshed at sprint close-out._
 - [ ] **8.5 (final verify)** Run the full clean-clone CI chain on the final commit:
   - `./gradlew assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking pixel6Api34DebugAndroidTest`
   - `bash scripts/check-stub-isolation.sh`
   - `pwsh scripts/integration-flow.ps1` (device-aware)
   - `pwsh scripts/integration-flow.ps1 -BuildOnly`
-  Record commit hash, commands, and outputs in §8.1's results doc.
+  Record commit hash, commands, and outputs in §8.1's results doc. _All script + unit-test gates green at commit `f8e741b`. `pixel6Api34DebugAndroidTest` + device-aware integration script require a live emulator and clearing of Blocker B1; outputs are conditional and recorded in results §6._
 
 ---
 

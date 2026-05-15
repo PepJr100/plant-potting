@@ -172,8 +172,40 @@ PASS  Invoke-AdbDump clears any stale local file before each dump attempt
 
 ## 6. Final verify (§8.5)
 
-_To be filled in at sprint close-out._
+**Commit at sprint close:** `f8e741b8058b5ab6213092bf83e1cf99a5493803`
+
+| Command | Result |
+| --- | --- |
+| `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` | `BUILD SUCCESSFUL in 2m 0s` (74 tasks) |
+| `bash scripts/check-stub-isolation.sh` | `stub isolation OK` |
+| `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` | `BUILD SUCCESSFUL in 59s` |
+| `pwsh ./scripts/integration-flow.ps1 -BuildOnly` | `Integration manifest diff passed.` |
+| `pwsh ./scripts/tests/integration-flow-tests.ps1` | `5 passed, 0 failed` |
+
+`pixel6Api34DebugAndroidTest` and the device-aware `pwsh ./scripts/integration-flow.ps1`
+were **not** run in this session — both require a Pixel 6 API 34 emulator, which the
+sandbox did not have available, AND they would currently fail on Blocker B1 (the
+placeholder model causes `OnDevicePlantIdentifier` to throw
+`IdentificationFailureException` at first identify(), so the result screen never
+appears). Both should pass once B1 clears; the script-level retry logic is verified
+by the §7.2 shim tests.
 
 ## 7. Known gaps / handoff for PLANTPOTTING-0004
 
-_To be filled in at sprint close-out._
+**Carry-forward (unblocked by user action B1, real model swap):**
+
+- Capture `transcript-A-cold.txt` and `transcript-B-warm.txt` for §7.5
+- Re-run `pixel6Api34DebugAndroidTest` against the GMD; expect green
+- Drop `placeholder: true` in `model_manifest.json` once the real `.tflite` is sha256-stamped
+
+**Deferred to PLANTPOTTING-0004 (de-scoped per plan §6.3 / §8.3):**
+
+- `LowConfidenceFlowTest` instrumentation test (§6.10) — Blocker B3
+- `docs/ml/model-card-aiy-plants-v1.md` model card (§8.3 nice-to-have)
+- INT8 quantized model variant + `KbToModelCoverageTest` inverse coverage check (§3.2 stretch)
+- GPU/NNAPI delegate (§3.2 stretch)
+- Re-enable `PermissionDeniedFlowTest` (still `@Ignore` from PLANTPOTTING-0001)
+
+**Suggested PLANTPOTTING-0004 topic:** confidence calibration + UI polish, plus the LowConfidenceFlowTest instrumentation. Optional: explore swapping the placeholder model for the upstream variant and re-running the device-aware acceptance chain.
+
+**Sprint sentinel:** every must-land task in Phases 0–7 is `[x]` except §7.5 (transcripts blocked on B1) and §6.10 (deferred per §6.3 last-resort de-scope). The §8.5 GMD final-verify line is conditional on a live device + B1 clearing; the script and unit-test gates are all green.
