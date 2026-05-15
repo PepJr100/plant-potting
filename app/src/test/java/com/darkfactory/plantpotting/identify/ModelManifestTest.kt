@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.double
@@ -43,13 +42,16 @@ class ModelManifestTest {
     @Test
     fun manifestIsValidJson() {
         val m = manifest()
+        // PLANTPOTTING-0004 §1.1: the active `normalization` stanza was removed for the
+        // shipped UINT8 model. The new required field is `input_dtype` (locked separately
+        // by ModelManifestDtypeContractTest).
         assertThat(m.keys).containsAtLeast(
             "source_url",
             "variant",
             "sha256",
             "input_size",
+            "input_dtype",
             "color_order",
-            "normalization",
             "output_tensor_shape",
             "label_count",
             "acquisition_date",
@@ -96,18 +98,102 @@ class ModelManifestTest {
     }
 
     @Test
-    fun normalisationMeanAndStdAreThreeChannel() {
-        val n = manifest()["normalization"]!!.jsonObject
-        val mean = (n["mean"] as JsonArray).map { it.jsonPrimitive.double }
-        val std = (n["std"] as JsonArray).map { it.jsonPrimitive.double }
-        assertThat(mean).hasSize(3)
-        assertThat(std).hasSize(3)
+    fun normalisationStanzaAbsentForShippedUint8Model() {
+        // PLANTPOTTING-0004 §1.1 / Decision §4.1: AIY V1/3 is UINT8 — normalization is
+        // encoded in tensor quantization params, not applied externally. The active
+        // `normalization` block was removed from the shipped manifest to prevent silent
+        // contract drift; the FP path keeps a `_comment_normalization_unused_for_uint8`
+        // breadcrumb.
+        val m = manifest()
+        assertThat(m.containsKey("normalization")).isFalse()
+        assertThat(m.containsKey("_comment_normalization_unused_for_uint8")).isTrue()
     }
 
     @Test
     fun licenseFieldIsApache20() {
         assertThat(manifest()["license"]!!.jsonPrimitive.content).isEqualTo("Apache-2.0")
     }
+
+    @Test
+    fun manifestRejectsInvalidInputDtypeUin8() {
+        try {
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithInputDtype("\"uin8\""),
+            )
+            assertThat("did not throw").isEqualTo("threw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message).contains("input_dtype")
+        }
+    }
+
+    @Test
+    fun manifestRejectsInvalidInputDtypeEmptyString() {
+        try {
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithInputDtype("\"\""),
+            )
+            assertThat("did not throw").isEqualTo("threw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message).contains("input_dtype")
+        }
+    }
+
+    @Test
+    fun manifestRejectsMissingInputDtype() {
+        try {
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithoutInputDtype(),
+            )
+            assertThat("did not throw").isEqualTo("threw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message).contains("input_dtype")
+        }
+    }
+
+    private fun manifestJsonWithInputDtype(dtypeLiteral: String): String =
+        """
+        {
+          "variant": "V1/3",
+          "sha256": "abc",
+          "placeholder": false,
+          "input_size": 224,
+          "input_dtype": $dtypeLiteral,
+          "color_order": "RGB",
+          "normalization": { "mean": [127.5,127.5,127.5], "std": [127.5,127.5,127.5] },
+          "output_tensor_shape": [1, 2102],
+          "label_count": 2102,
+          "labels_asset": "ml/aiy_plants_v1/labels.csv",
+          "mapping_asset": "ml/aiy_plants_v1/plant_class_map.json",
+          "thresholds": {
+            "high_confidence_plain": 0.55,
+            "high_confidence_margin_min": 0.45,
+            "high_confidence_margin_delta": 0.18,
+            "top_k_candidates": 3
+          }
+        }
+        """.trimIndent()
+
+    private fun manifestJsonWithoutInputDtype(): String =
+        """
+        {
+          "variant": "V1/3",
+          "sha256": "abc",
+          "placeholder": false,
+          "input_size": 224,
+          "color_order": "RGB",
+          "normalization": { "mean": [127.5,127.5,127.5], "std": [127.5,127.5,127.5] },
+          "output_tensor_shape": [1, 2102],
+          "label_count": 2102,
+          "labels_asset": "ml/aiy_plants_v1/labels.csv",
+          "mapping_asset": "ml/aiy_plants_v1/plant_class_map.json",
+          "thresholds": {
+            "high_confidence_plain": 0.55,
+            "high_confidence_margin_min": 0.45,
+            "high_confidence_margin_delta": 0.18,
+            "top_k_candidates": 3
+          }
+        }
+        """.trimIndent()
 
     @Test
     fun placeholderFlagDocumentsPendingRealModelDownload() {

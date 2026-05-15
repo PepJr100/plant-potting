@@ -3,6 +3,7 @@ package com.darkfactory.plantpotting.identify.model
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.darkfactory.plantpotting.identify.IdentificationFailureException
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -11,11 +12,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Decodes a JPEG into a normalised RGB tensor sized to the model manifest's input contract.
+ * Decodes a JPEG into a tensor sized to the model manifest's input contract.
  *
- * Reads `inputSize` / `colorOrder` / `normalization` from the manifest at construction time,
- * so swapping in a different model (e.g. INT8 variant per §3.2 stretch) requires only an
- * asset swap, no code change.
+ * Branches on [ModelManifest.inputDtype]:
+ *  - UINT8 (the shipped AIY V1/3 path): builds a `TensorImage(DataType.UINT8)`, resizes to
+ *    `manifest.inputSize`, and skips `NormalizeOp` — the model's quantization params
+ *    encode the centering, so feeding raw 0–255 bytes is the correct contract.
+ *  - FLOAT32: builds a `TensorImage(DataType.FLOAT32)`, resizes, and applies
+ *    `NormalizeOp(manifest.normalization.mean, manifest.normalization.std)`.
  *
  * Throws [IdentificationFailureException] on a malformed JPEG so the camera flow can route
  * to a clean "retake" state rather than masquerading model breakage as a low-confidence
@@ -27,12 +31,21 @@ class ImagePreprocessor
     constructor(
         private val manifest: ModelManifest,
     ) {
+        private val tensorDataType: DataType =
+            when (manifest.inputDtype) {
+                ModelDtype.UINT8 -> DataType.UINT8
+                ModelDtype.FLOAT32 -> DataType.FLOAT32
+            }
+
         private val processor: ImageProcessor =
             ImageProcessor
                 .Builder()
                 .add(ResizeOp(manifest.inputSize, manifest.inputSize, ResizeOp.ResizeMethod.BILINEAR))
-                .add(NormalizeOp(manifest.normalization.mean, manifest.normalization.std))
-                .build()
+                .also { builder ->
+                    if (manifest.inputDtype == ModelDtype.FLOAT32) {
+                        builder.add(NormalizeOp(manifest.normalization.mean, manifest.normalization.std))
+                    }
+                }.build()
 
         fun preprocess(jpeg: ByteArray): PreprocessedImage {
             if (jpeg.isEmpty()) {
@@ -45,14 +58,13 @@ class ImagePreprocessor
                 throw IdentificationFailureException("Decoded JPEG has zero dimensions")
             }
             val sized = ensureMutableArgb(bitmap)
-            val tensorImage = TensorImage(org.tensorflow.lite.DataType.FLOAT32)
+            val tensorImage = TensorImage(tensorDataType)
             tensorImage.load(sized)
             val processed = processor.process(tensorImage)
-            val floats = processed.tensorBuffer.floatArray
             return PreprocessedImage(
                 width = manifest.inputSize,
                 height = manifest.inputSize,
-                normalisedRgb = floats,
+                buffer = processed.buffer,
             )
         }
 

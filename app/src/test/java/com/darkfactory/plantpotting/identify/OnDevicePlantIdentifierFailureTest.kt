@@ -94,6 +94,7 @@ class OnDevicePlantIdentifierFailureTest {
                     modelPath = "ml/aiy_plants_v1/no_such_model.tflite",
                     labelCount = manifest.labelCount,
                     inputSize = manifest.inputSize,
+                    expectedInputDtype = manifest.inputDtype,
                 )
             val identifier =
                 OnDevicePlantIdentifier(

@@ -1,29 +1,36 @@
 package com.darkfactory.plantpotting.identify.model
 
+import java.nio.ByteBuffer
+
 /**
- * Result of [ImagePreprocessor.preprocess]: a square RGB tensor whose interleaved
- * float values have been resized and normalised per the model manifest's input contract.
+ * Result of [ImagePreprocessor.preprocess]: a square RGB tensor sized to the model
+ * manifest's input contract. The buffer is the natural shape for both UINT8 and FLOAT32
+ * paths (`TensorImage.buffer` in tensorflow-lite-support) and feeds straight into
+ * [org.tensorflow.lite.Interpreter.run].
  *
- * `normalisedRgb` is a contiguous `[H * W * 3]` array — row-major, `(R,G,B)` per pixel —
- * ready to be wrapped as a TFLite input tensor.
+ * - UINT8 path: `buffer.capacity() == width * height * 3` (one byte per channel).
+ * - FLOAT32 path: `buffer.capacity() == width * height * 3 * 4` (four bytes per channel).
+ *
+ * PLANTPOTTING-0004 Decision §4.2 — replaces the previous `normalisedRgb: FloatArray`
+ * shape so the same data class can carry either dtype without lying about its contents.
  */
 data class PreprocessedImage(
     val width: Int,
     val height: Int,
-    val normalisedRgb: FloatArray,
+    val buffer: ByteBuffer,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PreprocessedImage) return false
         return width == other.width &&
             height == other.height &&
-            normalisedRgb.contentEquals(other.normalisedRgb)
+            buffer == other.buffer
     }
 
     override fun hashCode(): Int {
         var result = width
         result = 31 * result + height
-        result = 31 * result + normalisedRgb.contentHashCode()
+        result = 31 * result + buffer.hashCode()
         return result
     }
 }

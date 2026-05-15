@@ -1,15 +1,13 @@
 {
-  "_comment_top": "Manifest for the AIY Plants V1 on-device classifier. The .tflite is the upstream INT8 / V1/3 variant extracted from the model.tar.gz bundle on Kaggle Models. Labels live alongside as labels.csv (the model's embedded probability-labels-en.txt, 2101 scientific names indexed 0..2100).",
+  "_comment_top": "Manifest for the AIY Plants V1 on-device classifier. The .tflite is the upstream INT8 / V1/3 variant extracted from the model.tar.gz bundle on Kaggle Models. Labels live alongside as labels.csv (the model's embedded probability-labels-en.txt, 2101 scientific names indexed 0..2100). AIY V1/3 is fully UINT8-quantized: BOTH input and output tensors are UINT8. Normalization is encoded in tensor quantization params (scale/zero_point), not applied externally — see PLANTPOTTING-0004 §1.1.",
   "source_url": "https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-plants-v1/3",
   "variant": "V1/3",
   "sha256": "9ff2cc02d066fc266045ce299f04fb76907d9313d576881b61c255aa19433521",
   "placeholder": false,
   "input_size": 224,
+  "input_dtype": "uint8",
   "color_order": "RGB",
-  "normalization": {
-    "mean": [127.5, 127.5, 127.5],
-    "std": [127.5, 127.5, 127.5]
-  },
+  "_comment_normalization_unused_for_uint8": "AIY V1/3 is UINT8-quantized; the preprocessor feeds raw 0-255 bytes directly. The previously-declared normalization stanza (mean=127.5, std=127.5) was the FLOAT32 contract for an FP16 variant we do not ship. Removed in PLANTPOTTING-0004 to prevent silent contract drift; ImagePreprocessor branches on input_dtype.",
   "output_tensor_shape": [1, 2102],
   "label_count": 2102,
   "acquisition_date": "2026-05-15",

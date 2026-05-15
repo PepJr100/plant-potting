@@ -3,6 +3,11 @@ package com.darkfactory.plantpotting
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import com.darkfactory.plantpotting.camera.CaptureCacheCleaner
 import com.darkfactory.plantpotting.ui.navigation.PlantPottingNavHost
 import com.darkfactory.plantpotting.ui.theme.PlantPottingTheme
@@ -18,7 +23,10 @@ class MainActivity : ComponentActivity() {
         captureCacheCleaner.sweep()
         setContent {
             PlantPottingTheme {
-                PlantPottingNavHost()
+                @OptIn(ExperimentalComposeUiApi::class)
+                Box(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
+                    PlantPottingNavHost()
+                }
             }
         }
     }

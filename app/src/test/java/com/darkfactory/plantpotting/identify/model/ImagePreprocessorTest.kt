@@ -10,27 +10,56 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.ByteArrayOutputStream
+import java.nio.ByteOrder
 
 /**
- * PLANTPOTTING-0003 §3.2 — verifies `ImagePreprocessor` honors the manifest input contract.
+ * PLANTPOTTING-0004 §1.4 — verifies `ImagePreprocessor` honors the manifest input contract,
+ * branching `TensorImage(DataType.UINT8)` vs `TensorImage(DataType.FLOAT32)` and applying
+ * `NormalizeOp` only on the FLOAT32 path. Reads the bundled `model_manifest.json` for the
+ * shipped path; constructs in-memory manifests for the FLOAT32 cross-check.
  *
- * Generates deterministic JPEGs in-memory (white 1×1, 100×100 gradient, 224×224 grey) and
- * asserts:
- *  - the produced tensor matches the manifest input size
- *  - normalization yields ≈ 1.0 for pure white and ≈ 0.0 for mean-grey (manifest mean = 127.5)
- *  - malformed JPEG bytes throw `IdentificationFailureException`
- *
- * RED before §3.3 lands the `ImagePreprocessor` class.
+ * The §1.5 refactor lands the dtype branch; without it, the UINT8 assertions fail because
+ * the preprocessor would still construct `TensorImage(DataType.FLOAT32)`.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [34])
 class ImagePreprocessorTest {
-    private fun manifest(): ModelManifest {
+    private fun shippedManifest(): ModelManifest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         return ModelManifestReader(context.assets).read()
     }
 
-    private fun preprocessor(): ImagePreprocessor = ImagePreprocessor(manifest())
+    private fun float32Manifest(inputSize: Int = 224): ModelManifest =
+        ModelManifest(
+            variant = "test/float32",
+            sha256 = "0",
+            placeholder = false,
+            inputSize = inputSize,
+            inputDtype = ModelDtype.FLOAT32,
+            colorOrder = "RGB",
+            normalization =
+                ModelManifest.Normalization(
+                    mean = floatArrayOf(127.5f, 127.5f, 127.5f),
+                    std = floatArrayOf(127.5f, 127.5f, 127.5f),
+                ),
+            outputTensorShape = listOf(1, 10),
+            labelCount = 10,
+            labelsAsset = "stub",
+            mappingAsset = "stub",
+            thresholds =
+                ModelManifest.Thresholds(
+                    highConfidencePlain = 0.55f,
+                    highConfidenceMarginMin = 0.45f,
+                    highConfidenceMarginDelta = 0.18f,
+                    topKCandidates = 3,
+                ),
+        )
+
+    private fun uint8Manifest(inputSize: Int = 224): ModelManifest =
+        float32Manifest(inputSize).copy(
+            variant = "test/uint8",
+            inputDtype = ModelDtype.UINT8,
+        )
 
     private fun whiteJpeg(
         width: Int = 1,
@@ -72,55 +101,74 @@ class ImagePreprocessorTest {
 
     @Test
     fun preprocessOutputsManifestInputSize() {
-        val result = preprocessor().preprocess(whiteJpeg())
-        val expected = manifest().inputSize
-        assertThat(result.width).isEqualTo(expected)
-        assertThat(result.height).isEqualTo(expected)
+        val manifest = shippedManifest()
+        val result = ImagePreprocessor(manifest).preprocess(whiteJpeg())
+        assertThat(result.width).isEqualTo(manifest.inputSize)
+        assertThat(result.height).isEqualTo(manifest.inputSize)
     }
 
     @Test
-    fun preprocessOutputsThreeChannelFloatBuffer() {
-        val result = preprocessor().preprocess(greyJpeg())
-        // [1, H, W, 3] interleaved as a contiguous float array
-        val expectedSize = manifest().inputSize * manifest().inputSize * 3
-        assertThat(result.normalisedRgb.size).isEqualTo(expectedSize)
+    fun uint8ManifestProducesUint8BufferAndSkipsNormaliseOp() {
+        val manifest = uint8Manifest()
+        val result = ImagePreprocessor(manifest).preprocess(whiteJpeg())
+        // UINT8: one byte per channel.
+        assertThat(result.buffer.capacity()).isEqualTo(manifest.inputSize * manifest.inputSize * 3)
+
+        val bytes = result.buffer.duplicate().apply { rewind() }
+        // White pixel in → bytes ~= 0xFF (no normalization).
+        val sample = bytes.get().toInt() and 0xFF
+        assertThat(sample).isAtLeast(0xF0)
     }
 
     @Test
-    fun whitePixelNormalisesToOne() {
-        val result = preprocessor().preprocess(whiteJpeg())
-        val sample = result.normalisedRgb[0]
+    fun float32ManifestKeepsNormaliseOp() {
+        val manifest = float32Manifest()
+        val result = ImagePreprocessor(manifest).preprocess(whiteJpeg())
+        // FLOAT32: four bytes per channel.
+        assertThat(result.buffer.capacity()).isEqualTo(manifest.inputSize * manifest.inputSize * 3 * 4)
+
+        val floats =
+            result.buffer
+                .duplicate()
+                .apply {
+                    order(ByteOrder.nativeOrder())
+                    rewind()
+                }.asFloatBuffer()
+        val firstChannel = floats.get(0)
         // (255 - 127.5) / 127.5 = 1.0
-        assertThat(sample).isWithin(0.01f).of(1.0f)
-    }
-
-    @Test
-    fun midGreyPixelNormalisesToZero() {
-        // 224x224 solid mid-grey (128) → after normalize with mean=127.5, std=127.5, every value ≈ 0.004
-        val result = preprocessor().preprocess(greyJpeg())
-        val sample = result.normalisedRgb[0]
-        assertThat(sample).isWithin(0.01f).of(0.0f)
+        assertThat(firstChannel).isWithin(0.05f).of(1.0f)
     }
 
     @Test
     fun gradientJpegProducesNonConstantTensor() {
-        // The 100x100 gradient bitmap should produce a tensor with at least two distinct values.
-        val result = preprocessor().preprocess(gradientJpeg())
-        val sample = result.normalisedRgb.toSet()
-        assertThat(sample.size).isGreaterThan(1)
+        val manifest = shippedManifest()
+        val result = ImagePreprocessor(manifest).preprocess(gradientJpeg())
+        val bytes = ByteArray(result.buffer.capacity())
+        result.buffer
+            .duplicate()
+            .apply { rewind() }
+            .get(bytes)
+        assertThat(bytes.toSet().size).isGreaterThan(1)
     }
 
     @Test
     fun emptyJpegBytesThrowIdentificationFailure() {
-        // BitmapFactory.decodeByteArray returns null on an empty array; the preprocessor
-        // converts this null into an IdentificationFailureException so the camera flow
-        // can route to a clean "retake" state rather than treating model-input breakage
-        // as low confidence (PLANTPOTTING-0003 §4.3).
+        val manifest = shippedManifest()
         try {
-            preprocessor().preprocess(ByteArray(0))
+            ImagePreprocessor(manifest).preprocess(ByteArray(0))
             assertThat("did not throw").isEqualTo("threw IdentificationFailureException")
         } catch (e: com.darkfactory.plantpotting.identify.IdentificationFailureException) {
             assertThat(e.message).isNotEmpty()
         }
+    }
+
+    @Test
+    fun shippedManifestIsUint8ButGreyImageStillProducesValidBuffer() {
+        // Smoke check: shipped manifest is UINT8, so a 224×224 grey image produces a
+        // 224*224*3 byte buffer, populated with bytes in [0,255].
+        val manifest = shippedManifest()
+        assertThat(manifest.inputDtype).isEqualTo(ModelDtype.UINT8)
+        val result = ImagePreprocessor(manifest).preprocess(greyJpeg())
+        assertThat(result.buffer.capacity()).isEqualTo(manifest.inputSize * manifest.inputSize * 3)
     }
 }

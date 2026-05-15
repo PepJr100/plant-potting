@@ -11,9 +11,15 @@
 # `species-asset-present`, `verify-no-networking-passed`) are still required.
 # `model-asset-present` is the PLANTPOTTING-0003 §2 addition (the on-device
 # `.tflite` ships under `assets/ml/aiy_plants_v1/`).
-# `source-badge=on-device match` is PLANTPOTTING-0003 §5.6 — production
-# wiring is the on-device classifier, so the badge no longer reads the
-# legacy "Stub identifier — replace in a later sprint" copy.
+# `source-badge=on-device match (low confidence)` is PLANTPOTTING-0004 §4.5
+# — production wiring is the on-device classifier, but the AIY V1/3 model
+# maps only 2 of 16 KB species verbatim (see model_manifest.json
+# #_comment_coverage). Synthetic emulator captures against the AOSP virtual
+# scene route to the low-confidence picker; the integration script taps
+# `lowConf.species.monstera-deliciosa` as a deterministic override (per
+# PLANTPOTTING-0004 §4.5 / integration-flow.ps1's low-conf branch). The
+# resulting ResultScreen still shows source = ON_DEVICE_MODEL, but with
+# `lowConfidence = true`, hence the `(low confidence)` badge suffix.
 #
 # `archetype-name=aroid chunky` and `recipe-row-count=5` reflect the
 # FakeFixedIdentifier-driven path (resolves to monstera-deliciosa →
@@ -29,4 +35,4 @@ manifest-mode=device-aware
 device-screenshot-count-at-least-1=true
 archetype-name=aroid chunky
 recipe-row-count=5
-source-badge=on-device match
+source-badge=on-device match (low confidence)

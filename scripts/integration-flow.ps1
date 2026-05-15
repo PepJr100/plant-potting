@@ -146,17 +146,66 @@ if ($BuildOnly) {
     Write-Host ("       tapping shutter at ({0},{1})" -f $shutterCenter.X, $shutterCenter.Y)
     & $adb shell input tap $shutterCenter.X $shutterCenter.Y | Out-Null
 
-    # Wait for the result screen ("See potting mix" CTA).
-    Write-Host "       waiting for result screen"
+    # Wait for either the result screen (high-confidence path → result.seePottingMix)
+    # OR the low-confidence picker (PLANTPOTTING-0004 §4.5 / Risk §7.11). The shipped
+    # AIY V1/3 model maps only 2 of 16 KB species verbatim — synthetic emulator captures
+    # against the AOSP virtual scene typically route to the low-conf path. When that
+    # happens, tap the deterministic `lowConf.species.monstera-deliciosa` row to
+    # override-pick a known KB species; the picker navigates onward to the same
+    # ResultScreen the high-conf path lands on (with `lowConfidence = true`, hence the
+    # `(low confidence)` badge suffix).
+    Write-Host "       waiting for result or low-confidence screen"
+    $afterShutterDump = "$artifactsDir/ui-hierarchy-after-shutter.xml"
+    $afterShutterNode = $null
+    for ($attempt = 1; $attempt -le 12; $attempt++) {
+        $ok = Invoke-AdbDump -adb $adb -path $afterShutterDump
+        if ($ok) {
+            $doc = New-Object System.Xml.XmlDocument
+            $doc.Load((Resolve-Path $afterShutterDump))
+            $highConfNode = $doc.SelectSingleNode("//node[@resource-id='result.seePottingMix']")
+            $lowConfPickNode = $doc.SelectSingleNode("//node[@resource-id='lowConf.species.monstera-deliciosa']")
+            if ($null -ne $highConfNode) {
+                $afterShutterNode = @{ Path = "high-conf"; Node = $highConfNode }
+                break
+            }
+            if ($null -ne $lowConfPickNode) {
+                $afterShutterNode = @{ Path = "low-conf"; Node = $lowConfPickNode }
+                break
+            }
+        }
+        Start-Sleep -Milliseconds 750
+    }
+    if ($null -eq $afterShutterNode) {
+        throw "Timed out waiting for result.seePottingMix OR lowConf.species.monstera-deliciosa after 12 dumps"
+    }
+
+    if ($afterShutterNode.Path -eq "low-conf") {
+        Write-Host "       low-confidence path: tapping lowConf.species.monstera-deliciosa override"
+        $lcCenter = Get-NodeBounds-Center -node $afterShutterNode.Node
+        & $adb shell input tap $lcCenter.X $lcCenter.Y | Out-Null
+    }
+
+    # Whichever path we took above, we should now end on ResultScreen.
     $resultDump = "$artifactsDir/ui-hierarchy-result.xml"
     $seePottingMixNode = Wait-ForNode -adb $adb -resourceId "result.seePottingMix" -dumpPath $resultDump
 
-    # Extract the source-driven badge text from the result-screen dump.
+    # Extract the source-driven badge text from the result-screen dump. The badge is
+    # rendered as a Material3 AssistChip whose own `text` attribute is empty; the actual
+    # label lives on a descendant TextView. PLANTPOTTING-0004 §4.5 — walk descendants
+    # to pick up the chip label rather than reading the chip node's own (empty) text.
     $resultDoc = New-Object System.Xml.XmlDocument
     $resultDoc.Load((Resolve-Path $resultDump))
     $badgeNode = $resultDoc.SelectSingleNode("//node[@resource-id='result.sourceBadge']")
     if ($null -ne $badgeNode) {
-        $sourceBadge = $badgeNode.GetAttribute("text").ToLower()
+        $directText = $badgeNode.GetAttribute("text")
+        if (-not [string]::IsNullOrEmpty($directText)) {
+            $sourceBadge = $directText.ToLower()
+        } else {
+            $labelNode = $badgeNode.SelectSingleNode(".//node[@text != '']")
+            if ($null -ne $labelNode) {
+                $sourceBadge = $labelNode.GetAttribute("text").ToLower()
+            }
+        }
         Write-Host ("       source-badge = '{0}'" -f $sourceBadge)
     } else {
         Write-Host "       warning: result.sourceBadge node missing in dump" -ForegroundColor Yellow

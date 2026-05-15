@@ -19,18 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecommendationScreen(
     viewModel: RecommendationViewModel,
@@ -42,12 +38,7 @@ fun RecommendationScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp)
-                // Surface Compose testTags as `resource-id` in the
-                // AccessibilityNodeInfo tree so `adb shell uiautomator dump`
-                // (used by `scripts/integration-flow.ps1`) can locate the
-                // archetype name and count `recommendation.recipeRow` nodes.
-                .semantics { testTagsAsResourceId = true },
+                .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         when (val s = state) {

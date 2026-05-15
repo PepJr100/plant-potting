@@ -69,6 +69,7 @@ object OnDeviceIdentifyProvidersModule {
             modelPath = "ml/aiy_plants_v1/model.tflite",
             labelCount = manifest.labelCount,
             inputSize = manifest.inputSize,
+            expectedInputDtype = manifest.inputDtype,
         )
 
     @Provides

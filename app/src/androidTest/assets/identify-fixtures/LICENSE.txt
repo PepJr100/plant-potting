@@ -1,0 +1,31 @@
+PLANTPOTTING-0004 §3.1 — instrumentation test fixture.
+
+monstera-deliciosa.jpg
+======================
+
+This file is a procedurally-generated synthetic JPEG (480×480 px, ~52 KB,
+deterministic seed 0x4D4F4E54). It approximates a leafy-green plant texture
+with radial veins and was created at sprint-time by a one-shot PowerShell +
+System.Drawing script in PLANTPOTTING-0004. It is **not** a photograph of an
+actual Monstera deliciosa.
+
+Purpose
+-------
+
+The fixture exists only to drive `OnDeviceModelRealInterpreterTest` — a smoke
+test that exercises the production [`OnDevicePlantIdentifier`] pipeline
+(preprocessor → real TFLite `Interpreter.run` against
+`ml/aiy_plants_v1/model.tflite` → score mapper) end-to-end on
+`pixel6Api34DebugAndroidTest`. The test asserts only that the call returns
+without throwing and that `source == IdSource.ON_DEVICE_MODEL`. It makes no
+assertions about which species the model predicts — AIY V1/3 maps only two of
+the sixteen KB species verbatim (see `model_manifest.json#_comment_coverage`).
+The synthetic fixture will almost certainly route to the low-confidence path.
+
+License
+-------
+
+The pixel bytes are a deterministic algorithmic output with no human creative
+authorship and no third-party content. They carry no copyright restrictions —
+treat as CC0 / public-domain-equivalent. The model under test (AIY Plants V1)
+is Apache-2.0; see `app/src/main/assets/ml/aiy_plants_v1/LICENSE-aiy-plants-v1.txt`.
