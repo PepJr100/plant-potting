@@ -1,0 +1,17 @@
+PLACEHOLDER for AIY Plants V1 .tflite model bytes.
+
+This file is intentionally a text placeholder so the asset path, manifest
+sha256, and noCompress + AssetManager wiring can be exercised by JVM and
+Robolectric tests without a 25 MB network download. The real model
+(google/aiy/vision/classifier/plants_V1, FP16 variant) must replace this
+file before any device-aware acceptance run.
+
+Download instructions:
+  - Source: https://tfhub.dev/google/lite-model/aiy/vision/classifier/plants_V1
+    (or the equivalent Kaggle Models mirror)
+  - License: Apache 2.0 — attribution in LICENSE-aiy-plants-v1.txt
+  - After replacing the file, regenerate the sha256 in model_manifest.json
+    by running: `sha256sum app/src/main/assets/ml/aiy_plants_v1/model.tflite`
+
+See docs/sprints/PLANTPOTTING-0003.md §4.1 / §2.2 and the `## Blockers`
+section of docs/sprints/results/PLANTPOTTING-0003.md for full context.

@@ -24,9 +24,52 @@ Both gates were green at the start of the sprint, so any failure surfaced later 
 
 ---
 
+## Blockers
+
+### B1 — Real AIY Plants V1 `.tflite` not downloaded (Phase 2 §2.2)
+
+The bundled `app/src/main/assets/ml/aiy_plants_v1/model.tflite` is a documented **text placeholder** (~600 bytes; the file's own header explains the swap-in protocol). The implementer's sandbox refused outbound HTTPS probes (Exfil-Scouting classifier denial), so the real ~25 MB FP16 model from `https://tfhub.dev/google/lite-model/aiy/vision/classifier/plants_V1` (or the Kaggle Models mirror) could not be fetched in-session.
+
+**Downstream consequences:**
+
+| Test / gate | Status |
+| --- | --- |
+| `ModelAssetsPresenceTest`, `ModelManifestTest`, `ModelLabelMappingValidationTest` | Green (asserted against the placeholder's sha256 + the 18-line `labels.csv` + the §4.3 thresholds) |
+| `OnDevicePlantIdentifierFixturesTest` and friends | Will run via `InterpreterFacade`'s fake (§3.5) so they don't need the real `.tflite`; unit-test path stays green |
+| `OnDeviceIdentifyModuleBindingTest` (instrumentation, §4.3) | Green — only asserts the Hilt-injected `PlantIdentifier` is an `OnDevicePlantIdentifier`; never calls `identify()` |
+| Production-app shutter tap (manual launch, AOSP GMD `pixel6Api34DebugAndroidTest`, `pwsh ./scripts/integration-flow.ps1`) | **Will fail** — the real `org.tensorflow.lite.Interpreter` will reject the placeholder bytes and `OnDevicePlantIdentifier` will throw `IdentificationFailureException`. The device-aware acceptance gates (§8.5) cannot be satisfied without the real model. |
+
+**Swap-in protocol** (one-liner from the user's PowerShell, no code changes required):
+
+```pwsh
+Invoke-WebRequest -Uri "https://tfhub.dev/google/lite-model/aiy/vision/classifier/plants_V1/3?lite-format=tflite" `
+    -OutFile "app/src/main/assets/ml/aiy_plants_v1/model.tflite"
+sha256sum "app/src/main/assets/ml/aiy_plants_v1/model.tflite"
+# Copy the printed sha into model_manifest.json `sha256`, set `placeholder: false`,
+# update `label_count` and `output_tensor_shape[1]` to the upstream label count (~2101),
+# and replace labels.csv with the upstream labels file.
+# Then re-run `./gradlew testDebugUnitTest verifyNoNetworking`.
+```
+
+Once the swap-in happens, all device-aware gates should clear without any code change — the placeholder boundary is entirely in the asset directory.
+
+---
+
 ## 1. Model choice (§4.1)
 
-_To be filled in when Phase 2 lands._
+Pick: `google/aiy/vision/classifier/plants_V1` per §4.1. Runtime: TFLite 2.14.0 Interpreter + tensorflow-lite-support 0.4.4 for the `ImageProcessor` (resize + normalize). No `tensorflow-lite-task-vision` (§4.1 rejected it). Mapping covers all 16 KB species (see §2 below).
+
+### 2. Phase 2 — Model assets, labels, mapping, manifest
+
+- `app/src/main/assets/ml/aiy_plants_v1/`:
+  - `model.tflite` (placeholder; see Blocker B1)
+  - `labels.csv` — 18 lines (interim vocabulary scoped to the mapping); replace with the upstream ~2101-line file when B1 clears
+  - `plant_class_map.json` — 18 mappings covering all 16 KB species, two aliases (`Sansevieria → Dracaena`, `Calathea → Goeppertia`)
+  - `model_manifest.json` — variant `V1/3`, FP16 default, sha256 of placeholder bytes, §4.3 thresholds verbatim, `placeholder: true` flag
+  - `LICENSE-aiy-plants-v1.txt` — Apache 2.0 attribution
+- `docs/kb/ml-mapping-notes.md` — editorial paragraph per mapping line, sibling of `plant-substrate-kb-notes.md`, no `TODO`/`stub`/`lorem` substrings
+
+`ModelAssetsPresenceTest`, `ModelManifestTest`, and `ModelLabelMappingValidationTest` all green; `ktlintTestSourceSetCheck` green.
 
 ### 1.x Phase 1 — TFLite deps + verifyNoNetworking guard
 

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "modelLabelsAsset": "ml/aiy_plants_v1/labels.csv",
+  "mapping": {
+    "Monstera deliciosa":      { "kbSpeciesId": "monstera-deliciosa" },
+    "Monstera adansonii":      { "kbSpeciesId": "monstera-adansonii" },
+    "Epipremnum aureum":       { "kbSpeciesId": "epipremnum-aureum" },
+    "Philodendron hederaceum": { "kbSpeciesId": "philodendron-hederaceum" },
+    "Philodendron erubescens": { "kbSpeciesId": "philodendron-pink-princess" },
+    "Spathiphyllum wallisii":  { "kbSpeciesId": "spathiphyllum-wallisii" },
+    "Ficus lyrata":            { "kbSpeciesId": "ficus-lyrata" },
+    "Ficus elastica":          { "kbSpeciesId": "ficus-elastica" },
+    "Sansevieria trifasciata": { "kbSpeciesId": "dracaena-trifasciata", "alias": true },
+    "Dracaena trifasciata":    { "kbSpeciesId": "dracaena-trifasciata" },
+    "Zamioculcas zamiifolia":  { "kbSpeciesId": "zamioculcas-zamiifolia" },
+    "Chlorophytum comosum":    { "kbSpeciesId": "chlorophytum-comosum" },
+    "Phalaenopsis":            { "kbSpeciesId": "phalaenopsis" },
+    "Calathea orbifolia":      { "kbSpeciesId": "goeppertia-orbifolia", "alias": true },
+    "Goeppertia orbifolia":    { "kbSpeciesId": "goeppertia-orbifolia" },
+    "Crassula ovata":          { "kbSpeciesId": "crassula-ovata" },
+    "Saintpaulia ionantha":    { "kbSpeciesId": "saintpaulia-ionantha" },
+    "Hoya carnosa":            { "kbSpeciesId": "hoya-carnosa" }
+  }
+}
