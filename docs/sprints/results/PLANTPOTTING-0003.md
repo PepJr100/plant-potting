@@ -202,3 +202,40 @@ by the §7.2 shim tests.
 **Suggested PLANTPOTTING-0004 topic:** confidence calibration + UI polish, plus the LowConfidenceFlowTest instrumentation. Optional: explore swapping the placeholder model for the upstream variant and re-running the device-aware acceptance chain.
 
 **Sprint sentinel:** every must-land task in Phases 0–7 is `[x]` except §7.5 (transcripts blocked on B1) and §6.10 (deferred per §6.3 last-resort de-scope). The §8.5 GMD final-verify line is conditional on a live device + B1 clearing; the script and unit-test gates are all green.
+
+---
+
+## 8. Review (2026-05-15)
+
+Sprint closed as `done` in the ledger per user direction; two production bugs surfaced during device-aware review and **carry forward to PLANTPOTTING-0004 as the headline scope**. See `docs/sprints/feedback/PLANTPOTTING-0003/feedback.md` for full root-cause + fix-direction.
+
+| # | Bug | Severity | Hit acceptance |
+| --- | --- | --- | --- |
+| 1 | `OnDevicePlantIdentifier` throws on every real capture: real model is UINT8-quantized, but `ImagePreprocessor` builds a `TensorImage(FLOAT32)`. Failure text: `"TFLite inference failed: Cannot convert between a TensorFlowLite tensor with type UINT8 and a Java object of type [[[[F …"` | P0 | §2.1.1, §2.1.2, §2.1.3, §2.1.4 — all unreachable from a real capture |
+| 2 | Compose `testTag` not bridged to `resource-id` in uiautomator dumps; `Modifier.semantics { testTagsAsResourceId = true }` is missing on the root composition in `MainActivity.kt`. Every Compose node dumps with `resource-id=""`. PLANTPOTTING-0001's device-aware flow never actually passed — it was masked by Bug A's null-root race | P1 | §7.5, §8.5 device-aware integration line |
+
+**Meta-finding (most important):** both bugs slipped through the green test chain because neither was covered by the existing test surface:
+- Bug 1: every unit test of the identifier uses a faked `InterpreterFacade` that doesn't enforce TFLite tensor-type contracts. Every instrumentation test is Hilt-swapped to `FakeFixedIdentifier` via `TestIdentifyModule`. Nothing ever feeds a real `ByteArray` through `Interpreter.run` against the shipped `.tflite`.
+- Bug 2: Compose UI tests use the semantics tree directly (`onNodeWithTag`), never uiautomator dumps. The only consumer of `resource-id` is `scripts/integration-flow.ps1`, which was failing earlier in the chain for an unrelated reason in 0001/0002.
+
+PLANTPOTTING-0004 should add one `@HiltAndroidTest` that does **not** swap the production binding — feeds a real JPEG through the real `OnDevicePlantIdentifier`, asserts success. That would have caught Bug 1 immediately. For Bug 2, the device-aware script's first real run is itself the regression test.
+
+**Acceptance criteria as observed at review (delta from §8 self-report at close-out):**
+
+| §8 line | Self-report | Observed at review | Note |
+| --- | --- | --- | --- |
+| §8.1 build + lint + tests | green | green | no change |
+| §8.1 check-stub-isolation | green | green | no change |
+| §8.2 seam invariants | green | green | no change — interface byte-for-byte unchanged |
+| §8.3 assets + mapping | green | green | no change |
+| §8.4 fixtures + failure + mapper + preprocessor + facade | green | green **against fakes** | Bug 1 — never run against real native interpreter |
+| §8.5 badge + picker + archetype + recommendation unit tests | green | green | no change at unit-test layer |
+| §8.5 EndToEndFlowTest GMD assertion | green | green **with `FakeFixedIdentifier`** | does not exercise real model |
+| §8.5 LowConfidenceFlowTest instrumentation | n/a | n/a | already deferred (B3) |
+| §8.6 integration-flow device-aware clean diff | conditional | **FAIL** | Bug 2: `Wait-ForNode camera.shutter` times out |
+| §8.6 integration-flow -BuildOnly clean diff | green | green | no change |
+| §8.6 three transcripts (cold/warm/build-only) | 1/3 captured | 1/3 + cold-failure trace + diagnostic dumps | cold/warm still uncaptured; failure traces preserved as evidence |
+| §8.7 results doc | done | done | this section added |
+| §8.7 ledger `done` | not yet | done (close-out) | committed alongside this update |
+
+**Carry-forward to PLANTPOTTING-0004:** see `feedback.md` "Notes for next sprint" — propose framing as a fix sprint (Bug 1 + Bug 2 + the missing real-model instrumentation test + §7.5 transcripts), then schedule confidence calibration + UI polish to PLANTPOTTING-0005.
