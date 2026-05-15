@@ -24,6 +24,8 @@ class RecommendationViewModelTest {
                         rationale = "Suits Monstera deliciosa.",
                         isBlend = false,
                     )
+
+                override fun recommendByArchetype(archetypeId: String): Recommendation = error("not used")
             }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to "monstera-deliciosa"))
         val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine)
@@ -38,6 +40,8 @@ class RecommendationViewModelTest {
         val engine =
             object : RecommendationEngine {
                 override fun recommend(speciesId: String): Recommendation = throw IllegalArgumentException("unknown species: $speciesId")
+
+                override fun recommendByArchetype(archetypeId: String): Recommendation = error("not used")
             }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to "ghost"))
         val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine)

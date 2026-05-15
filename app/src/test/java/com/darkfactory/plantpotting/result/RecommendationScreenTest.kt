@@ -109,6 +109,8 @@ class RecommendationScreenTest {
         val engine =
             object : RecommendationEngine {
                 override fun recommend(speciesId: String): Recommendation = recommendation
+
+                override fun recommendByArchetype(archetypeId: String): Recommendation = recommendation
             }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to speciesId))
         return RecommendationViewModel(savedStateHandle = saved, engine = engine)

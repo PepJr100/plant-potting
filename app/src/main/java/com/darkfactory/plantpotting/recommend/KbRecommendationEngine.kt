@@ -24,6 +24,21 @@ class KbRecommendationEngine
             }
         }
 
+        override fun recommendByArchetype(archetypeId: String): Recommendation {
+            val archetype =
+                kb.archetypes[archetypeId]
+                    ?: throw IllegalArgumentException("unknown archetype: $archetypeId")
+            // Strip the `{species}` placeholder out of the archetype template so the
+            // rationale reads as a general statement, not a species-specific one.
+            val rationale = archetype.rationaleTemplate.replace("{species}", "this plant")
+            return Recommendation(
+                archetypeName = archetype.displayName,
+                recipe = archetype.recipe,
+                rationale = rationale,
+                isBlend = false,
+            )
+        }
+
         private fun single(
             species: Species,
             mapping: ArchetypeMapping.Single,

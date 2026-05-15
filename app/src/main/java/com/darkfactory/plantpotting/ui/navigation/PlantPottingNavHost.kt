@@ -14,6 +14,8 @@ import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
+import com.darkfactory.plantpotting.result.ArchetypePickerScreen
+import com.darkfactory.plantpotting.result.LowConfidencePickerScreen
 import com.darkfactory.plantpotting.result.RecommendationScreen
 import com.darkfactory.plantpotting.result.ResultScreen
 import dagger.hilt.android.EntryPointAccessors
@@ -58,21 +60,11 @@ fun PlantPottingNavHost() {
                                     lowConfidence = command.lowConfidence,
                                 ),
                             )
-                        is NavCommand.LowConfidence -> {
-                            // PLANTPOTTING-0003 §5.8: the picker route lands in Phase 6.
-                            // Until then, surface the user to a synthetic "not found" result
-                            // path so they aren't stuck. Documented gap in the results doc.
-                            navController.navigate(
-                                Routes.result(
-                                    speciesId = "",
-                                    source = IdSource.ON_DEVICE_MODEL,
-                                    lowConfidence = true,
-                                ),
-                            )
-                        }
+                        is NavCommand.LowConfidence ->
+                            navController.navigate(Routes.lowConfidencePicker(command.candidates))
                         is NavCommand.Failure -> {
                             // Failure stays on the camera screen via CameraUiState.Failure;
-                            // no navigation per §5.8.
+                            // no navigation per PLANTPOTTING-0003 §5.8.
                         }
                     }
                 },
@@ -105,6 +97,56 @@ fun PlantPottingNavHost() {
             arguments =
                 listOf(
                     navArgument(Routes.ARG_SPECIES_ID) { type = NavType.StringType },
+                ),
+        ) {
+            RecommendationScreen(
+                viewModel = hiltViewModel(),
+                onRetake = {
+                    navController.navigate(Routes.CAMERA) {
+                        popUpTo(Routes.CAMERA) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable(
+            route = Routes.LOW_CONFIDENCE_PICKER,
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_CANDIDATES) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
+        ) {
+            LowConfidencePickerScreen(
+                viewModel = hiltViewModel(),
+                onSpeciesPicked = { speciesId ->
+                    navController.navigate(
+                        Routes.result(
+                            speciesId = speciesId,
+                            source = IdSource.ON_DEVICE_MODEL,
+                            lowConfidence = true,
+                        ),
+                    )
+                },
+                onPickByArchetype = {
+                    navController.navigate(Routes.ARCHETYPE_PICKER)
+                },
+            )
+        }
+        composable(Routes.ARCHETYPE_PICKER) {
+            ArchetypePickerScreen(
+                viewModel = hiltViewModel(),
+                onArchetypePicked = { archetypeId ->
+                    navController.navigate(Routes.archetypeRecommendation(archetypeId))
+                },
+            )
+        }
+        composable(
+            route = Routes.ARCHETYPE_RECOMMENDATION,
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_ARCHETYPE_ID) { type = NavType.StringType },
                 ),
         ) {
             RecommendationScreen(

@@ -18,16 +18,37 @@ class RecommendationViewModel
         savedStateHandle: SavedStateHandle,
         engine: RecommendationEngine,
     ) : ViewModel() {
-        private val rawId: String = savedStateHandle.get<String>(Routes.ARG_SPECIES_ID).orEmpty()
-        private val speciesId: String =
-            runCatching { URLDecoder.decode(rawId, "UTF-8") }
-                .getOrDefault(rawId)
+        private val rawSpeciesId: String =
+            savedStateHandle.get<String>(Routes.ARG_SPECIES_ID).orEmpty()
+
+        private val rawArchetypeId: String =
+            savedStateHandle.get<String>(Routes.ARG_ARCHETYPE_ID).orEmpty()
 
         private val _state = MutableStateFlow<RecommendationUiState>(RecommendationUiState.Loading)
         val state: StateFlow<RecommendationUiState> = _state.asStateFlow()
 
         init {
-            _state.value =
+            _state.value = computeInitialState(engine)
+        }
+
+        private fun computeInitialState(engine: RecommendationEngine): RecommendationUiState =
+            if (rawArchetypeId.isNotEmpty()) {
+                val archetypeId =
+                    runCatching { URLDecoder.decode(rawArchetypeId, "UTF-8") }
+                        .getOrDefault(rawArchetypeId)
+                runCatching {
+                    val rec = engine.recommendByArchetype(archetypeId)
+                    RecommendationUiState.Ready(
+                        archetypeName = rec.archetypeName,
+                        rationale = rec.rationale,
+                        recipe = rec.recipe,
+                        isBlend = rec.isBlend,
+                    )
+                }.getOrElse { RecommendationUiState.NotFound }
+            } else {
+                val speciesId =
+                    runCatching { URLDecoder.decode(rawSpeciesId, "UTF-8") }
+                        .getOrDefault(rawSpeciesId)
                 runCatching {
                     val rec = engine.recommend(speciesId)
                     RecommendationUiState.Ready(
@@ -37,5 +58,5 @@ class RecommendationViewModel
                         isBlend = rec.isBlend,
                     )
                 }.getOrElse { RecommendationUiState.NotFound }
-        }
+            }
     }

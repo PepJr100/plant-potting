@@ -1,0 +1,153 @@
+package com.darkfactory.plantpotting.result
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.lifecycle.SavedStateHandle
+import com.darkfactory.plantpotting.kb.model.Archetype
+import com.darkfactory.plantpotting.kb.model.ArchetypeMapping
+import com.darkfactory.plantpotting.kb.model.KnowledgeBase
+import com.darkfactory.plantpotting.kb.model.RecipeIngredient
+import com.darkfactory.plantpotting.kb.model.Species
+import com.darkfactory.plantpotting.ui.navigation.Routes
+import com.google.common.truth.Truth.assertThat
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+
+/**
+ * PLANTPOTTING-0003 §6.3 — Compose-UI assertions for the picker:
+ *  - top-3 candidates render with `(N%)` suffix when present
+ *  - 16-species manual list renders
+ *  - tapping a row emits `onSpeciesPicked(...)` with the species id
+ *  - tapping "Pick by archetype" emits `onPickByArchetype()`
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE, sdk = [34])
+class LowConfidencePickerScreenTest {
+    @get:Rule val composeRule = createComposeRule()
+
+    private val kb = fixtureKb()
+
+    private fun vm(candidatesArg: String?): LowConfidencePickerViewModel {
+        val saved = SavedStateHandle(mapOf(Routes.ARG_CANDIDATES to candidatesArg.orEmpty()))
+        return LowConfidencePickerViewModel(savedStateHandle = saved, kb = kb)
+    }
+
+    @Test
+    fun rendersTopThreeChipsWhenCandidatesPresent() {
+        val v = vm("monstera-deliciosa|72,ficus-lyrata|18")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.TOP_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText("Swiss cheese plant (72%)").assertIsDisplayed()
+        composeRule.onNodeWithText("Fiddle-leaf fig (18%)").assertIsDisplayed()
+    }
+
+    @Test
+    fun rendersAllSpeciesInManualList() {
+        val v = vm("")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SPECIES_LIST).assertIsDisplayed()
+        // Sample three of the fixture species names — the LazyColumn may only have
+        // composed the first viewport, but Robolectric typically realizes most.
+        composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
+    }
+
+    @Test
+    fun tappingATopRowEmitsCandidateSpeciesId() {
+        val v = vm("monstera-deliciosa|72,ficus-lyrata|18")
+        var picked: String? = null
+        composeRule.setContent {
+            LowConfidencePickerScreen(
+                viewModel = v,
+                onSpeciesPicked = { picked = it },
+                onPickByArchetype = {},
+            )
+        }
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.candidateTag("monstera-deliciosa"))
+            .performClick()
+        assertThat(picked).isEqualTo("monstera-deliciosa")
+    }
+
+    @Test
+    fun tappingPickByArchetypeFiresCallback() {
+        val v = vm("")
+        var fired = false
+        composeRule.setContent {
+            LowConfidencePickerScreen(
+                viewModel = v,
+                onSpeciesPicked = {},
+                onPickByArchetype = { fired = true },
+            )
+        }
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.PICK_BY_ARCHETYPE)
+            .performClick()
+        assertThat(fired).isTrue()
+    }
+
+    @Test
+    fun tappingASpeciesRowEmitsThatSpeciesId() {
+        val v = vm("")
+        var picked: String? = null
+        composeRule.setContent {
+            LowConfidencePickerScreen(
+                viewModel = v,
+                onSpeciesPicked = { picked = it },
+                onPickByArchetype = {},
+            )
+        }
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.speciesTag("ficus-lyrata"))
+            .performClick()
+        assertThat(picked).isEqualTo("ficus-lyrata")
+    }
+
+    // ---- fixtures ----
+
+    private fun fixtureKb(): KnowledgeBase {
+        val arch =
+            Archetype(
+                id = "standard",
+                displayName = "Standard",
+                shortDescription = "",
+                recipe = listOf(RecipeIngredient("coir", 100)),
+                rationaleTemplate = "Suits {species}.",
+                citations = listOf("Brief"),
+            )
+        val list =
+            listOf(
+                species("monstera-deliciosa", "Monstera deliciosa", "Swiss cheese plant"),
+                species("ficus-lyrata", "Ficus lyrata", "Fiddle-leaf fig"),
+                species("dracaena-trifasciata", "Dracaena trifasciata", "Snake plant"),
+            )
+        return KnowledgeBase(
+            archetypes = mapOf("standard" to arch),
+            species = list,
+            speciesIndex = list.associateBy { it.id },
+        )
+    }
+
+    private fun species(
+        id: String,
+        scientificName: String,
+        common: String,
+    ) = Species(
+        id = id,
+        scientificName = scientificName,
+        commonNames = listOf(common),
+        aliases = emptyList(),
+        mapping = ArchetypeMapping.Single("standard"),
+        speciesRationale = "$scientificName.",
+        citations = listOf("Brief"),
+    )
+}

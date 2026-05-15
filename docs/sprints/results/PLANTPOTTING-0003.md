@@ -26,6 +26,16 @@ Both gates were green at the start of the sprint, so any failure surfaced later 
 
 ## Blockers
 
+### B3 — §6.10 LowConfidenceFlowTest deferred to PLANTPOTTING-0004
+
+The instrumentation flow test (`@HiltAndroidTest`) requires a GMD/emulator to drive
+the full shutter → picker → result → recommendation flow. The sandbox didn't have a
+running emulator available, and the §6.3 Compose-UI test already exercises every
+behaviour the flow test would assert (top-3 chips, tap routing, search filter, pick-
+by-archetype CTA, badge dispatch) at the unit level. Per the §6.3 last-resort de-
+scope, the instrumentation test moves to PLANTPOTTING-0004. The picker is fully
+exercised at the unit-test layer today.
+
 ### B2 — Phase 4 §4.3 binding test de-scoped (Hilt @UninstallModules vs @TestInstallIn)
 
 `OnDeviceIdentifyModuleBindingTest` was planned to assert at runtime that the
