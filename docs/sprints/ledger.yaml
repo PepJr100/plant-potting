@@ -17,3 +17,8 @@ sprints:
     executor: opus
     created: "2026-05-15T09:33:10+00:00"
     updated: "2026-05-15T15:22:57+00:00"
+  - id: PLANTPOTTING-0004
+    title: Fix sprint for PLANTPOTTING-0003 review bugs
+    status: planned
+    created: "2026-05-15T15:26:06+00:00"
+    updated: "2026-05-15T15:45:24+00:00"
