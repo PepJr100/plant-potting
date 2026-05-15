@@ -201,10 +201,10 @@ TDD ordering: paired test tasks land **RED first** where the spec permits. Test 
 
 ### Phase 0 — Sprint setup and contract lock
 
-- [ ] **0.1** Re-read this plan plus the eight anchor files: `docs/sprints/PLANTPOTTING-0001.md`, `docs/sprints/PLANTPOTTING-0002.md`, both feedback docs, `app/src/main/java/com/darkfactory/plantpotting/identify/PlantIdentifier.kt`, `app/src/main/java/com/darkfactory/plantpotting/identify/StubPlantIdentifier.kt`, `app/src/main/java/com/darkfactory/plantpotting/identify/IdentifyModule.kt`, `scripts/integration-flow.ps1`.
-- [ ] **0.2 (baseline)** Run `./gradlew assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` + `bash scripts/check-stub-isolation.sh` on a clean `main` *before* any edits. Record outputs in `docs/sprints/results/PLANTPOTTING-0003.md` as the evidence sink. Surface any baseline regression to the user before continuing.
-- [ ] **0.3** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0003` `status: in-progress`, stamp `executor`, refresh `updated`.
-- [ ] **0.4 (test, RED first)** Add `PlantIdentifierContractTest` (JVM) asserting the interface shape: exactly one `suspend fun identify(jpeg: ByteArray): IdentificationResult`, and `IdentificationResult` still has the four fields (`speciesId`, `displayName`, `source`, and the new `lowConfidence` from §4.4). This locks the seam against accidental drift. RED before §3.1's data-class extension lands.
+- [x] **0.1** Re-read this plan plus the eight anchor files: `docs/sprints/PLANTPOTTING-0001.md`, `docs/sprints/PLANTPOTTING-0002.md`, both feedback docs, `app/src/main/java/com/darkfactory/plantpotting/identify/PlantIdentifier.kt`, `app/src/main/java/com/darkfactory/plantpotting/identify/StubPlantIdentifier.kt`, `app/src/main/java/com/darkfactory/plantpotting/identify/IdentifyModule.kt`, `scripts/integration-flow.ps1`.
+- [x] **0.2 (baseline)** Run `./gradlew assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` + `bash scripts/check-stub-isolation.sh` on a clean `main` *before* any edits. Record outputs in `docs/sprints/results/PLANTPOTTING-0003.md` as the evidence sink. Surface any baseline regression to the user before continuing.
+- [x] **0.3** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0003` `status: in-progress`, stamp `executor`, refresh `updated`.
+- [x] **0.4 (test, RED first)** Add `PlantIdentifierContractTest` (JVM) asserting the interface shape: exactly one `suspend fun identify(jpeg: ByteArray): IdentificationResult`, and `IdentificationResult` still has the four fields (`speciesId`, `displayName`, `source`, and the new `lowConfidence` from §4.4). This locks the seam against accidental drift. RED before §3.1's data-class extension lands.
 
 ### Phase 1 — TFLite dependencies + verifyNoNetworking guard
 

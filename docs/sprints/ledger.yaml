@@ -13,6 +13,7 @@ sprints:
     updated: "2026-05-14T16:42:40+00:00"
   - id: PLANTPOTTING-0003
     title: On-device ML identifier + Bug A fix + source-driven badge
-    status: planned
+    status: in-progress
+    executor: opus
     created: "2026-05-15T09:33:10+00:00"
-    updated: "2026-05-15T09:33:10+00:00"
+    updated: "2026-05-15T10:49:57+00:00"
