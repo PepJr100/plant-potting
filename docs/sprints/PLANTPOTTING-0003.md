@@ -208,10 +208,10 @@ TDD ordering: paired test tasks land **RED first** where the spec permits. Test 
 
 ### Phase 1 — TFLite dependencies + verifyNoNetworking guard
 
-- [ ] **1.1** Add to `gradle/libs.versions.toml`: `tensorflow-lite = "2.14.0"`, `tensorflow-lite-support = "0.4.4"`. Add the matching `org.tensorflow:tensorflow-lite` and `org.tensorflow:tensorflow-lite-support` entries to the `[libraries]` section. **Do not add `tensorflow-lite-task-vision`** — see §4.1 rationale.
-- [ ] **1.2 (test, RED first)** Add `VerifyNoNetworkingRegressionTest` (JVM) that runs `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` (or reads the cached report) and asserts that none of `okhttp`, `retrofit`, `firebase`, `play-services-network`, `volley`, `ktor-client-okhttp` substrings appear in the dependency tree. Fails RED before §1.1 lands; goes green after the TFLite deps are added cleanly. (Do not match on `play-services-tasks` — it's the Tasks API, not networking.)
-- [ ] **1.3** Add the two TFLite deps to `app/build.gradle.kts` under `implementation(...)`. Configure `androidResources { noCompress += "tflite" }` so the `.tflite` asset can be memory-mapped.
-- [ ] **1.4 (verify)** `./gradlew verifyNoNetworking` green. `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` shows tensorflow-lite-* and *no* OkHttp/Retrofit/Firebase/Volley/Ktor transitive. Record both in the results doc.
+- [x] **1.1** Add to `gradle/libs.versions.toml`: `tensorflow-lite = "2.14.0"`, `tensorflow-lite-support = "0.4.4"`. Add the matching `org.tensorflow:tensorflow-lite` and `org.tensorflow:tensorflow-lite-support` entries to the `[libraries]` section. **Do not add `tensorflow-lite-task-vision`** — see §4.1 rationale.
+- [x] **1.2 (test, RED first)** Add `VerifyNoNetworkingRegressionTest` (JVM) that runs `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` (or reads the cached report) and asserts that none of `okhttp`, `retrofit`, `firebase`, `play-services-network`, `volley`, `ktor-client-okhttp` substrings appear in the dependency tree. Fails RED before §1.1 lands; goes green after the TFLite deps are added cleanly. (Do not match on `play-services-tasks` — it's the Tasks API, not networking.)
+- [x] **1.3** Add the two TFLite deps to `app/build.gradle.kts` under `implementation(...)`. Configure `androidResources { noCompress += "tflite" }` so the `.tflite` asset can be memory-mapped.
+- [x] **1.4 (verify)** `./gradlew verifyNoNetworking` green. `./gradlew :app:dependencies --configuration releaseRuntimeClasspath` shows tensorflow-lite-* and *no* OkHttp/Retrofit/Firebase/Volley/Ktor transitive. Record both in the results doc.
 
 ### Phase 2 — Model + labels + mapping + manifest (assets)
 

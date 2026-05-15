@@ -60,6 +60,12 @@ android {
         }
     }
 
+    androidResources {
+        // Keep the on-device model uncompressed so it can be memory-mapped
+        // directly from the APK via AssetFileDescriptor.
+        noCompress += "tflite"
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -118,6 +124,12 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 
+    // TensorFlow Lite (on-device inference). PLANTPOTTING-0003 §4.1 — do NOT add
+    // tensorflow-lite-task-vision; the hand-rolled InterpreterFacade keeps unit
+    // tests JVM-only.
+    implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.support)
+
     // Unit test
     testImplementation(libs.junit)
     testImplementation(libs.truth)
@@ -152,34 +164,45 @@ tasks.register("verifyNoNetworking") {
     group = "verification"
     description = "Fails if any production runtime dependency includes a networking library."
     doLast {
+        // Narrow allowlist per PLANTPOTTING-0003 §7.4: match only on substrings that
+        // are unambiguously networking. `play-services-tasks` is the Tasks API
+        // (a coroutine/promise primitive used by TFLite Support), NOT networking,
+        // and must not appear here. `okio` is broadly used standalone; `play-services-base`
+        // is a generic Play Services foundation. Adding either would cause false positives.
         val forbidden =
             listOf(
                 "okhttp",
                 "retrofit",
-                "okio",
-                "ktor",
-                "volley",
-                "google-http-client",
                 "firebase",
-                "play-services-base",
-                "play-services-tasks",
+                "play-services-network",
+                "volley",
+                "ktor-client-okhttp",
             )
         val config = configurations.getByName("releaseRuntimeClasspath")
-        val matches =
+        val resolved =
             config.resolvedConfiguration.resolvedArtifacts
                 .map { "${it.moduleVersion.id.group}:${it.moduleVersion.id.name}" }
-                .filter { coord ->
-                    forbidden.any { needle ->
-                        coord.lowercase().contains(needle)
-                    }
-                }.sorted()
+                .sorted()
                 .distinct()
+        val matches =
+            resolved.filter { coord ->
+                forbidden.any { needle -> coord.lowercase().contains(needle) }
+            }
         if (matches.isNotEmpty()) {
             throw GradleException(
                 "verifyNoNetworking: forbidden networking deps in releaseRuntimeClasspath:\n  - " +
                     matches.joinToString("\n  - "),
             )
         }
+        // Write a release-runtime-deps audit to disk for the
+        // VerifyNoNetworkingRegressionTest unit test and the results doc.
+        val auditFile =
+            layout.buildDirectory
+                .file("verify-no-networking/release-runtime-deps.txt")
+                .get()
+                .asFile
+        auditFile.parentFile.mkdirs()
+        auditFile.writeText(resolved.joinToString("\n"))
     }
 }
 

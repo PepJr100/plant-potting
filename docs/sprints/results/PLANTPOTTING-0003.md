@@ -28,6 +28,36 @@ Both gates were green at the start of the sprint, so any failure surfaced later 
 
 _To be filled in when Phase 2 lands._
 
+### 1.x Phase 1 — TFLite deps + verifyNoNetworking guard
+
+Versions pinned in `gradle/libs.versions.toml`:
+
+- `tensorflowLite = "2.14.0"` → `org.tensorflow:tensorflow-lite`
+- `tensorflowLiteSupport = "0.4.4"` → `org.tensorflow:tensorflow-lite-support`
+
+`androidResources { noCompress += "tflite" }` set in `app/build.gradle.kts` so the
+`.tflite` model can be memory-mapped from the APK.
+
+The `verifyNoNetworking` Gradle task's forbidden allowlist was narrowed per §7.4 to
+the unambiguous-networking set: `okhttp`, `retrofit`, `firebase`, `play-services-network`,
+`volley`, `ktor-client-okhttp`. (`play-services-tasks` was previously listed as forbidden
+but is the Tasks API, not networking, and would have produced false positives once TFLite
+support pulled it in.) The task also now writes the resolved release-runtime classpath to
+`app/build/verify-no-networking/release-runtime-deps.txt` so a JUnit test
+(`VerifyNoNetworkingRegressionTest`) can audit it without re-invoking Gradle.
+
+Audit after the TFLite wires landed (94 deps total; relevant slice):
+
+```
+org.tensorflow:tensorflow-lite
+org.tensorflow:tensorflow-lite-api
+org.tensorflow:tensorflow-lite-support
+org.tensorflow:tensorflow-lite-support-api
+```
+
+No OkHttp / Retrofit / Firebase / Volley / Ktor / play-services-network transitives present
+after `./gradlew verifyNoNetworking` re-resolved the configuration.
+
 ## 2. Mapping coverage summary (§4.2)
 
 _To be filled in when Phase 2 lands._
