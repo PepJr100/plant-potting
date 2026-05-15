@@ -51,7 +51,7 @@ import java.util.concurrent.Executor
 @Composable
 fun CameraScreen(
     viewModel: CameraViewModel,
-    onSpeciesIdentified: (String) -> Unit,
+    onNavigate: (NavCommand) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -67,8 +67,8 @@ fun CameraScreen(
     val imageCapture: ImageCapture? = injectedImageCapture ?: boundImageCapture
 
     LaunchedEffect(viewModel) {
-        viewModel.navigate.collectLatest { speciesId ->
-            onSpeciesIdentified(speciesId)
+        viewModel.navigate.collectLatest { command ->
+            onNavigate(command)
         }
     }
 

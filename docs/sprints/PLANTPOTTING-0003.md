@@ -252,19 +252,19 @@ TDD ordering: paired test tasks land **RED first** where the spec permits. Test 
 
 ### Phase 5 — Source-driven badge (UX 2)
 
-- [ ] **5.1 (test, RED first)** Add `ResultScreenBadgeTest` (Compose UI test, JVM Robolectric where possible). Render `ResultScreen` with a `ResultUiState` carrying each (source, lowConfidence) tuple; assert the badge text matches the expected string:
+- [x] **5.1 (test, RED first)** Add `ResultScreenBadgeTest` (Compose UI test, JVM Robolectric where possible). Render `ResultScreen` with a `ResultUiState` carrying each (source, lowConfidence) tuple; assert the badge text matches the expected string:
   - `STUB_DETERMINISTIC` / `STUB_RANDOM`, any `lowConfidence` → "Stub identifier — replace in a later sprint" (legacy copy, surfaces only in tests).
   - `ON_DEVICE_MODEL`, `lowConfidence = false` → "On-device match".
   - `ON_DEVICE_MODEL`, `lowConfidence = true` → "On-device match (low confidence)".
   - `CLOUD` → "Cloud match unavailable in this offline build".
-- [ ] **5.2** Add four new strings to `app/src/main/res/values/strings.xml`: `result_badge_stub`, `result_badge_on_device`, `result_badge_on_device_low`, `result_badge_cloud`. Keep the legacy `result_stub_badge` string for one sprint as a soft-deprecated alias only if any test source still references it; otherwise delete.
-- [ ] **5.3** Extend `ResultUiState` (`result/ResultUiState.kt`): `val source: IdSource = IdSource.STUB_DETERMINISTIC` and `val lowConfidence: Boolean = false`. Defaults preserve every existing test that constructed `ResultUiState` without these fields.
-- [ ] **5.4** Extend `Routes.kt`: `result/{speciesId}?source={source}&lowConfidence={lowConfidence}`. Defaults for legacy/test callers: `source=STUB_DETERMINISTIC`, `lowConfidence=false`.
-- [ ] **5.5** Update `ResultViewModel` to read `source` and `lowConfidence` from `SavedStateHandle` and populate `ResultUiState`.
-- [ ] **5.6** Update `ResultScreen` to choose the badge string from `state.source` + `state.lowConfidence`. Replace any hard-coded `R.string.result_stub_badge` reference.
-- [ ] **5.7** Update `CameraViewModel`: change the navigation flow from `MutableSharedFlow<String>` to `MutableSharedFlow<NavCommand>` where `NavCommand` is a sealed class with `Success(speciesId, source, lowConfidence)`, `LowConfidence(candidates: List<Candidate>)`, and `Failure(message: String)`. Map identifier outcomes to the right command per §4.3.
-- [ ] **5.8** Update `PlantPottingNavHost` to consume the new `NavCommand` shape and route accordingly: `Success` → `result/...`; `LowConfidence` → `low-confidence-picker?candidates=...`; `Failure` → existing camera failure state (no nav).
-- [ ] **5.9 (test)** Update `EndToEndFlowTest` so the test fake identifier returns `source = IdSource.ON_DEVICE_MODEL` (since production wiring is now the on-device model), and the badge assertion reads "On-device match", not the stub copy.
+- [x] **5.2** Add four new strings to `app/src/main/res/values/strings.xml`: `result_badge_stub`, `result_badge_on_device`, `result_badge_on_device_low`, `result_badge_cloud`. Keep the legacy `result_stub_badge` string for one sprint as a soft-deprecated alias only if any test source still references it; otherwise delete. _Legacy `result_stub_badge` deleted; replaced by `result_badge_stub`._
+- [x] **5.3** Extend `ResultUiState` (`result/ResultUiState.kt`): `val source: IdSource = IdSource.STUB_DETERMINISTIC` and `val lowConfidence: Boolean = false`. Defaults preserve every existing test that constructed `ResultUiState` without these fields.
+- [x] **5.4** Extend `Routes.kt`: `result/{speciesId}?source={source}&lowConfidence={lowConfidence}`. Defaults for legacy/test callers: `source=STUB_DETERMINISTIC`, `lowConfidence=false`.
+- [x] **5.5** Update `ResultViewModel` to read `source` and `lowConfidence` from `SavedStateHandle` and populate `ResultUiState`.
+- [x] **5.6** Update `ResultScreen` to choose the badge string from `state.source` + `state.lowConfidence`. Replace any hard-coded `R.string.result_stub_badge` reference.
+- [x] **5.7** Update `CameraViewModel`: change the navigation flow from `MutableSharedFlow<String>` to `MutableSharedFlow<NavCommand>` where `NavCommand` is a sealed class with `Success(speciesId, source, lowConfidence)`, `LowConfidence(candidates: List<Candidate>)`, and `Failure(message: String)`. Map identifier outcomes to the right command per §4.3.
+- [x] **5.8** Update `PlantPottingNavHost` to consume the new `NavCommand` shape and route accordingly: `Success` → `result/...`; `LowConfidence` → `low-confidence-picker?candidates=...`; `Failure` → existing camera failure state (no nav). _LowConfidence currently routes to a synthetic low-conf `ResultScreen` until Phase 6 lands the picker route; flagged in NavHost._
+- [x] **5.9 (test)** Update `EndToEndFlowTest` so the test fake identifier returns `source = IdSource.ON_DEVICE_MODEL` (since production wiring is now the on-device model), and the badge assertion reads "On-device match", not the stub copy.
 
 ### Phase 6 — `LowConfidencePicker` + `ArchetypePicker` screens
 

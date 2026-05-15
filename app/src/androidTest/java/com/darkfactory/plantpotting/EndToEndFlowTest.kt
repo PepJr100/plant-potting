@@ -48,8 +48,11 @@ class EndToEndFlowTest {
             ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
         }
 
-        // Result screen: stub badge visible + scientific name from FakeFixedIdentifier.
-        composeRule.onNodeWithTag(ResultScreenTags.STUB_BADGE).assertIsDisplayed()
+        // Result screen: source-driven badge visible. Production wiring is now the
+        // on-device model (PLANTPOTTING-0003 §5.6), so the badge reads "On-device match"
+        // — not the legacy "Stub identifier" copy.
+        composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).assertIsDisplayed()
+        composeRule.onNodeWithText("On-device match").assertIsDisplayed()
         composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
 
         // Navigate to the recommendation screen.

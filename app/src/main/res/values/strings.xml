@@ -18,7 +18,10 @@
     <string name="camera_capture_failed">Capture failed. Try again.</string>
 
     <!-- Result screen -->
-    <string name="result_stub_badge">Stub identifier — replace in a later sprint</string>
+    <string name="result_badge_stub">Stub identifier — replace in a later sprint</string>
+    <string name="result_badge_on_device">On-device match</string>
+    <string name="result_badge_on_device_low">On-device match (low confidence)</string>
+    <string name="result_badge_cloud">Cloud match unavailable in this offline build</string>
     <string name="result_see_potting_mix">See potting mix</string>
     <string name="result_not_found">We couldn\'t find this plant in the knowledge base.</string>
 

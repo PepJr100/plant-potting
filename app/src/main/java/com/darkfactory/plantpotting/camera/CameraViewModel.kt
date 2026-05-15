@@ -3,6 +3,7 @@ package com.darkfactory.plantpotting.camera
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darkfactory.plantpotting.identify.PlantIdentifier
+import com.darkfactory.plantpotting.identify.model.CandidateProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +23,8 @@ class CameraViewModel
         private val _state = MutableStateFlow<CameraUiState>(CameraUiState.Idle)
         val state: StateFlow<CameraUiState> = _state.asStateFlow()
 
-        private val _navigate = MutableSharedFlow<String>(extraBufferCapacity = 1)
-        val navigate: SharedFlow<String> = _navigate.asSharedFlow()
+        private val _navigate = MutableSharedFlow<NavCommand>(extraBufferCapacity = 1)
+        val navigate: SharedFlow<NavCommand> = _navigate.asSharedFlow()
 
         /** Invoked by the host once a JPEG has been captured. */
         fun onCaptureReady(jpeg: ByteArray) {
@@ -35,10 +36,24 @@ class CameraViewModel
                 _state.value = CameraUiState.Identifying
                 runCatching { identifier.identify(jpeg) }
                     .onSuccess { result ->
+                        val command =
+                            if (result.lowConfidence) {
+                                val candidates =
+                                    (identifier as? CandidateProvider)?.mostRecentCandidates ?: emptyList()
+                                NavCommand.LowConfidence(candidates)
+                            } else {
+                                NavCommand.Success(
+                                    speciesId = result.speciesId,
+                                    source = result.source,
+                                    lowConfidence = false,
+                                )
+                            }
                         _state.value = CameraUiState.Success(result.speciesId)
-                        _navigate.tryEmit(result.speciesId)
+                        _navigate.tryEmit(command)
                     }.onFailure { e ->
-                        _state.value = CameraUiState.Failure(e.message ?: "identification failed")
+                        val message = e.message ?: "identification failed"
+                        _state.value = CameraUiState.Failure(message)
+                        _navigate.tryEmit(NavCommand.Failure(message))
                     }
             }
         }

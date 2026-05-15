@@ -77,7 +77,51 @@ class CameraViewModelTest {
             val vm = CameraViewModel(fake)
             vm.navigate.test {
                 vm.onCaptureReady(byteArrayOf(0))
-                assertThat(awaitItem()).isEqualTo("ficus-lyrata")
+                val event = awaitItem()
+                assertThat(event).isInstanceOf(NavCommand.Success::class.java)
+                val success = event as NavCommand.Success
+                assertThat(success.speciesId).isEqualTo("ficus-lyrata")
+                assertThat(success.source).isEqualTo(IdSource.STUB_DETERMINISTIC)
+                assertThat(success.lowConfidence).isFalse()
+            }
+        }
+
+    @Test
+    fun lowConfidenceEmitsLowConfidenceNavCommand() =
+        runTest {
+            val fake =
+                FakePlantIdentifier(
+                    result =
+                        IdentificationResult(
+                            speciesId = "",
+                            displayName = "",
+                            source = IdSource.ON_DEVICE_MODEL,
+                            lowConfidence = true,
+                        ),
+                )
+            val vm = CameraViewModel(fake)
+            vm.navigate.test {
+                vm.onCaptureReady(byteArrayOf(0))
+                val event = awaitItem()
+                assertThat(event).isInstanceOf(NavCommand.LowConfidence::class.java)
+                // The fake doesn't implement CandidateProvider → candidates list empty.
+                assertThat((event as NavCommand.LowConfidence).candidates).isEmpty()
+            }
+        }
+
+    @Test
+    fun failureEmitsFailureNavCommand() =
+        runTest {
+            val throwing =
+                object : PlantIdentifier {
+                    override suspend fun identify(jpeg: ByteArray): IdentificationResult = throw IllegalStateException("camera broke")
+                }
+            val vm = CameraViewModel(throwing)
+            vm.navigate.test {
+                vm.onCaptureReady(byteArrayOf(0))
+                val event = awaitItem()
+                assertThat(event).isInstanceOf(NavCommand.Failure::class.java)
+                assertThat((event as NavCommand.Failure).message).contains("camera broke")
             }
         }
 
