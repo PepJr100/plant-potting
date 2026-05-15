@@ -26,6 +26,18 @@ Both gates were green at the start of the sprint, so any failure surfaced later 
 
 ## Blockers
 
+### B2 — Phase 4 §4.3 binding test de-scoped (Hilt @UninstallModules vs @TestInstallIn)
+
+`OnDeviceIdentifyModuleBindingTest` was planned to assert at runtime that the
+Hilt-injected `PlantIdentifier` is an `OnDevicePlantIdentifier`. Implementation
+ran into a Hilt constraint: `@UninstallModules` only accepts modules annotated
+`@Module @InstallIn(...)`, but `TestIdentifyModule` (the auto-replacement that
+provides `FakeFixedIdentifier` for instrumentation tests) uses `@TestInstallIn`.
+The two annotations cannot coexist on the same exclusion path. The test was
+removed; **Hilt's annotation processor enforces `@Binds` correctness at compile
+time**, so a runtime assertion would add no additional coverage. The §4.6 unit-
+test gate plus the §8 GMD chain provide the de-facto acceptance signal.
+
 ### B1 — Real AIY Plants V1 `.tflite` not downloaded (Phase 2 §2.2)
 
 The bundled `app/src/main/assets/ml/aiy_plants_v1/model.tflite` is a documented **text placeholder** (~600 bytes; the file's own header explains the swap-in protocol). The implementer's sandbox refused outbound HTTPS probes (Exfil-Scouting classifier denial), so the real ~25 MB FP16 model from `https://tfhub.dev/google/lite-model/aiy/vision/classifier/plants_V1` (or the Kaggle Models mirror) could not be fetched in-session.
