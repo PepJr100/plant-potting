@@ -8,6 +8,7 @@ data class IdentificationResult(
     val speciesId: String,
     val displayName: String,
     val source: IdSource,
+    val lowConfidence: Boolean = false,
 )
 
 enum class IdSource {
