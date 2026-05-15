@@ -25,6 +25,7 @@ sprints:
     updated: "2026-05-15T17:58:24+00:00"
   - id: PLANTPOTTING-0005
     title: Post-shutter polish + un-defer carry-forward from 0003/0004
-    status: planned
+    status: in-progress
+    executor: opus
     created: "2026-05-15T20:16:47+00:00"
-    updated: "2026-05-15T20:16:47+00:00"
+    updated: "2026-05-15T20:46:07+00:00"
