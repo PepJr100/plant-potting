@@ -1,6 +1,6 @@
 # PLANTPOTTING-0004 — Fix sprint for PLANTPOTTING-0003 review bugs
 
-**Status:** planned
+**Status:** done
 **Sprint shape:** narrow fix sprint, same pattern as PLANTPOTTING-0002 → PLANTPOTTING-0001
 **Sprint window:** ~3–5 days for a single AI implementer (opus, gpt-5.4, or gemini — picked at `sprint-execute` time)
 **Primary source:** `docs/sprints/feedback/PLANTPOTTING-0003/feedback.md`
@@ -269,7 +269,7 @@ Phase 4 requires a live `Pixel_6_API_34` emulator. **If unavailable, surface to 
 
 ### Phase 5 — Docs, ledger, sprint close
 
-- [ ] **5.1** Author `docs/sprints/results/PLANTPOTTING-0004.md` (same shape as 0001/0002/0003 results docs):
+- [x] **5.1** Author `docs/sprints/results/PLANTPOTTING-0004.md` (same shape as 0001/0002/0003 results docs):
   - §0 baseline outputs + §0.4/§0.5/§0.6 contract-test RED-then-green status.
   - §1 Bug 1 fix: diff summary (manifest field, preprocessor branch, `PreprocessedImage` → `ByteBuffer`, facade dtype assertion + **output dequantization**), §1.4 / §1.6 test-rename notes.
   - §2 Bug 2 fix: the four-line `MainActivity` diff; the cleanup list (`RecommendationScreen.kt`); the §2.4 dump verification line.
@@ -283,8 +283,8 @@ Phase 4 requires a live `Pixel_6_API_34` emulator. **If unavailable, surface to 
     - Re-enabling `PermissionDeniedFlowTest` (`@Ignore` since 0001).
     - INT8 quant variant work / GPU / NNAPI delegate.
   - §6 final-verify table (commands + outputs + commit hash).
-- [ ] **5.2** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0004` `status: done`, refresh `updated`.
-- [ ] **5.3 (final verify)** Run the full gate chain on the final commit:
+- [x] **5.2** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0004` `status: done`, refresh `updated`.
+- [x] **5.3 (final verify)** Run the full gate chain on the final commit:
   - `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking`
   - `bash scripts/check-stub-isolation.sh`
   - `./gradlew --no-daemon pixel6Api34DebugAndroidTest`

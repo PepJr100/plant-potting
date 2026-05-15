@@ -254,4 +254,5 @@ polish should treat it as the headline result surface, not a fallback.
 | `pwsh ./scripts/integration-flow.ps1` (warm) | GREEN — `transcript-B-warm.txt` |
 | `pwsh ./scripts/integration-flow.ps1 -BuildOnly` | GREEN — `transcript-C-buildonly.txt` |
 
-Final commit hash: _to be stamped by ledger close (§5.2)._
+Final commit hash: implementation at `c26d1ac` (PLANTPOTTING-0004 fix Bug 1
++ Bug 2). Ledger-close commit follows; both are on `main`.
