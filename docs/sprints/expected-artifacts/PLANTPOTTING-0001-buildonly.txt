@@ -4,9 +4,11 @@
 # the four build-only lines plus the `manifest-mode=build-only`
 # discriminator, and explicitly does NOT satisfy any device-aware
 # acceptance gate (see PLANTPOTTING-0002 §3.1).
+# `model-asset-present` is the PLANTPOTTING-0003 §2 addition.
 
 apk-exists=true
 archetypes-asset-present=true
 species-asset-present=true
+model-asset-present=true
 verify-no-networking-passed=true
 manifest-mode=build-only

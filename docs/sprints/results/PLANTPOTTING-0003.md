@@ -137,7 +137,38 @@ _To be filled in when Phase 5 lands._
 
 ## 5. Bug A — retroactive closure of PLANTPOTTING-0002 §8 line 310
 
-_To be filled in when Phase 7 lands. PLANTPOTTING-0002.md is intentionally **not edited** per §7.6._
+**Status:** script logic fixed and unit-test-verified; live device-aware transcripts blocked on Blocker B1.
+
+**Fix shape (PLANTPOTTING-0003 §4.8 / §7):**
+
+- `scripts/integration-flow-helpers.ps1` extracts `Resolve-AdbPath`, `Get-NodeBounds-Center`, `Invoke-AdbDump`, and `Wait-ForNode` so the §7.2 test harness can dot-source them.
+- `Invoke-AdbDump` now returns `$true` / `$false` instead of throwing on every miss. Three soft-failure paths are documented and unit-tested via the adb shims:
+  1. `uiautomator dump` exits 0 but stderr contains `null root node returned by UiTestAutomationBridge` (the documented Android race) → `$false`.
+  2. `uiautomator dump` exits 0 but the device-side file is missing after `adb pull` → `$false`.
+  3. `adb pull` exits non-zero → `$false`.
+  Hard failures (adb itself missing on transport, non-retryable dump errors) still throw.
+- `Wait-ForNode` checks the return value and continues iterating on `$false`. Default `maxAttempts` bumped from 8 to 12.
+- The main script sleeps 2 s after `am start` before the first dump to give the AOSP image time to land in the foreground.
+- A new `source-badge=...` line is captured from the result-screen dump and diffed against the expected manifest.
+
+**Unit-test verification (`scripts/tests/integration-flow-tests.ps1`):**
+
+```
+PASS  Wait-ForNode succeeds on the second dump after a null-root race
+PASS  Wait-ForNode throws after maxAttempts against a perpetually-null-root shim
+PASS  Invoke-AdbDump returns false on the null-root race without throwing
+PASS  Invoke-AdbDump returns true on a clean dump
+PASS  Invoke-AdbDump clears any stale local file before each dump attempt
+5 passed, 0 failed
+```
+
+**Build-only run (`scripts/integration-flow.ps1 -BuildOnly`):** `Integration manifest diff passed.` against the updated `PLANTPOTTING-0001-buildonly.txt`.
+
+**Cold + warm device-aware transcripts:** blocked on Blocker B1 (the placeholder model causes `OnDevicePlantIdentifier` to throw `IdentificationFailureException` before the result screen appears, so the script's `Wait-ForNode -resourceId "result.seePottingMix"` correctly times out). Once the real `.tflite` is dropped in, the user can capture `transcript-A-cold.txt` and `transcript-B-warm.txt` against a connected `Pixel_6_API_34` emulator without any code changes.
+
+**PLANTPOTTING-0002 §8 line 310 closure:** the script-logic half of that acceptance criterion is now satisfied (unit-tested at the shim level + build-only regression green). The "clean diff against the device-aware expected file" half remains conditional on B1 — but the deterministic failure mode it documents (null-root race) is fixed in code.
+
+**PLANTPOTTING-0002.md is intentionally not edited** per §7.6 / codex critique 2.6.
 
 ## 6. Final verify (§8.5)
 

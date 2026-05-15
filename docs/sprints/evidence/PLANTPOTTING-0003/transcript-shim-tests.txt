@@ -1,0 +1,14 @@
+ERROR: null root node returned by UiTestAutomationBridge.
+PASS  Wait-ForNode succeeds on the second dump after a null-root race
+ERROR: null root node returned by UiTestAutomationBridge.
+ERROR: null root node returned by UiTestAutomationBridge.
+ERROR: null root node returned by UiTestAutomationBridge.
+PASS  Wait-ForNode throws after maxAttempts against a perpetually-null-root shim
+ERROR: null root node returned by UiTestAutomationBridge.
+PASS  Invoke-AdbDump returns false on the null-root race without throwing
+ERROR: null root node returned by UiTestAutomationBridge.
+PASS  Invoke-AdbDump returns true on a clean dump
+ERROR: null root node returned by UiTestAutomationBridge.
+PASS  Invoke-AdbDump clears any stale local file before each dump attempt
+
+5 passed, 0 failed

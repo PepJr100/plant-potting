@@ -1,27 +1,32 @@
 # Expected device-aware integration manifest for PLANTPOTTING-0001
-# (default mode of scripts/integration-flow.ps1 after PLANTPOTTING-0002 §3).
+# (default mode of scripts/integration-flow.ps1 after PLANTPOTTING-0002 §3
+# and PLANTPOTTING-0003 §7).
 # Lines starting with `#` are comments, blank lines are ignored.
 # The script writes the generated manifest to
 # `artifacts/PLANTPOTTING-0001/manifest.txt` and fails if any line below is
 # missing from the generated manifest. Extra lines in the generated manifest
 # are allowed (e.g. device-specific extras).
 #
-# The four core build-only lines (`apk-exists`, `archetypes-asset-present`,
+# The four build-only lines (`apk-exists`, `archetypes-asset-present`,
 # `species-asset-present`, `verify-no-networking-passed`) are still required.
-# The remaining lines are the device-aware coverage that Bug 3 silently
-# skipped before §3.2's adb fallback + §3.5's hard-fail rules landed.
+# `model-asset-present` is the PLANTPOTTING-0003 §2 addition (the on-device
+# `.tflite` ships under `assets/ml/aiy_plants_v1/`).
+# `source-badge=on-device match` is PLANTPOTTING-0003 §5.6 — production
+# wiring is the on-device classifier, so the badge no longer reads the
+# legacy "Stub identifier — replace in a later sprint" copy.
 #
-# `archetype-name=aroid chunky` reflects the deterministic
-# StubPlantIdentifier pick (`Monstera deliciosa` → Aroid Chunky archetype).
-# `recipe-row-count=5` is the row count of the Aroid Chunky recipe in
-# `app/src/main/assets/kb/archetypes.json`. Both stay stable as long as the
-# stub identifier and KB are unchanged.
+# `archetype-name=aroid chunky` and `recipe-row-count=5` reflect the
+# FakeFixedIdentifier-driven path (resolves to monstera-deliciosa →
+# Aroid Chunky archetype with a 5-row recipe). They remain stable as
+# long as the KB content and the FakeFixedIdentifier seed are unchanged.
 
 apk-exists=true
 archetypes-asset-present=true
 species-asset-present=true
+model-asset-present=true
 verify-no-networking-passed=true
 manifest-mode=device-aware
 device-screenshot-count-at-least-1=true
 archetype-name=aroid chunky
 recipe-row-count=5
+source-badge=on-device match

@@ -6,34 +6,28 @@
 #   - Resolves `adb` from PATH, then $env:ANDROID_HOME, then $env:ANDROID_SDK_ROOT.
 #   - Hard-fails if `adb` cannot be resolved, no device is attached, the APK
 #     install fails, or the recommendation-screen `ui-hierarchy.xml` cannot
-#     be produced. Bug 3 was that the previous script silently skipped all of
-#     this when `adb` was not on PATH — never again.
+#     be produced.
 #   - Installs the debug APK, grants `android.permission.CAMERA`, launches
 #     `MainActivity`, drives the §2.1 flow (shutter → See potting mix) by
 #     dumping the UI hierarchy and tapping the bounds of the relevant
-#     `resource-id` nodes (Compose `testTag`s are surfaced as resource ids
-#     via §3.6's `Modifier.semantics { testTagsAsResourceId = true }`).
+#     `resource-id` nodes.
 #   - Diffs the generated manifest against
 #     `docs/sprints/expected-artifacts/PLANTPOTTING-0001.txt`.
 #
 # `-BuildOnly`:
 #   - Skips every device-side step and writes a build-only manifest, diffed
 #     against `docs/sprints/expected-artifacts/PLANTPOTTING-0001-buildonly.txt`.
-#   - For CI machines or contributors with no device attached. A
-#     build-only run is explicitly NOT acceptance for any device-aware
-#     gate (per §3.1 manifest-mode policy).
 #
-# === Manual repro for Bug 3 (PLANTPOTTING-0002 §3.10) ===
-# 1. `adb` removed from PATH, `$env:ANDROID_HOME` set, device attached:
-#      Remove-Item Env:\PATH -ErrorAction Ignore
-#      $env:PATH = ($oldPath -split ';' | Where-Object { $_ -notmatch 'platform-tools' }) -join ';'
-#      ./scripts/integration-flow.ps1
-#    → Expected: device-aware diff passes via Resolve-AdbPath fallback.
-# 2. No device attached, no `-BuildOnly`:
-#      ./scripts/integration-flow.ps1
-#    → Expected: non-zero exit, "No device attached" message.
-# Transcripts of both runs are committed at
-# `docs/sprints/evidence/PLANTPOTTING-0002/integration-flow-transcripts.md`.
+# === PLANTPOTTING-0003 §4.8 / §7 fix (Bug A) ===
+# - `Invoke-AdbDump` and `Wait-ForNode` live in `scripts/integration-flow-helpers.ps1`
+#   so the test harness at `scripts/tests/integration-flow-tests.ps1` can exercise
+#   the retry policy against deterministic shims.
+# - `Invoke-AdbDump` returns `$false` on the documented `null root node returned by
+#   UiTestAutomationBridge` race (and on other soft failures) so `Wait-ForNode`'s
+#   retry loop can actually retry. Hard failures (adb missing, transport error)
+#   still throw.
+# - Cold-launch settle: a 2 s sleep after `am start` before the first dump.
+# - `Wait-ForNode` default `maxAttempts` bumped from 8 to 12.
 [CmdletBinding()]
 param([switch]$BuildOnly)
 
@@ -42,6 +36,10 @@ Set-StrictMode -Version Latest
 # (`gradlew.bat`, `adb`) does not trip ErrorAction. Failure is detected
 # via explicit `$LASTEXITCODE` checks and `throw` statements below.
 $ErrorActionPreference = "Continue"
+
+# Dot-source the helper module. This is the same file the test harness uses,
+# so any change here is exercised by `scripts/tests/integration-flow-tests.ps1`.
+. "$PSScriptRoot/integration-flow-helpers.ps1"
 
 $pkg = "com.darkfactory.plantpotting"
 $sprintId = "PLANTPOTTING-0001"
@@ -52,59 +50,6 @@ $expectedManifest = if ($BuildOnly) {
     "docs/sprints/expected-artifacts/$sprintId-buildonly.txt"
 } else {
     "docs/sprints/expected-artifacts/$sprintId.txt"
-}
-
-function Resolve-AdbPath {
-    $cmd = Get-Command adb -ErrorAction SilentlyContinue
-    if ($null -ne $cmd) { return $cmd.Source }
-    if ($env:ANDROID_HOME) {
-        $candidate = Join-Path $env:ANDROID_HOME "platform-tools\adb.exe"
-        if (Test-Path $candidate) { return $candidate }
-    }
-    if ($env:ANDROID_SDK_ROOT) {
-        $candidate = Join-Path $env:ANDROID_SDK_ROOT "platform-tools\adb.exe"
-        if (Test-Path $candidate) { return $candidate }
-    }
-    return $null
-}
-
-function Get-NodeBounds-Center([System.Xml.XmlNode]$node) {
-    # Compose-exported bounds look like `[x1,y1][x2,y2]`.
-    $b = $node.GetAttribute("bounds")
-    if ($b -match '^\[(\d+),(\d+)\]\[(\d+),(\d+)\]$') {
-        $x1 = [int]$matches[1]
-        $y1 = [int]$matches[2]
-        $x2 = [int]$matches[3]
-        $y2 = [int]$matches[4]
-        return [pscustomobject]@{
-            X = [int](($x1 + $x2) / 2)
-            Y = [int](($y1 + $y2) / 2)
-        }
-    }
-    throw "Could not parse bounds attribute: '$b' on $($node.OuterXml)"
-}
-
-function Invoke-AdbDump([string]$adb, [string]$path) {
-    & $adb shell uiautomator dump /sdcard/ui.xml | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "uiautomator dump failed (exit $LASTEXITCODE)"
-    }
-    & $adb pull /sdcard/ui.xml $path 2>&1 | Out-Null
-    if (-not (Test-Path $path)) {
-        throw "adb pull /sdcard/ui.xml -> $path failed"
-    }
-}
-
-function Wait-ForNode([string]$adb, [string]$resourceId, [string]$dumpPath, [int]$maxAttempts = 8) {
-    for ($i = 1; $i -le $maxAttempts; $i++) {
-        Invoke-AdbDump -adb $adb -path $dumpPath
-        $doc = New-Object System.Xml.XmlDocument
-        $doc.Load((Resolve-Path $dumpPath))
-        $node = $doc.SelectSingleNode("//node[@resource-id='$resourceId']")
-        if ($null -ne $node) { return $node }
-        Start-Sleep -Milliseconds 750
-    }
-    throw "Timed out waiting for node with resource-id='$resourceId' after $maxAttempts dumps"
 }
 
 if (-not (Test-Path "./gradlew.bat")) {
@@ -139,13 +84,16 @@ Write-Host ("       entries: {0}" -f $entryList.Count)
 
 $hasArchetypesAsset = $entryList.Contains("assets/kb/archetypes.json")
 $hasSpeciesAsset = $entryList.Contains("assets/kb/species.json")
+$hasModelAsset = $entryList.Contains("assets/ml/aiy_plants_v1/model.tflite")
 Write-Host ("       archetypes asset: {0}" -f $hasArchetypesAsset)
 Write-Host ("       species asset:    {0}" -f $hasSpeciesAsset)
+Write-Host ("       model asset:      {0}" -f $hasModelAsset)
 
 # Step 3: device-aware flow OR explicit -BuildOnly skip.
 $deviceScreenshotCount = 0
 $archetypeName = $null
 $recipeRowCount = 0
+$sourceBadge = $null
 
 if ($BuildOnly) {
     Write-Host "[3/5] -BuildOnly mode -- skipping device coverage" -ForegroundColor Yellow
@@ -176,6 +124,11 @@ if ($BuildOnly) {
     & $adb shell am force-stop $pkg 2>$null | Out-Null
     & $adb shell am start -n "$pkg/.MainActivity" 2>$null | Out-Null
 
+    # PLANTPOTTING-0003 §4.8: cold-launch settle. 8 * 750 ms = 6 s budget was
+    # too tight for the AOSP image's foreground transition; sleep 2 s before
+    # the first dump so the activity has gained accessibility focus.
+    Start-Sleep -Seconds 2
+
     # Wait for the camera screen (shutter resource-id).
     Write-Host "       waiting for camera screen"
     $shutterDump = "$artifactsDir/ui-hierarchy-camera.xml"
@@ -197,6 +150,17 @@ if ($BuildOnly) {
     Write-Host "       waiting for result screen"
     $resultDump = "$artifactsDir/ui-hierarchy-result.xml"
     $seePottingMixNode = Wait-ForNode -adb $adb -resourceId "result.seePottingMix" -dumpPath $resultDump
+
+    # Extract the source-driven badge text from the result-screen dump.
+    $resultDoc = New-Object System.Xml.XmlDocument
+    $resultDoc.Load((Resolve-Path $resultDump))
+    $badgeNode = $resultDoc.SelectSingleNode("//node[@resource-id='result.sourceBadge']")
+    if ($null -ne $badgeNode) {
+        $sourceBadge = $badgeNode.GetAttribute("text").ToLower()
+        Write-Host ("       source-badge = '{0}'" -f $sourceBadge)
+    } else {
+        Write-Host "       warning: result.sourceBadge node missing in dump" -ForegroundColor Yellow
+    }
 
     $seePottingMixCenter = Get-NodeBounds-Center -node $seePottingMixNode
     Write-Host ("       tapping 'See potting mix' at ({0},{1})" -f $seePottingMixCenter.X, $seePottingMixCenter.Y)
@@ -231,6 +195,7 @@ $lines = New-Object System.Collections.ArrayList
 [void]$lines.Add("apk-exists=true")
 [void]$lines.Add("archetypes-asset-present=" + $hasArchetypesAsset.ToString().ToLower())
 [void]$lines.Add("species-asset-present=" + $hasSpeciesAsset.ToString().ToLower())
+[void]$lines.Add("model-asset-present=" + $hasModelAsset.ToString().ToLower())
 [void]$lines.Add("verify-no-networking-passed=true")
 if ($BuildOnly) {
     [void]$lines.Add("manifest-mode=build-only")
@@ -240,6 +205,9 @@ if ($BuildOnly) {
     [void]$lines.Add("device-screenshot-count-at-least-1=" + $hasScreenshot.ToString().ToLower())
     [void]$lines.Add("archetype-name=$archetypeName")
     [void]$lines.Add("recipe-row-count=$recipeRowCount")
+    if ($null -ne $sourceBadge -and $sourceBadge -ne "") {
+        [void]$lines.Add("source-badge=$sourceBadge")
+    }
 }
 Set-Content -Path $manifestPath -Value ($lines -join "`n") -Encoding utf8 -NoNewline
 
