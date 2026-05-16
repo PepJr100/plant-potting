@@ -34,6 +34,16 @@ pending a CC-licensed Monstera fixture and a GMD probe run.
 | Integration manifest | ✓ shipped | `scripts/integration-flow.ps1` (cold + warm + buildonly) diffs against `expected-artifacts/PLANTPOTTING-0001*.txt`. No re-baselining in 0005. |
 | Documentation | △ partial | This file + `ml-mapping-notes.md` calibration entry land in 0005; per-sprint results doc + probe data pending. |
 
+## Sprint history
+
+| SID | Title | Status | Headline outcome |
+| --- | --- | --- | --- |
+| PLANTPOTTING-0001 | Android scaffold + end-to-end stub flow with KB | done | Camera → result → recommendation flow on stub identifier; KB + Hilt + Compose scaffolding; integration-flow manifest baseline. |
+| PLANTPOTTING-0002 | Fix sprint for PLANTPOTTING-0001 review bugs | done | Settings round-trip recovery (Bug 4); permission rationale wording; bind-pending overlay. |
+| PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | done | `OnDevicePlantIdentifier` wired to AIY V1/3; source-driven `ResultScreen` badge; `LowConfidencePicker` v1; `_comment_coverage` (2 of 16 species in-vocab). |
+| PLANTPOTTING-0004 | Fix sprint for PLANTPOTTING-0003 review bugs | done | UINT8 preprocessor branch (Bug 1); `testTagsAsResourceId` bridge (Bug 2); `OnDeviceModelRealInterpreterTest` lands. |
+| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | in-progress | LowConfidencePicker polished; bottom-anchored Failure banner; `TestIdentifyModule` deleted (7 tests migrated to `@BindValue`); `LowConfidenceFlowTest` + un-`@Ignore`'d PermissionDenied; `perSpeciesThresholds` mechanism. Real-photo probe + GMD gates carry to 0006. |
+
 ## Known gaps
 
 Carried forward from 0005's non-goals (§2.4) and Blockers section:
