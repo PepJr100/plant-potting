@@ -1,5 +1,6 @@
 package com.darkfactory.plantpotting.result
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
@@ -9,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Box
 import androidx.lifecycle.SavedStateHandle
 import com.darkfactory.plantpotting.kb.model.Archetype
 import com.darkfactory.plantpotting.kb.model.ArchetypeMapping

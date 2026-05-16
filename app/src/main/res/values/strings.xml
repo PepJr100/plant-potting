@@ -16,6 +16,8 @@
     <string name="camera_shutter_label">Capture plant photo</string>
     <string name="camera_loading">Identifying…</string>
     <string name="camera_capture_failed">Capture failed. Try again.</string>
+    <string name="camera_failure_retry">Try again</string>
+    <string name="camera_failure_banner_content_description">Capture failed</string>
 
     <!-- Result screen -->
     <string name="result_badge_stub">Stub identifier — replace in a later sprint</string>
