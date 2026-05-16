@@ -152,7 +152,12 @@ fun PermissionScreenHost(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var hasRequested by rememberSaveable { mutableStateOf(false) }
-    var permanentlyDenied by rememberSaveable { mutableStateOf(initialPermanentlyDenied) }
+    // PLANTPOTTING-0005 §4.4: also consult `guard.isPermanentlyDenied()` so an
+    // instrumentation fake can drive the PermanentlyDenied state without going
+    // through the system permission dialog. Production guards return `false`.
+    var permanentlyDenied by rememberSaveable {
+        mutableStateOf(initialPermanentlyDenied || guard.isPermanentlyDenied())
+    }
     var isGrantedNow by remember { mutableStateOf(guard.isGranted()) }
     var alreadyNavigated by rememberSaveable { mutableStateOf(false) }
 
