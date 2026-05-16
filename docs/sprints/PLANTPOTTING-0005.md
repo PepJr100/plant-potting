@@ -160,13 +160,13 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 
 ### Phase 6 — Documentation: ROADMAP.md + ml-mapping-notes.md + README link
 
-- [ ] **6.1** Write `docs/ROADMAP.md` — one page, four sections:
+- [x] **6.1** Write `docs/ROADMAP.md` — one page, four sections:
   1. **Current state (post-0005)** — three-sentence summary: on-device ML works; LowConfidencePicker + Failure polished; calibration scaffold in place; test infra clean.
   2. **Layer status** — table: rows KB / identifier / UI / tests / infra; columns Status (✓ shipped / △ partial / ✗ gap) and Notes.
   3. **Known gaps** — bullets seeded by §2.4 non-goals.
   4. **Candidate next sprint** — one paragraph proposing PLANTPOTTING-0006 (likely: confidence calibration v2 with multi-species fixture sweep + per-species threshold seeding). Do not pre-commit scope.
-- [ ] **6.2 (Gemini addition)** Add a calibration-provenance entry to `docs/kb/ml-mapping-notes.md` — names the per-class threshold mechanism, summarises the probe outcome (one paragraph), and explains the §5.6 / §5.7 decisions. This is *why* the values landed where they did — survives sprint result rotation.
-- [ ] **6.3** Update `README.md`'s "Current state" section to reflect post-0005 state. Replace the existing "Known gaps (carried to PLANTPOTTING-0005, see …)" bullet list with one line: "See [`docs/ROADMAP.md`](docs/ROADMAP.md) for layer status and the gap inventory." Add `PLANTPOTTING-0005 | Post-shutter polish + un-defer | done` to the status table only after the ledger flips at §7.7.
+- [x] **6.2 (Gemini addition)** Add a calibration-provenance entry to `docs/kb/ml-mapping-notes.md` — names the per-class threshold mechanism, summarises the probe outcome (one paragraph), and explains the §5.6 / §5.7 decisions. This is *why* the values landed where they did — survives sprint result rotation.
+- [x] **6.3** Update `README.md`'s "Current state" section to reflect post-0005 state. Replace the existing "Known gaps (carried to PLANTPOTTING-0005, see …)" bullet list with one line: "See [`docs/ROADMAP.md`](docs/ROADMAP.md) for layer status and the gap inventory." Add `PLANTPOTTING-0005 | Post-shutter polish + un-defer | done` to the status table only after the ledger flips at §7.7.
 
 ### Phase 7 — Final-verify, evidence, ledger close
 

@@ -74,3 +74,26 @@ Direct rank-match. Hoya carnosa is the most widely sold Hoya in the West; we acc
 - A new model variant lands — re-audit each mapping line against the new vocabulary; some labels may have been renamed.
 - A KB species is added or renamed in `species.json` — add a mapping entry pointing at the new id and a paragraph here.
 - A KB species id changes (rare; we avoid this) — propagate to every mapping row pointing at the old id, and either rewrite the paragraph or delete the row.
+
+## Calibration provenance
+
+PLANTPOTTING-0005 §5 introduced the *per-species threshold override* mechanism — a new
+`perSpeciesThresholds: Map<String, Float>` field on `ModelManifest`, parsed from
+`per_species_thresholds` in `model_manifest.json`, and consulted by `ModelScoreMapper`
+*before* the global `Thresholds.highConfidencePlain` default. The override applies only
+to the `_plain` (top-1 vs threshold) path; the margin path (`_margin_min` / `_margin_delta`)
+is intentionally not overridable — see PLANTPOTTING-0005 §4.3 (premature surface).
+
+**Probe outcome.** Pending. The §5.5 probe — running `OnDeviceModelRealInterpreterTest`
+against a real CC-licensed Monstera deliciosa photograph and recording top-1 species id
++ score, top-3, `result.lowConfidence`, and `result.source` — has not yet run. The plan
+gates the §5.6 accuracy-bearing assertion (preferred form: `speciesId == "monstera-deliciosa"
+&& !lowConfidence`; fallback: source-only + top-3 contains the species) on the probe's
+verdict, and gates §5.7's optional seeding on whether the probe shows an in-vocab
+species fails the global threshold by a margin a per-class override would close.
+
+**Seeded values.** None. `per_species_thresholds` ships as an empty object with a
+breadcrumb comment in `model_manifest.json`. When PLANTPOTTING-0006 (or whoever
+picks up the deferred §5.4–§5.8 work) runs the probe and decides to seed, this entry
+should be updated to name the species, the chosen threshold, and the probe numbers
+that justified the deviation from the global 0.55.

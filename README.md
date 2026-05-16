@@ -7,9 +7,9 @@ identifies the species; the app surfaces a recipe-driven potting-mix
 recommendation drawn from a bundled knowledge base. No network calls at
 runtime — `./gradlew verifyNoNetworking` is a hard gate.
 
-## Current state (post PLANTPOTTING-0004, 2026-05-15)
+## Current state (post PLANTPOTTING-0005 mechanism, 2026-05-16)
 
-Four sprints landed on `main`:
+Five sprints in flight on `main`:
 
 | Sprint | Title | Status |
 | --- | --- | --- |
@@ -17,6 +17,7 @@ Four sprints landed on `main`:
 | PLANTPOTTING-0002 | Fix sprint for 0001 review bugs | done |
 | PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | done |
 | PLANTPOTTING-0004 | Fix sprint for 0003 review bugs (UINT8 dtype + testTagsAsResourceId bridge) | done |
+| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | in-progress (mechanism + tests landed; real-photo probe + GMD gates pending — see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 
 What you can do today:
 
@@ -67,16 +68,7 @@ PlantIdentifier (interface)
 KB: `app/src/main/assets/kb/species.json` (16 species) and `archetypes.json`
 (potting-mix recipes). Validated at app start.
 
-Known gaps (carried to PLANTPOTTING-0005, see
-`docs/sprints/feedback/PLANTPOTTING-0004/feedback.md`):
-
-- Full `TestIdentifyModule` global-removal + six-test `@BindValue` migration.
-- Confidence calibration / per-class threshold tuning.
-- `CameraUiState.Failure` UI polish.
-- `LowConfidencePicker` polish (it's the headline post-shutter screen on
-  most captures, not a fallback).
-- `LowConfidenceFlowTest` instrumentation and re-enabling
-  `PermissionDeniedFlowTest` (currently `@Ignore`'d).
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for layer status and the gap inventory.
 
 ## Prerequisites
 
