@@ -60,6 +60,11 @@ object OnDeviceIdentifyProvidersModule {
 
     @Provides
     @Singleton
+    @PerSpeciesThresholds
+    fun providePerSpeciesThresholds(manifest: ModelManifest): Map<String, Float> = manifest.perSpeciesThresholds
+
+    @Provides
+    @Singleton
     fun provideInterpreterFacade(
         assets: AssetManager,
         manifest: ModelManifest,

@@ -145,9 +145,9 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 
 ### Phase 5 — Confidence calibration scaffold (probe → assert)
 
-- [ ] **5.1 (test, RED first)** Add `ModelScoreMapperPerSpeciesThresholdTest` at `app/src/test/java/com/darkfactory/plantpotting/identify/model/ModelScoreMapperPerSpeciesThresholdTest.kt`. Methods: `perSpeciesOverrideUsedWhenPresent` (manifest seeded with `perSpeciesThresholds = mapOf("monstera-deliciosa" to 0.35f)`, top-1 score = 0.40f → high-confidence); `globalThresholdUsedWhenNoOverride` (override map empty, score = 0.40f → low-confidence vs `high_confidence_plain = 0.55`). RED today.
-- [ ] **5.2** Add `val perSpeciesThresholds: Map<String, Float> = emptyMap()` to `ModelManifest`. Parse `per_species_thresholds` (snake-case) in `ModelManifestReader`; optional — defaults to empty if absent. Add a `_comment_per_species_thresholds` breadcrumb in `model_manifest.json` explaining override semantics even though no values are seeded yet. (Flips §0.6 GREEN.)
-- [ ] **5.3** Update `ModelScoreMapper`: in the method that decides `lowConfidence` for a given top-1, consult `manifest.perSpeciesThresholds[speciesId] ?: manifest.thresholds.high_confidence_plain`. Override only the `_plain` value — `high_confidence_margin_min` / `_margin_delta` overrides are deferred (premature surface; see §4 below).
+- [x] **5.1 (test, RED first)** Add `ModelScoreMapperPerSpeciesThresholdTest` at `app/src/test/java/com/darkfactory/plantpotting/identify/model/ModelScoreMapperPerSpeciesThresholdTest.kt`. Methods: `perSpeciesOverrideUsedWhenPresent` (manifest seeded with `perSpeciesThresholds = mapOf("monstera-deliciosa" to 0.35f)`, top-1 score = 0.40f → high-confidence); `globalThresholdUsedWhenNoOverride` (override map empty, score = 0.40f → low-confidence vs `high_confidence_plain = 0.55`). RED today.
+- [x] **5.2** Add `val perSpeciesThresholds: Map<String, Float> = emptyMap()` to `ModelManifest`. Parse `per_species_thresholds` (snake-case) in `ModelManifestReader`; optional — defaults to empty if absent. Add a `_comment_per_species_thresholds` breadcrumb in `model_manifest.json` explaining override semantics even though no values are seeded yet. (Flips §0.6 GREEN.)
+- [x] **5.3** Update `ModelScoreMapper`: in the method that decides `lowConfidence` for a given top-1, consult `manifest.perSpeciesThresholds[speciesId] ?: manifest.thresholds.high_confidence_plain`. Override only the `_plain` value — `high_confidence_margin_min` / `_margin_delta` overrides are deferred (premature surface; see §4 below).
 - [ ] **5.4** Source a CC-licensed Monstera deliciosa photograph from Wikimedia Commons (CC-BY or CC0). Resize to 480×480 JPEG-q80; budget ≤200 KB. Replace `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`. Update `LICENSE.txt` with: source URL, author (if available), licence name, retrieval date (Codex addition). **Verify the licence terms permit redistribution under this repo's licence** before committing. Note in the commit body that the previous procedural fixture (seed `0x4D4F4E54`) is replaced.
 - [ ] **5.5 (probe, NOT a checked-in test)** With the real fixture in place, run `OnDeviceModelRealInterpreterTest` with a temporary `println` (or a one-off `@Test fun probe()` you remove before commit) that captures: top-1 species id + score; top-3 species/score pairs; `result.lowConfidence`; `result.source`. Run on GMD. **Record the captured output verbatim in `docs/sprints/results/PLANTPOTTING-0005.md`.** This is research, not a test gate.
 - [ ] **5.6 (test, after probe)** Add the accuracy-bearing assertion to `OnDeviceModelRealInterpreterTest`. Pre-committed forms:
@@ -331,3 +331,19 @@ The sprint is `done` when every one of these holds:
 | **Total** | **~6 days** |
 
 Within the 5–7 day envelope. §6.1 (`@BindValue` finicky), §6.2 (probe outcome), and §6.3 (`FakeCameraPermissionGuard` state extent) are the three most likely slip sources; all have documented fallbacks that keep the sprint in scope.
+
+---
+
+## Blockers
+
+The opus executor session that landed Phases 1–4 and §5.1–§5.3 cannot complete the following on its own; they require human/GMD involvement. The sprint stays `in-progress` until they're picked up.
+
+- **§5.4 — real CC-licensed Monstera fixture.** Sourcing a Wikimedia Commons CC-BY/CC-BY-SA/CC0 photograph, verifying the licence terms, resizing to 480×480 JPEG-q80 ≤200 KB, replacing `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`, and updating `LICENSE.txt` with source URL + author + licence name + retrieval date. A non-interactive shell can't reliably download + resize without imaging tools the user prefers picking.
+- **§5.5 — probe run.** `OnDeviceModelRealInterpreterTest` with a temporary `println` capturing top-1 species id + score, top-3, `result.lowConfidence`, `result.source`. Requires the `pixel6Api34` GMD (or a booted emulator) and the §5.4 fixture in place.
+- **§5.6 — accuracy-bearing assertion.** Decision (preferred vs fallback form) gated on §5.5's numbers.
+- **§5.7 — conditional `perSpeciesThresholds` seeding.** Gated on §5.5's numbers showing a margin a per-class override would close.
+- **§5.8 — `pixel6Api34DebugAndroidTest -PtestInstrumentationRunnerArguments.class=...OnDeviceModelRealInterpreterTest`** run capture.
+- **§3.12, §4.7, §7.2, §7.6 — GMD runs and manual emulator walkthrough.** Same GMD dependency as above.
+- **§7.3 — `integration-flow.ps1` cold + warm + buildonly transcripts.** Best executed from the user's pwsh terminal (the project's existing run-script convention).
+
+The calibration *mechanism* (§5.1–§5.3) is fully in place and JVM-verified — `ModelScoreMapper` consults `perSpeciesThresholds[bestSpeciesId] ?: thresholds.highConfidencePlain`. The manifest ships with `per_species_thresholds: {}` (empty) + a `_comment_per_species_thresholds` breadcrumb. When the §5.5 probe runs and §5.7 fires, the seeding is a one-line edit to that map.

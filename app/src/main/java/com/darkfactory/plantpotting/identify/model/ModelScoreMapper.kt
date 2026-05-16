@@ -3,6 +3,7 @@ package com.darkfactory.plantpotting.identify.model
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.identify.IdentificationResult
 import com.darkfactory.plantpotting.identify.ModelLabelsList
+import com.darkfactory.plantpotting.identify.PerSpeciesThresholds
 import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,6 +30,7 @@ class ModelScoreMapper
         private val mapping: ModelLabelMap,
         private val kb: KnowledgeBase,
         private val thresholds: ModelManifest.Thresholds,
+        @PerSpeciesThresholds private val perSpeciesThresholds: Map<String, Float> = emptyMap(),
     ) {
         fun map(scores: FloatArray): MappedScore {
             require(scores.size == labels.size) {
@@ -50,7 +52,18 @@ class ModelScoreMapper
                     .toList()
 
             val bestEntry = mapping.lookup(labels[bestIdx])
-            val highConfDirect = bestProb >= thresholds.highConfidencePlain && bestEntry != null
+            // PLANTPOTTING-0005 §5.3 — per-species override consulted before the global
+            // `highConfidencePlain`. Override only the `_plain` value; margin overrides are
+            // deferred per §4.3 ("premature surface"). The map ships empty by default; a
+            // species id is present only if §5.7's probe-evidence gate fired.
+            val bestSpeciesId = bestEntry?.kbSpeciesId
+            val plainThreshold =
+                if (bestSpeciesId != null) {
+                    perSpeciesThresholds[bestSpeciesId] ?: thresholds.highConfidencePlain
+                } else {
+                    thresholds.highConfidencePlain
+                }
+            val highConfDirect = bestProb >= plainThreshold && bestEntry != null
             val highConfMargin =
                 bestProb >= thresholds.highConfidenceMarginMin &&
                     (bestProb - secondProb) >= thresholds.highConfidenceMarginDelta &&
