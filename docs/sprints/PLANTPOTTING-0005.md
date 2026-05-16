@@ -115,18 +115,18 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 
 **Order matters — migrate every test before deleting the module, then delete. Compile-check after each test, not in batches** (Hilt's generated-graph error blames the generated file, not the source line).
 
-- [ ] **3.1** Extend `FakeFixedIdentifier`'s constructor to accept `lowConfidence: Boolean = false` and `speciesId: String = "monstera-deliciosa"` (and any other knobs the seven tests will need). Do not break existing call sites — all new params have defaults.
-- [ ] **3.2** Migrate `EndToEndFlowTest`: add `@BindValue @JvmField var fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()`. Run `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` and confirm GREEN before moving on.
-- [ ] **3.3** Migrate `CameraPreviewLayoutTest` (same pattern). Compile-check.
-- [ ] **3.4** Migrate `CameraScreenSmokeTest`. Compile-check.
-- [ ] **3.5** Migrate `CameraScreenBindStateTest`. Compile-check.
-- [ ] **3.6** Migrate `CameraScreenBoundStateTest` (Codex inventory found this; Claude's draft missed it). Compile-check.
-- [ ] **3.7** Migrate `PermissionResumeRecoveryTest`. Compile-check.
-- [ ] **3.8** Migrate `PermissionDeniedFlowTest` (existing methods only — §4 handles the un-ignore). Compile-check.
-- [ ] **3.9** Delete `app/src/androidTest/java/com/darkfactory/plantpotting/identify/TestIdentifyModule.kt`. Confirm `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` GREEN.
-- [ ] **3.10 (production-shape regression guard — Codex addition)** Add an explicit androidTest assertion that `OnDeviceModelRealInterpreterTest` resolves `PlantIdentifier` to `OnDevicePlantIdentifier`, not `FakeFixedIdentifier`. Implementation: inject `PlantIdentifier` (or `@ApplicationContext` + manual resolution) and assert `identifier::class.qualifiedName == "com.darkfactory.plantpotting.identify.OnDevicePlantIdentifier"`. Without this, a future global swap could silently downgrade the real-model test back to a fake — the exact regression PLANTPOTTING-0004 §4.5 deferred.
-- [ ] **3.11** Update comments in migrated androidTests that referenced "the global fake" to name the local `@BindValue` binding instead. Remove the obsolete §1.7 / §4.5 explanation in `OnDeviceModelRealInterpreterTest`.
-- [ ] **3.12** Run `./gradlew --no-daemon pixel6Api34DebugAndroidTest`. All seven migrated tests + `OnDeviceModelRealInterpreterTest` pass. Capture to `docs/sprints/results/PLANTPOTTING-0005-phase3-gmd.txt`.
+- [x] **3.1** Extend `FakeFixedIdentifier`'s constructor to accept `lowConfidence: Boolean = false` and `speciesId: String = "monstera-deliciosa"` (and any other knobs the seven tests will need). Do not break existing call sites — all new params have defaults.
+- [x] **3.2** Migrate `EndToEndFlowTest`: add `@BindValue @JvmField var fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()`. Run `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` and confirm GREEN before moving on.
+- [x] **3.3** Migrate `CameraPreviewLayoutTest` (same pattern). Compile-check.
+- [x] **3.4** Migrate `CameraScreenSmokeTest`. Compile-check.
+- [x] **3.5** Migrate `CameraScreenBindStateTest`. Compile-check.
+- [x] **3.6** Migrate `CameraScreenBoundStateTest` (Codex inventory found this; Claude's draft missed it). Compile-check.
+- [x] **3.7** Migrate `PermissionResumeRecoveryTest`. Compile-check.
+- [x] **3.8** Migrate `PermissionDeniedFlowTest` (existing methods only — §4 handles the un-ignore). Compile-check.
+- [x] **3.9** Delete `app/src/androidTest/java/com/darkfactory/plantpotting/identify/TestIdentifyModule.kt`. Confirm `./gradlew --no-daemon :app:compileDebugAndroidTestKotlin` GREEN.
+- [x] **3.10 (production-shape regression guard — Codex addition)** Add an explicit androidTest assertion that `OnDeviceModelRealInterpreterTest` resolves `PlantIdentifier` to `OnDevicePlantIdentifier`, not `FakeFixedIdentifier`. Implementation: inject `PlantIdentifier` (or `@ApplicationContext` + manual resolution) and assert `identifier::class.qualifiedName == "com.darkfactory.plantpotting.identify.OnDevicePlantIdentifier"`. Without this, a future global swap could silently downgrade the real-model test back to a fake — the exact regression PLANTPOTTING-0004 §4.5 deferred.
+- [x] **3.11** Update comments in migrated androidTests that referenced "the global fake" to name the local `@BindValue` binding instead. Remove the obsolete §1.7 / §4.5 explanation in `OnDeviceModelRealInterpreterTest`.
+- [x] **3.12** Run `./gradlew --no-daemon pixel6Api34DebugAndroidTest`. All seven migrated tests + `OnDeviceModelRealInterpreterTest` pass. Capture to `docs/sprints/results/PLANTPOTTING-0005-phase3-gmd.txt`.
 
 ### Phase 4 — `LowConfidenceFlowTest` + `PermissionDeniedFlowTest` un-ignore
 

@@ -16,13 +16,12 @@ import javax.inject.Inject
  * [OnDevicePlantIdentifier] (production preprocessor + production
  * `TfLiteInterpreterFacade` against the real `model.tflite` asset) end-to-end.
  *
- * Decision §4.5: we inject the **concrete** class, not the `PlantIdentifier` interface.
- * `TestIdentifyModule` (`@TestInstallIn(replaces = [OnDeviceIdentifyModule::class])`)
- * swaps the `@Binds PlantIdentifier` only; the concrete `@Singleton @Inject`
- * `OnDevicePlantIdentifier` is still buildable from the binding graph and gets the real
- * [com.darkfactory.plantpotting.identify.model.ImagePreprocessor] +
- * [com.darkfactory.plantpotting.identify.model.TfLiteInterpreterFacade] from
- * [com.darkfactory.plantpotting.identify.OnDeviceIdentifyProvidersModule].
+ * PLANTPOTTING-0005 §3 — `TestIdentifyModule` (the global `@TestInstallIn` swap to a
+ * fake) has been removed; per-test `@BindValue` is the canonical pattern now. The
+ * production `OnDeviceIdentifyModule.@Binds PlantIdentifier → OnDevicePlantIdentifier`
+ * is therefore active for this test (no @UninstallModules), and the §3.10 guard below
+ * asserts it. We continue to also `@Inject` the concrete `OnDevicePlantIdentifier`
+ * directly so the test exercises the real native interpreter regardless of the bind.
  *
  * Falsifiability (§4.6): if the §1.5 preprocessor branch is reverted to FLOAT32, this
  * test fails with the verbatim Bug 1 error
@@ -33,6 +32,12 @@ class OnDeviceModelRealInterpreterTest {
     @get:Rule val hiltRule = HiltAndroidRule(this)
 
     @Inject lateinit var identifier: OnDevicePlantIdentifier
+
+    // PLANTPOTTING-0005 §3.10 production-shape regression guard. Without this, a
+    // future global swap (a re-introduced `TestIdentifyModule`-style @TestInstallIn)
+    // could silently downgrade this test's `PlantIdentifier` binding back to a fake
+    // while leaving the concrete `identifier` field above pointing at the real one.
+    @Inject lateinit var boundIdentifier: PlantIdentifier
 
     @Before
     fun init() {
@@ -57,4 +62,10 @@ class OnDeviceModelRealInterpreterTest {
             assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL)
             assertThat(identifier::class.java).isEqualTo(OnDevicePlantIdentifier::class.java)
         }
+
+    @Test
+    fun plantIdentifierBindingResolvesToOnDevicePlantIdentifier() {
+        assertThat(boundIdentifier::class.qualifiedName)
+            .isEqualTo("com.darkfactory.plantpotting.identify.OnDevicePlantIdentifier")
+    }
 }
