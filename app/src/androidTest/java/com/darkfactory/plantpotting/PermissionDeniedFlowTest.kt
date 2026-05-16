@@ -50,9 +50,9 @@ class PermissionDeniedFlowTest {
 }
 
 /**
- * PLANTPOTTING-0005 §4.5 / §4.6 — recovers the previously `@Ignore`d test that
+ * PLANTPOTTING-0005 §4.5 / §4.6 — recovers the previously-skipped test that
  * asserted the "Open Settings" intent fires on permanent denial. The original
- * `@Ignore` cited that the system permission dialog is outside the Compose tree;
+ * skip cited that the system permission dialog is outside the Compose tree;
  * the fix is to drive the permanent-denial state via the fake guard instead
  * (see [FakeCameraPermissionGuard.permanentlyDeniedOverride] and the new
  * `CameraPermissionGuard.isPermanentlyDenied()` hook consulted by

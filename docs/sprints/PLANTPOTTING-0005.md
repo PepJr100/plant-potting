@@ -170,16 +170,16 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 
 ### Phase 7 — Final-verify, evidence, ledger close
 
-- [ ] **7.1 (final-verify, JVM gates)** `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking`. Capture to `docs/sprints/results/PLANTPOTTING-0005-final-verify.txt`. **Required GREEN.**
+- [x] **7.1 (final-verify, JVM gates)** `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking`. Capture to `docs/sprints/results/PLANTPOTTING-0005-final-verify.txt`. **Required GREEN.**
 - [ ] **7.2 (final-verify, instrumentation)** `./gradlew --no-daemon pixel6Api34DebugAndroidTest`. Capture to `docs/sprints/evidence/PLANTPOTTING-0005/gmd-output.txt`. **Required GREEN; @Ignore count == 0; expected pass count ≥ 12** (existing 10 + `LowConfidenceFlowTest` + `PermissionDeniedFlowTest.openSettings…` un-ignored; one or two extra from the §4.3 second path).
 - [ ] **7.3 (final-verify, integration-flow)** `pwsh ./scripts/integration-flow.ps1` (cold), `pwsh ./scripts/integration-flow.ps1` (warm), `pwsh ./scripts/integration-flow.ps1 -BuildOnly`. Capture to `evidence/PLANTPOTTING-0005/transcript-A-cold.txt`, `transcript-B-warm.txt`, `transcript-C-buildonly.txt`. **All three required GREEN** (`Integration manifest diff passed.`).
-- [ ] **7.4 (final-verify, stub isolation)** `bash scripts/check-stub-isolation.sh`. **Required GREEN.**
-- [ ] **7.5 (audit)** Confirm: `grep -R "TestIdentifyModule" app/src/androidTest/` → 0 hits; `grep -R "@Ignore" app/src/androidTest/` → 0 hits; `grep -R "testTagsAsResourceId" app/src/main/` → exactly 1 hit at `MainActivity.kt`; **`grep -RE "println|@Ignore\\(\"probe" app/src/androidTest/` → 0 hits** (probe-code removal audit).
+- [x] **7.4 (final-verify, stub isolation)** `bash scripts/check-stub-isolation.sh`. **Required GREEN.**
+- [x] **7.5 (audit)** Confirm: `grep -R "TestIdentifyModule" app/src/androidTest/` → 0 hits; `grep -R "@Ignore" app/src/androidTest/` → 0 hits; `grep -R "testTagsAsResourceId" app/src/main/` → exactly 1 hit at `MainActivity.kt`; **`grep -RE "println|@Ignore\\(\"probe" app/src/androidTest/` → 0 hits** (probe-code removal audit).
 - [ ] **7.6 (Codex addition — manual emulator walkthrough)** On a booted emulator, walk: grant permission → camera → shutter → land on `LowConfidencePicker` (verify sub-headline + chevron chips + outlined archetype CTA + working search/empty-states) → pick a species → `ResultScreen` (source badge: `on-device match (low confidence)`) → `RecommendationScreen` (archetype name + recipe table summing to 100%) → retake. Then manually trigger a capture failure (e.g. block `ImageCapture` momentarily or use a forced-failure debug toggle if one exists; otherwise simulate by injecting `Failure` state via a debug-only path) and verify the polished bottom-anchored banner is legible and the `Try again` button restores `Idle`. Capture screenshots of the polished `LowConfidencePicker` and `Failure` banner to `evidence/PLANTPOTTING-0005/`.
-- [ ] **7.7** Write `docs/sprints/results/PLANTPOTTING-0005.md`. Cover: baseline, per-phase diff summary, contract-lock RED→GREEN evidence, the seven-test migration list (per §0.4 reconciliation), §5.5 probe numbers, §5.6 accuracy-assertion decision, §5.7 seeding decision, final-verify gates, files added/modified/deleted, deferrals carried to PLANTPOTTING-0006.
+- [x] **7.7** Write `docs/sprints/results/PLANTPOTTING-0005.md`. Cover: baseline, per-phase diff summary, contract-lock RED→GREEN evidence, the seven-test migration list (per §0.4 reconciliation), §5.5 probe numbers, §5.6 accuracy-assertion decision, §5.7 seeding decision, final-verify gates, files added/modified/deleted, deferrals carried to PLANTPOTTING-0006.
 - [ ] **7.8** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, refresh `updated`.
-- [ ] **7.9** Tick every `- [ ]` in this plan to `- [x]` as work lands (the executor should be doing this incrementally; final pass at close-out catches strays).
-- [ ] **7.10** Record final commit hash(es) in the results doc.
+- [x] **7.9** Tick every `- [ ]` in this plan to `- [x]` as work lands (the executor should be doing this incrementally; final pass at close-out catches strays).
+- [x] **7.10** Record final commit hash(es) in the results doc.
 
 ---
 
