@@ -1,33 +1,41 @@
 package com.darkfactory.plantpotting.result
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.darkfactory.plantpotting.R
 
 /**
- * PLANTPOTTING-0003 §6.4 — vertical layout:
- *  - up-to-3 top-mapped candidate chips (omitted when no candidates mapped)
- *  - search field
- *  - full 16-species KB list (filtered by the search)
- *  - "Pick by archetype" CTA at the bottom
+ * PLANTPOTTING-0005 §2.1 — the post-shutter screen for unmapped / weak / uncertain
+ * predictions. AIY V1/3 maps only 2 of 16 KB species verbatim so this screen is the
+ * primary post-shutter destination, not a fallback. PLANTPOTTING-0003 §6.4 layout
+ * (sub-headline + up-to-3 mapped candidate chips + search + 16-species list +
+ * archetype CTA) preserved; PLANTPOTTING-0005 adds the SUBTITLE row, the
+ * NO_CANDIDATES_EMPTY info card, the SEARCH_EMPTY empty-state, the outlined-style
+ * archetype CTA, and a trailing chevron on candidate chips.
  *
  * Routing decisions belong to the navhost; this screen only emits callbacks.
  */
@@ -39,6 +47,8 @@ fun LowConfidencePickerScreen(
 ) {
     val query by viewModel.query.collectAsState()
     val filtered by viewModel.filteredSpecies.collectAsState()
+    val searchActive = query.isNotBlank()
+    val searchEmpty = searchActive && filtered.isEmpty()
 
     Column(
         modifier =
@@ -51,6 +61,11 @@ fun LowConfidencePickerScreen(
             text = "We couldn't identify your plant confidently.",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.testTag(LowConfidencePickerTags.HEADLINE),
+        )
+        Text(
+            text = stringResource(id = R.string.low_conf_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.testTag(LowConfidencePickerTags.SUBTITLE),
         )
         if (viewModel.topCandidates.isNotEmpty()) {
             Text(
@@ -66,6 +81,16 @@ fun LowConfidencePickerScreen(
                                 text = "${c.commonName.ifBlank { c.scientificName }} (${c.probabilityPct}%)",
                             )
                         },
+                        trailingIcon = {
+                            Text(
+                                text = "›",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier =
+                                    Modifier.testTag(
+                                        LowConfidencePickerTags.candidateChevronTag(c.speciesId),
+                                    ),
+                            )
+                        },
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -74,7 +99,19 @@ fun LowConfidencePickerScreen(
                     )
                 }
             }
-            HorizontalDivider()
+        } else {
+            OutlinedCard(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(LowConfidencePickerTags.NO_CANDIDATES_EMPTY),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.low_conf_no_candidates),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
         }
         OutlinedTextField(
             value = query,
@@ -83,44 +120,69 @@ fun LowConfidencePickerScreen(
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SEARCH),
         )
-        LazyColumn(modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SPECIES_LIST)) {
-            items(filtered, key = { it.id }) { sp ->
-                TextButton(
-                    onClick = { onSpeciesPicked(sp.id) },
-                    modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.speciesTag(sp.id)),
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            if (searchEmpty) {
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .testTag(LowConfidencePickerTags.SEARCH_EMPTY),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = sp.scientificName,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontStyle = FontStyle.Italic),
-                        )
-                        if (sp.commonNames.isNotEmpty()) {
-                            Text(
-                                text = sp.commonNames.first(),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+                    Text(
+                        text = stringResource(id = R.string.low_conf_search_empty, query),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SPECIES_LIST)) {
+                    items(filtered, key = { it.id }) { sp ->
+                        TextButton(
+                            onClick = { onSpeciesPicked(sp.id) },
+                            modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.speciesTag(sp.id)),
+                        ) {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = sp.scientificName,
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontStyle = FontStyle.Italic),
+                                )
+                                if (sp.commonNames.isNotEmpty()) {
+                                    Text(
+                                        text = sp.commonNames.first(),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        Button(
+        OutlinedButton(
             onClick = onPickByArchetype,
             modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.PICK_BY_ARCHETYPE),
         ) {
-            Text("I don't know — pick by archetype")
+            Text(stringResource(id = R.string.low_conf_pick_other))
         }
     }
 }
 
 object LowConfidencePickerTags {
     const val HEADLINE = "lowConf.headline"
+    const val SUBTITLE = "lowConf.subtitle"
     const val TOP_ROW = "lowConf.topRow"
+    const val NO_CANDIDATES_EMPTY = "lowConf.noCandidatesEmpty"
     const val SEARCH = "lowConf.search"
+    const val SEARCH_EMPTY = "lowConf.searchEmpty"
     const val SPECIES_LIST = "lowConf.speciesList"
     const val PICK_BY_ARCHETYPE = "lowConf.pickByArchetype"
 
     fun candidateTag(speciesId: String): String = "lowConf.candidate.$speciesId"
+
+    fun candidateChevronTag(speciesId: String): String = "lowConf.candidate.$speciesId.chevron"
 
     fun speciesTag(speciesId: String): String = "lowConf.species.$speciesId"
 }
