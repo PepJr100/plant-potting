@@ -297,22 +297,22 @@ Key dependencies:
 The sprint is `done` when every one of these holds:
 
 - [ ] §3 task list — all `- [ ]` boxes ticked.
-- [ ] `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` GREEN (`docs/sprints/results/PLANTPOTTING-0005-final-verify.txt`).
+- [x] `./gradlew --no-daemon assembleDebug testDebugUnitTest lint ktlintCheck verifyNoNetworking` GREEN (`docs/sprints/results/PLANTPOTTING-0005-final-verify.txt`).
 - [ ] `./gradlew --no-daemon pixel6Api34DebugAndroidTest` GREEN with zero `@Ignore`d tests in `app/src/androidTest/` (`evidence/PLANTPOTTING-0005/gmd-output.txt`).
-- [ ] `bash scripts/check-stub-isolation.sh` GREEN.
+- [x] `bash scripts/check-stub-isolation.sh` GREEN.
 - [ ] `pwsh ./scripts/integration-flow.ps1` (cold + warm) and `-BuildOnly` all emit `Integration manifest diff passed.` (`evidence/PLANTPOTTING-0005/transcript-A/B/C-*.txt`).
-- [ ] §7.5 audit greps: `TestIdentifyModule` → 0 hits in androidTest; `@Ignore` → 0 hits in androidTest; `testTagsAsResourceId` → exactly 1 hit at `MainActivity.kt`; `println` / `@Ignore("probe` → 0 hits in androidTest.
-- [ ] §0.6, §0.7, §0.8 contract-lock tests RED on baseline, GREEN at close (evidence in results doc).
-- [ ] §3.10 production-shape regression guard added and GREEN.
+- [x] §7.5 audit greps: `TestIdentifyModule` → 0 hits in androidTest; `@Ignore` → 0 hits in androidTest; `testTagsAsResourceId` → exactly 1 hit at `MainActivity.kt`; `println` / `@Ignore("probe` → 0 hits in androidTest.
+- [x] §0.6, §0.7, §0.8 contract-lock tests RED on baseline, GREEN at close (evidence in results doc).
+- [x] §3.10 production-shape regression guard added and GREEN.
 - [ ] `OnDeviceModelRealInterpreterTest` asserts an accuracy-bearing claim (preferred or fallback form per §5.6) against a real CC-licensed Monstera photo.
 - [ ] `app/src/androidTest/assets/identify-fixtures/LICENSE.txt` carries source URL + author (if available) + licence name + retrieval date for the real fixture.
-- [ ] `docs/ROADMAP.md` exists (one page, four sections).
-- [ ] `docs/kb/ml-mapping-notes.md` carries the calibration provenance entry.
-- [ ] `README.md` links `docs/ROADMAP.md` and reflects post-0005 state.
+- [x] `docs/ROADMAP.md` exists (one page, four sections).
+- [x] `docs/kb/ml-mapping-notes.md` carries the calibration provenance entry.
+- [x] `README.md` links `docs/ROADMAP.md` and reflects post-0005 state.
 - [ ] `docs/sprints/results/PLANTPOTTING-0005.md` covers baseline, per-phase diffs, contract-lock evidence, probe numbers, accuracy-assertion decision, seeding decision (§5.7), final-verify gates, files-added/modified/deleted, deferrals to 0006.
 - [ ] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, `executor` stamped.
 - [ ] §7.6 manual emulator walkthrough completed; screenshots captured.
-- [ ] **No new** `@Ignore`s, dependencies, model swaps, KB edits, interface changes, or `expected-artifacts` re-baselining.
+- [x] **No new** `@Ignore`s, dependencies, model swaps, KB edits, interface changes, or `expected-artifacts` re-baselining.
 
 ---
 
