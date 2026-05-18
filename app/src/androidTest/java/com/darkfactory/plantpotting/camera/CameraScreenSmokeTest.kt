@@ -11,10 +11,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
+import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
+import com.darkfactory.plantpotting.identify.PlantIdentifier
 import com.darkfactory.plantpotting.permission.FakeGuardStateRule
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +36,11 @@ import org.junit.Test
  * back camera on the GMD happens to bind successfully or not.
  */
 @HiltAndroidTest
+@UninstallModules(OnDeviceIdentifyModule::class)
 class CameraScreenSmokeTest {
+    @BindValue @JvmField
+    val fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()
+
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 

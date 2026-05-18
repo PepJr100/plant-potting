@@ -16,6 +16,8 @@
     <string name="camera_shutter_label">Capture plant photo</string>
     <string name="camera_loading">Identifying…</string>
     <string name="camera_capture_failed">Capture failed. Try again.</string>
+    <string name="camera_failure_retry">Try again</string>
+    <string name="camera_failure_banner_content_description">Capture failed</string>
 
     <!-- Result screen -->
     <string name="result_badge_stub">Stub identifier — replace in a later sprint</string>
@@ -24,6 +26,13 @@
     <string name="result_badge_cloud">Cloud match unavailable in this offline build</string>
     <string name="result_see_potting_mix">See potting mix</string>
     <string name="result_not_found">We couldn\'t find this plant in the knowledge base.</string>
+
+    <!-- Low-confidence picker -->
+    <string name="low_conf_subtitle">This model recognises a limited plant vocabulary — please confirm or pick below.</string>
+    <string name="low_conf_no_candidates">No close matches — pick from the full list below.</string>
+    <string name="low_conf_search_empty">No species match \"%1$s\"</string>
+    <string name="low_conf_pick_other">None of these look like my plant</string>
+    <string name="low_conf_candidate_chevron_content_description">Pick this species</string>
 
     <!-- Recommendation screen -->
     <string name="recommendation_blend_chip">Blend recipe</string>

@@ -12,15 +12,22 @@ import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -138,15 +145,46 @@ fun CameraScreen(
         }
 
         if (state is CameraUiState.Failure) {
-            Text(
-                text = (state as CameraUiState.Failure).reason,
-                color = Color.White,
+            val reason = (state as CameraUiState.Failure).reason
+            val retryLabel = stringResource(id = R.string.camera_failure_retry)
+            val iconDescription = stringResource(id = R.string.camera_failure_banner_content_description)
+            // Bottom-anchored banner (Material3 has no first-class Banner composable;
+            // built as OutlinedCard per §4.1). `bottom = 144.dp` keeps the FAB shutter
+            // visible above the banner — verified by §2.5 / manual check in §7.6.
+            OutlinedCard(
                 modifier =
                     Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(16.dp)
-                        .testTag(CameraScreenTags.ERROR),
-            )
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(bottom = 144.dp)
+                        .testTag(CameraScreenTags.FAILURE_BANNER),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Warning,
+                        contentDescription = iconDescription,
+                    )
+                    Text(
+                        text = reason,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .testTag(CameraScreenTags.ERROR),
+                    )
+                    TextButton(
+                        onClick = { viewModel.reset() },
+                        modifier = Modifier.testTag(CameraScreenTags.FAILURE_RETRY),
+                    ) {
+                        Text(text = retryLabel)
+                    }
+                }
+            }
         }
 
         val shutterLabel = stringResource(id = R.string.camera_shutter_label)
@@ -183,8 +221,12 @@ fun CameraScreen(
 object CameraScreenTags {
     const val PREVIEW = "camera.preview"
     const val SHUTTER = "camera.shutter"
+
+    /** Back-compat tag preserved on the banner body text (was top-center Text pre-0005). */
     const val ERROR = "camera.error"
     const val BIND_PROGRESS = "camera.bindProgress"
+    const val FAILURE_BANNER = "camera.failureBanner"
+    const val FAILURE_RETRY = "camera.failureRetry"
 }
 
 /**

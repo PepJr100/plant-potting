@@ -146,6 +146,29 @@ class CameraViewModelTest {
             }
         }
 
+    @Test
+    fun newCaptureClearsFailureState() =
+        runTest {
+            val fake =
+                FakePlantIdentifier(
+                    result =
+                        IdentificationResult(
+                            speciesId = "monstera-deliciosa",
+                            displayName = "Swiss cheese plant",
+                            source = IdSource.STUB_DETERMINISTIC,
+                        ),
+                )
+            val vm = CameraViewModel(fake)
+            vm.onCaptureFailed("prior")
+            assertThat(vm.state.value).isInstanceOf(CameraUiState.Failure::class.java)
+            vm.onCaptureReady(byteArrayOf(1, 2, 3))
+            // Under UnconfinedTestDispatcher the launched coroutine runs inline,
+            // so the terminal state should already be Success (not Failure).
+            // PLANTPOTTING-0005 §2.2: a stale persistent banner would lie if a
+            // new capture left the Failure state in place.
+            assertThat(vm.state.value).isNotInstanceOf(CameraUiState.Failure::class.java)
+        }
+
     private class FakePlantIdentifier(
         private val result: IdentificationResult,
     ) : PlantIdentifier {

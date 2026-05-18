@@ -50,15 +50,17 @@ jobs:
       - name: Stub identifier isolation guard
         run: bash scripts/check-stub-isolation.sh
 
-      - name: Build, lint, unit tests, ktlint, GMD, networking guard
+      - name: Generate networking-guard audit (must run before testDebugUnitTest)
+        run: ./gradlew --no-daemon verifyNoNetworking
+
+      - name: Build, lint, unit tests, ktlint, GMD
         run: |
           ./gradlew --no-daemon \
             assembleDebug \
             testDebugUnitTest \
             lint \
             ktlintCheck \
-            pixel6Api34DebugAndroidTest \
-            verifyNoNetworking
+            pixel6Api34DebugAndroidTest
 
       - name: Upload reports on failure
         if: failure()

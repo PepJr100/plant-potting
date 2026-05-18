@@ -32,6 +32,9 @@ data class ModelManifest(
     val labelsAsset: String,
     val mappingAsset: String,
     val thresholds: Thresholds,
+    // PLANTPOTTING-0005 §5.2 — optional per-species override of `Thresholds.highConfidencePlain`.
+    // Keyed by KB `speciesId`. Empty by default; seed only with probe evidence (§4.6).
+    val perSpeciesThresholds: Map<String, Float> = emptyMap(),
 ) {
     data class Normalization(
         val mean: FloatArray,
@@ -125,6 +128,11 @@ class ModelManifestReader(
             val shape = obj["output_tensor_shape"]!!.jsonArray.map { it.jsonPrimitive.int }
             val thresholds = obj["thresholds"]!!.jsonObject
 
+            val perSpeciesThresholds: Map<String, Float> =
+                obj["per_species_thresholds"]?.jsonObject?.mapValues { (_, v) ->
+                    v.jsonPrimitive.float
+                } ?: emptyMap()
+
             return ModelManifest(
                 variant = obj["variant"]!!.jsonPrimitive.content,
                 sha256 = obj["sha256"]!!.jsonPrimitive.content,
@@ -144,6 +152,7 @@ class ModelManifestReader(
                         highConfidenceMarginDelta = thresholds["high_confidence_margin_delta"]!!.jsonPrimitive.float,
                         topKCandidates = thresholds["top_k_candidates"]!!.jsonPrimitive.int,
                     ),
+                perSpeciesThresholds = perSpeciesThresholds,
             )
         }
     }

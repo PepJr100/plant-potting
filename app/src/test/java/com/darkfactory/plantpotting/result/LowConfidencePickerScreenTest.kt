@@ -1,10 +1,15 @@
 package com.darkfactory.plantpotting.result
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import com.darkfactory.plantpotting.kb.model.Archetype
 import com.darkfactory.plantpotting.kb.model.ArchetypeMapping
@@ -110,6 +115,62 @@ class LowConfidencePickerScreenTest {
             .onNodeWithTag(LowConfidencePickerTags.speciesTag("ficus-lyrata"))
             .performClick()
         assertThat(picked).isEqualTo("ficus-lyrata")
+    }
+
+    // -- §1.2 / §1.3 — empty-candidate info card -------------------------------
+
+    @Test
+    fun emptyCandidatesShowsInfoCard() {
+        val v = vm("")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.NO_CANDIDATES_EMPTY).assertIsDisplayed()
+        // Negative: the chip row is gone when there are no top candidates.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.TOP_ROW).assertDoesNotExist()
+    }
+
+    @Test
+    fun nonEmptyCandidatesHidesInfoCard() {
+        val v = vm("monstera-deliciosa|72")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.TOP_ROW).assertIsDisplayed()
+        composeRule.onNodeWithTag(LowConfidencePickerTags.NO_CANDIDATES_EMPTY).assertDoesNotExist()
+    }
+
+    // -- §1.4 / §1.5 — search empty-state --------------------------------------
+
+    @Test
+    fun searchWithNoMatchesShowsEmptyState() {
+        val v = vm("")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).performTextInput("zzzz")
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH_EMPTY).assertIsDisplayed()
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SPECIES_LIST).assertDoesNotExist()
+    }
+
+    // -- §1.8 — small-screen reachability --------------------------------------
+
+    @Test
+    fun lowConfidencePickerSmallScreenReachability() {
+        val v = vm("")
+        composeRule.setContent {
+            Box(modifier = Modifier.requiredSize(width = 360.dp, height = 640.dp)) {
+                LowConfidencePickerScreen(
+                    viewModel = v,
+                    onSpeciesPicked = {},
+                    onPickByArchetype = {},
+                )
+            }
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).assertIsDisplayed()
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.speciesTag("monstera-deliciosa"))
+            .assertIsDisplayed()
     }
 
     // ---- fixtures ----

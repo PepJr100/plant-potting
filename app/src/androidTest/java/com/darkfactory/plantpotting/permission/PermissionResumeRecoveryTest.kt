@@ -8,8 +8,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.camera.CameraScreenTags
+import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
+import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
+import com.darkfactory.plantpotting.identify.PlantIdentifier
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -37,7 +42,11 @@ import org.junit.Test
  *   real Settings round-trip closely enough for this regression.
  */
 @HiltAndroidTest
+@UninstallModules(OnDeviceIdentifyModule::class)
 class PermissionResumeRecoveryTest {
+    @BindValue @JvmField
+    val fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()
+
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 

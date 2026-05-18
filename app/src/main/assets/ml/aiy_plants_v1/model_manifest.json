@@ -22,5 +22,7 @@
     "top_k_candidates": 3
   },
   "_comment_thresholds": "These mirror PLANTPOTTING-0003 §4.3 verbatim. They are the policy source-of-truth; the Kotlin ModelScoreMapper reads them at construction time, and ModelManifestTest sanity-checks they have not drifted.",
+  "per_species_thresholds": {},
+  "_comment_per_species_thresholds": "PLANTPOTTING-0005 §5.2 — optional per-species override of high_confidence_plain. Keys are KB speciesId; values are absolute thresholds (0..1) that replace the global default for that species only. Empty by default; seed only when a probe shows an in-vocab species fails the global threshold by a margin a per-class override would close (§4.6). Margin overrides are deferred (§4.3).",
   "_comment_coverage": "Of the 18 plant_class_map.json mapping entries, only 2 (Monstera deliciosa, Crassula ovata) are present verbatim in the upstream 2101-label vocabulary. The remaining 14 species are not in the model's training set — they will route through LowConfidencePicker's manual search (PLANTPOTTING-0003 §4.3 unmapped path). This matches the §7.1 risk assessment; the design treats unmapped predictions as user-facing uncertainty rather than silent fallback."
 }

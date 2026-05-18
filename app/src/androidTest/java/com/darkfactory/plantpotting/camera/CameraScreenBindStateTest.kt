@@ -9,9 +9,14 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
+import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
+import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
+import com.darkfactory.plantpotting.identify.PlantIdentifier
 import com.darkfactory.plantpotting.permission.FakeGuardStateRule
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +38,11 @@ import org.junit.runners.model.Statement
  * effect BEFORE `composeRule`'s activity launches.
  */
 @HiltAndroidTest
+@UninstallModules(OnDeviceIdentifyModule::class)
 class CameraScreenBindStateTest {
+    @BindValue @JvmField
+    val fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()
+
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -70,7 +79,11 @@ class CameraScreenBindStateTest {
  * [CameraScreenBindStateTest] avoids per-test rule reconfiguration.
  */
 @HiltAndroidTest
+@UninstallModules(OnDeviceIdentifyModule::class)
 class CameraScreenBoundStateTest {
+    @BindValue @JvmField
+    val fakeIdentifier: PlantIdentifier = FakeFixedIdentifier()
+
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 

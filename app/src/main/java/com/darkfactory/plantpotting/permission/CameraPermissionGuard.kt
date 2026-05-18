@@ -29,4 +29,15 @@ open class CameraPermissionGuard
 
         open fun shouldShowRationale(activity: Activity): Boolean =
             ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+
+        /**
+         * Whether the user has previously selected "don't ask again". The platform has no
+         * direct query for this — production callers (`PermissionScreenHost`) infer it from
+         * the launcher's denial callback + `!shouldShowRationale`. This hook is provided so
+         * instrumentation tests can drive the permanent-denied state without going through
+         * the system permission dialog (`PermissionDeniedFlowTest` /
+         * `FakeCameraPermissionGuard`). The default of `false` preserves production
+         * behaviour — the host's existing launcher-based tracking is unaffected.
+         */
+        open fun isPermanentlyDenied(): Boolean = false
     }
