@@ -4,8 +4,7 @@ Houseplant Soil & Potting Guidance — Android app.
 
 Point the in-app camera at a houseplant; an on-device TensorFlow Lite model
 identifies the species; the app surfaces a recipe-driven potting-mix
-recommendation drawn from a bundled knowledge base. No network calls at
-runtime — `./gradlew verifyNoNetworking` is a hard gate.
+recommendation drawn from a bundled knowledge base. 
 
 ## Current state (post PLANTPOTTING-0005 mechanism, 2026-05-16)
 
