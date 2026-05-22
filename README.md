@@ -1,10 +1,27 @@
-# PlantPotting
 
+# PlantPotting
 Houseplant Soil & Potting Guidance — Android app.
+Built by Rob Evans (PM)
+
+A small Android app that identifies a houseplant from a photo and recommends the right soil and substrate mix to repot it in, using on-device machine learning.
+
+Built as a vehicle to apply what I'd learned about agentic engineering and to refine my own PM processes around AI-driven development, inspired by the software factory work at StrongDM (https://factory.strongdm.ai). (Also because I'd killed a few houseplants with the wrong potting mix!).
+
+## What I drove, and what the harness did
+
+The agentic Claude Code harness wrote and tested the code. I owned the problem framing, the research and knowledge pyramid that sat behind the model and recommendations, and the structure of the sprint plan-execute-review cycle that kept the work coherent across iterations.
+
+## How I validated it
+
+Validation was personal and deliberate, not user-driven. The real question I was testing was whether I could run a Plan-Do-Learn cycle on the product alongside a separate Plan-Do-Learn cycle on the harness itself, one that accounted for the use of AI and the pace it enables.
+
+## How to use
 
 Point the in-app camera at a houseplant; an on-device TensorFlow Lite model
 identifies the species; the app surfaces a recipe-driven potting-mix
 recommendation drawn from a bundled knowledge base. 
+
+<p align="center"><img src="docs/images/result-screen.png" alt="ResultScreen showing a Monstera deliciosa identification and potting-mix recipe" width="320"></p>
 
 ## Current state (post PLANTPOTTING-0005 mechanism, 2026-05-16)
 
