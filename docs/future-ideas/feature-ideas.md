@@ -1,5 +1,5 @@
 ---
-through_sid: PLANTPOTTING-0005
+through_sid: PLANTPOTTING-0007
 ---
 
 # Feature ideas — async funnel
@@ -13,7 +13,7 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-2. the plant ML is too limited on houseplants. This needs to get MUCH better sooner!
+_(none open)_
 
 ## developed idea
 
@@ -22,6 +22,18 @@ _(none yet — raw ideas that have been fleshed out into a paragraph go here)_
 ## idea decisions
 
 ### accepted and added to roadmap or sprint
+
+- **PLANTPOTTING-0007 = houseplant model swap (V1 entry).** Raw idea *"the plant ML is too
+  limited on houseplants — this needs to get MUCH better sooner"* folded directly into the
+  sprint. 0007 surveys on-device, network-free, houseplant-weighted candidate classifiers
+  (PlantNet-300K MobileNetV3-Small/EfficientNet-Lite INT8, iNat on-device plants, PlantCLEF
+  stretch); builds a swap-evaluation harness over an expanded ≥6-species real-photo fixture set
+  (Monstera + jade + snake plant, pothos, ZZ, peace lily, +2) comparing top-1/top-3, in-vocab
+  coverage, size, and inference latency against the AIY baseline; and **lands a running
+  prototype** of the winner wired behind a single `ACTIVE_MODEL_ROOT` switch, identifying plants
+  live through `OnDevicePlantIdentifier`. No in-sprint ML training (a fine-tuning sprint is the
+  documented fallback if no public model wins). _Accepted 2026-06-04 (`/sprint-planner`): SID
+  reserved, plan at `docs/sprints/PLANTPOTTING-0007.md`._
 
 - **PLANTPOTTING-0006 = multi-species calibration sweep + 2 UX fixes.** With 0005 fully
   closed (real-photo probe confirmed `monstera-deliciosa @ 0.8984`, high-conf, no seeding
