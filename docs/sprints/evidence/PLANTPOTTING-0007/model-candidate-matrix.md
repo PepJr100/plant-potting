@@ -209,8 +209,48 @@ than betting on one developer's training run. Net: at least **one** clears the b
    (both Philodendrons, monstera-adansonii, ficus-lyrata, chlorophytum, hoya) — but it is no
    longer the *only* path to a better-than-AIY prototype.
 
+## ADDENDUM 1b (2026-06-04) — shortlist pass over houseplant-specific siblings
+
+All of these train on the **same Kaggle "House Plant Species" 47-class dataset**
+([kakasher/house-plant-species](https://huggingface.co/datasets/kakasher/house-plant-species),
+14,790 images; original [kacpergregorowicz/house-plant-species](https://www.kaggle.com/datasets/kacpergregorowicz/house-plant-species)),
+so they all share the **same ~10/16 KB overlap** computed above. They differ on the axes that
+actually gate a swap: **license, architecture/size, format, and documented accuracy.**
+
+| Model | Arch | Format / committed? | Size (bundle fit?) | Accuracy | License | Verdict |
+|---|---|---|---|---|---|---|
+| **`house_plant_species_mobilenetv2`** (Vatsalyakrish02) | MobileNetV2 (TF-Hub) | `.h5` **committed** → needs `.h5`→TFLite | 22.5 MB `.h5`; **INT8 ≈ 3.5 MB ✅** | **unreported** | **Apache-2.0 ✅** | **PRIMARY probe candidate.** Only model hitting bundle-fit **and** a permissive license **and** the 47-class houseplant vocab. |
+| **`dima806/house-plant-image-detection`** | **ViT-base** patch16-224 | safetensors **committed** | **85.8M params** (~340 MB F32 / ~85 MB INT8) — **❌ not bundle-fit** | **89.97% acc, 0.894 macro-F1** (per-class metrics published) | **Apache-2.0 ✅** | **Reference / accuracy ceiling.** Proves the 47-class data yields a ~90% model, and gives per-class F1 (e.g. Snake plant, ZZ, Monstera strong; Begonia/Dracaena weak). Too large to bundle as-is — but the strongest argument that a *distilled/fine-tuned mobile* model (fine-tuning sprint) is worth it. |
+| **`ademaulana/plantClassification`** | MobileNetV3-Small | `.h5` **+ `.tflite` committed** | small ✅ (already TFLite) | 88% val | ❌ **no OSS license** ("research/educational only") | **Rejected: license.** Also trained on a *different* Kaggle set (`marquis03/plants-classification`, ~30 generic classes), **not** the 47 houseplants — coverage unverified/likely worse. Bundle-fit + already-TFLite, but unshippable. |
+| **`FilipK206/house_plant_classifier`** | Keras/TF 2.18 (`.keras`) | model **git-ignored — NOT committed**; only training `.ipynb` + Flask app | n/a | not stated | ❌ **none** | **Rejected: no artifact + no license.** Useful only as a *training recipe* reference for a fine-tuning sprint; confirms the 47-class set is the de-facto houseplant standard (identical `class_names.json`). |
+
+### Shortlist outcome
+- **Bundle-fit + permissively-licensed + houseplant-47 intersection is thin — exactly one model
+  hits all three: `house_plant_species_mobilenetv2` (Vatsalya, MobileNetV2, Apache-2.0).** It is
+  the single on-device probe candidate (after `.h5`→TFLite conversion).
+- **`dima806` ViT-base** is the **documented accuracy ceiling** (Apache-2.0, ~90% on this exact
+  vocab) but is **not bundle-fit**; carry its *published* metrics as the comparator rather than
+  re-probing on device (and optionally probe it off-device on our fixtures for a ceiling number).
+- ademaulana and FilipK206 are out (license; and ademaulana also wrong dataset).
+- So Phase 3 probes **AIY (baseline) + Vatsalya MobileNetV2 (candidate)**, with dima806's
+  published numbers cited as the quality ceiling. This satisfies the plan's "≤2 candidates"
+  rule (1 bundle candidate + 1 reference ceiling).
+
+### Net read for selection
+A **better-than-AIY running prototype is achievable** with Vatsalya's MobileNetV2 (5× KB
+coverage; bundle-fit after conversion) **if** it probes acceptably on the fixtures. If it
+probes weak, dima806 proves the *data* supports ~90% — pointing straight at a fine-tuning/
+distillation sprint to get that quality into a mobile footprint. Either way the 6 KB species
+absent from the 47-class set (monstera-adansonii, both Philodendrons, ficus-lyrata,
+chlorophytum, hoya) still need the fine-tuning sprint for coverage.
+
 ## Sources
 - House Plant Species (model + 47-class dataset, Apache-2.0): https://github.com/Vatsalyakrish02/House_plant_species
+- dima806/house-plant-image-detection (ViT-base, Apache-2.0, ~90%): https://huggingface.co/dima806/house-plant-image-detection
+- ademaulana/plantClassification (MobileNetV3-Small, no OSS license): https://huggingface.co/ademaulana/plantClassification
+- FilipK206/house_plant_classifier (training recipe, no committed model/license): https://github.com/FilipK206/house_plant_classifier
+- Kaggle "House Plant Species" 47-class dataset: https://www.kaggle.com/datasets/kacpergregorowicz/house-plant-species — HF mirror: https://huggingface.co/datasets/kakasher/house-plant-species
+- AIY Plants V1: https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-plants-v1/3
 - AIY Plants V1: https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-plants-v1/3
 - Google Nature Explorer (iNaturalist plants): https://aiyprojects.withgoogle.com/model/nature-explorer/
 - PlantNet-300K repo & README: https://github.com/plantnet/PlantNet-300K — https://github.com/plantnet/PlantNet-300K/blob/main/README.md
