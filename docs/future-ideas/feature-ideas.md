@@ -13,7 +13,7 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none open — see idea decisions below)_
+2. the plant ML is too limited on houseplants. This needs to get MUCH better sooner!
 
 ## developed idea
 
