@@ -81,5 +81,25 @@ and are logged, not built.
 
 ### Phase 6 — close-out gates
 
-_(pending — focused JVM, instrumented GMD, full JVM suite, stub-isolation, verifyNoNetworking,
-integration-flow cold/warm/buildonly, ledger flip.)_
+Run cheap-to-expensive; all GREEN:
+
+| Gate | Result |
+|---|---|
+| Focused JVM (`LowConfidencePickerScreenTest`, `LowConfidencePickerSubtitleContractTest`) | GREEN |
+| Threshold contract tests | n/a — no seeding, map empty (skipped by design) |
+| Instrumented `OnDeviceModelRealInterpreterTest` (Monstera + crassula) on `pixel6Api34` | **3/3 GREEN** |
+| Full JVM unit suite (`testDebugUnitTest`) | GREEN |
+| `ktlintCheck` | GREEN |
+| Stub-isolation (`scripts/check-stub-isolation.sh`) | `stub isolation OK` |
+| Network-free (`verifyNoNetworking`) | GREEN |
+| `integration-flow.ps1` cold / warm / buildonly | all `Integration manifest diff passed.` |
+
+Audit greps clean: 0 `println` / probe / `@Ignore` in `app/src/androidTest/`; the temporary
+probe was removed and replaced by the committed honest assertion. Integration-flow transcripts:
+`docs/sprints/evidence/PLANTPOTTING-0006/transcript-{A-cold,B-warm,C-buildonly}.txt`; instrumented
+GMD evidence: `gmd-OnDeviceModelRealInterpreterTest-green.xml` + `gmd-green-summary.txt`.
+
+**V0.1 multi-species sweep: COMPLETE.** Both AIY V1/3 ↔ KB in-vocab overlaps
+(`monstera-deliciosa`, `crassula-ovata`) are probed against real photos with committed
+accuracy-bearing assertions. `per_species_thresholds` ships empty by evidence-driven design.
+Ledger flipped to `done`.

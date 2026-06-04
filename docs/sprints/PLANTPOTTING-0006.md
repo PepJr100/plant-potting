@@ -152,16 +152,19 @@ on the `CameraUiState.Failure` live visual (user-waived — JVM coverage accepte
 
 ### Phase 6 — Close-out gates (cheap-failure-first ordering)
 
-- [ ] **Focused JVM tests first** (so failures are cheap to diagnose): `LowConfidencePickerScreenTest`,
+- [x] **Focused JVM tests first** (so failures are cheap to diagnose): `LowConfidencePickerScreenTest`,
       `LowConfidencePickerSubtitleContractTest`, and — only if a threshold was seeded —
       `ModelScoreMapperPerSpeciesThresholdTest` / `PerSpeciesThresholdsContractTest`; all green.
-- [ ] Run the instrumented `OnDeviceModelRealInterpreterTest` (Monstera **and** crassula) on
-      `pixel6Api34`; green.
-- [ ] Run the full JVM unit suite; green.
-- [ ] Confirm the stub-isolation gate (`scripts/check-stub-isolation.sh`) remains GREEN.
-- [ ] Confirm the network-free gate (`verifyNoNetworking`) remains GREEN.
-- [ ] Run `scripts/integration-flow.ps1` (cold / warm / buildonly) and confirm GREEN.
-- [ ] Declare the V0.1 multi-species sweep complete in `docs/sprints/results/PLANTPOTTING-0006.md`
+      → focused two GREEN; threshold contract tests n/a (no seeding, map empty).
+- [x] Run the instrumented `OnDeviceModelRealInterpreterTest` (Monstera **and** crassula) on
+      `pixel6Api34`; green. → **3/3 GREEN** (Monstera high-conf, crassula low-conf, binding guard).
+- [x] Run the full JVM unit suite; green. → `testDebugUnitTest` GREEN (+ `ktlintCheck` GREEN).
+- [x] Confirm the stub-isolation gate (`scripts/check-stub-isolation.sh`) remains GREEN.
+      → `stub isolation OK`.
+- [x] Confirm the network-free gate (`verifyNoNetworking`) remains GREEN.
+- [x] Run `scripts/integration-flow.ps1` (cold / warm / buildonly) and confirm GREEN.
+      → all three `Integration manifest diff passed.` (transcripts in `evidence/PLANTPOTTING-0006/`).
+- [x] Declare the V0.1 multi-species sweep complete in `docs/sprints/results/PLANTPOTTING-0006.md`
       and flip the sprint ledger entry for PLANTPOTTING-0006 (only after all gates above are green).
 
 ## Sequencing & dependencies
@@ -236,25 +239,26 @@ non-zero scores floor to `0`, producing "Jade plant (0%)" — reads as broken.
 
 ## Acceptance criteria / done-ness
 
-- [ ] `app/src/androidTest/assets/identify-fixtures/crassula-ovata.jpg` is checked in (matching the
+- [x] `app/src/androidTest/assets/identify-fixtures/crassula-ovata.jpg` is checked in (matching the
       Monstera fixture's dims/encoding), with a complete provenance block appended to `LICENSE.txt`
       (CC license + full attribution + test-only note).
-- [ ] `OnDeviceModelRealInterpreterTest` runs the crassula probe on `pixel6Api34` and carries a passing
+- [x] `OnDeviceModelRealInterpreterTest` runs the crassula probe on `pixel6Api34` and carries a passing
       accuracy assertion — preferred form if the global is cleared cleanly, else the documented honest
-      fallback with a recorded reason.
-- [ ] Probe outcome (top-1, top-3, score, route, source) recorded in **both** `docs/kb/ml-mapping-notes.md`
+      fallback with a recorded reason. → honest fallback (probe 0.1055, low-conf), reason recorded.
+- [x] Probe outcome (top-1, top-3, score, route, source) recorded in **both** `docs/kb/ml-mapping-notes.md`
       and `docs/sprints/results/PLANTPOTTING-0006.md`, mirroring the Monstera entry.
-- [ ] `per_species_thresholds` decision recorded with the deciding number — seeded with a value **or**
+- [x] `per_species_thresholds` decision recorded with the deciding number — seeded with a value **or**
       explicitly "not warranted, ships empty" — and `model_manifest.json` reflects it.
-- [ ] If seeded: the Monstera assertion re-runs green immediately after seeding, proving no cross-class
-      regression; threshold contract tests updated.
-- [ ] `R.string.low_conf_subtitle` contains no "model" jargon and reads as the new copy;
+      → not warranted (0.1055); manifest ships `{}` unchanged.
+- [x] If seeded: the Monstera assertion re-runs green immediately after seeding, proving no cross-class
+      regression; threshold contract tests updated. → n/a (not seeded); Monstera re-ran green @ 0.8984.
+- [x] `R.string.low_conf_subtitle` contains no "model" jargon and reads as the new copy;
       `LowConfidencePickerSubtitleContractTest` updated and green.
-- [ ] No chip renders "(0%)"; floored-to-zero candidates show the name with no suffix and remain
+- [x] No chip renders "(0%)"; floored-to-zero candidates show the name with no suffix and remain
       selectable; `LowConfidencePickerScreenTest` covers both the zero-suffix and normal-suffix cases.
-- [ ] Full JVM suite + `LowConfidencePickerScreenTest` + instrumented Monstera & crassula tests pass;
+- [x] Full JVM suite + `LowConfidencePickerScreenTest` + instrumented Monstera & crassula tests pass;
       `scripts/integration-flow.ps1` cold/warm/buildonly and the stub-isolation / network-free gates are
       GREEN.
-- [ ] Any conditional cleanup either implemented (because its trigger fired) or explicitly logged as
+- [x] Any conditional cleanup either implemented (because its trigger fired) or explicitly logged as
       "not forced — deferred" in the mapping notes. No unrelated refactors landed.
-- [ ] V0.1 multi-species sweep declared complete in the results doc and the ledger flipped.
+- [x] V0.1 multi-species sweep declared complete in the results doc and the ledger flipped.
