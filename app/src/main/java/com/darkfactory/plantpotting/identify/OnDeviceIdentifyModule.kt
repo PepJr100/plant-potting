@@ -39,20 +39,25 @@ abstract class OnDeviceIdentifyModule {
     abstract fun bindPlantIdentifier(impl: OnDevicePlantIdentifier): PlantIdentifier
 }
 
+/**
+ * PLANTPOTTING-0007 §Phase 5 — the one model-root switch, isolated in its own module so an
+ * instrumentation test can `@UninstallModules(ActiveModelRootModule::class)` + `@BindValue` a
+ * different root (e.g. the prototype candidate) without disturbing any other provider.
+ * Production reads `BuildConfig.ACTIVE_MODEL_ROOT` (default `ml/aiy_plants_v1`, flipped to the
+ * winning model's root on the prototype build/branch).
+ */
 @Module
 @InstallIn(SingletonComponent::class)
-object OnDeviceIdentifyProvidersModule {
-    /**
-     * PLANTPOTTING-0007 §Phase 5 — the one model-root switch. Production reads
-     * `BuildConfig.ACTIVE_MODEL_ROOT` (default `ml/aiy_plants_v1`, flipped to the winning
-     * model's root on the prototype build/branch). Provided (not read inline) so an
-     * instrumentation test can override the root for the whole graph via a single binding.
-     */
+object ActiveModelRootModule {
     @Provides
     @Singleton
     @ActiveModelRoot
     fun provideActiveModelRoot(): String = BuildConfig.ACTIVE_MODEL_ROOT
+}
 
+@Module
+@InstallIn(SingletonComponent::class)
+object OnDeviceIdentifyProvidersModule {
     @Provides
     @Singleton
     fun provideModelManifest(

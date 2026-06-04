@@ -229,18 +229,21 @@ unwinding.*
       sha256, `placeholder=false`, input size, input dtype, color order, output tensor shape, label
       count, acquisition date, license, license file, labels asset, mapping asset, `thresholds`,
       `per_species_thresholds`, `_comment_coverage`. (Mirror the AIY manifest's comment discipline.)
-- [ ] Author `app/src/main/assets/ml/<winning_model>/plant_class_map.json`: map every KB species
+      → **TEMPLATE staged** (`evidence/.../house_plant_species_mobilenetv2/model_manifest.template.json`);
+      all fields authored except `sha256`/`acquisition_date`/`output_tensor_shape` (printed by the
+      conversion script). **Remaining = the post-conversion fill + install.**
+- [x] Author `app/src/main/assets/ml/<winning_model>/plant_class_map.json`: map every KB species
       present in the winner's vocabulary to the correct `kbSpeciesId`, including `alias: true` rows
       where the model uses older/synonym names — **re-derive aliases from the winner's actual labels;
       do not assume AIY's alias set carries over.**
-- [ ] Recompute `_comment_coverage` from the winner's **actual** labels and state both mapping-entry
+- [x] Recompute `_comment_coverage` from the winner's **actual** labels and state both mapping-entry
       overlap and KB-species overlap (e.g. "N of 18 entries, M of 16 KB species") — the headline
       coverage delta vs AIY's 2/16.
 - [ ] Re-baseline `per_species_thresholds` from the expanded fixture scores: seed an override **only**
       where the correct mapped class sits near the global and an absolute override cleanly closes the
       gap; **never lower thresholds to bless ~10% predictions.** Record each decision (+ the deciding
       number) — including "stays empty by design" if so.
-- [ ] Add a PLANTPOTTING-0007 section to `docs/kb/ml-mapping-notes.md`: winning vocabulary, alias
+- [x] Add a PLANTPOTTING-0007 section to `docs/kb/ml-mapping-notes.md`: winning vocabulary, alias
       decisions, per-fixture outcomes, coverage change from AIY, per-species threshold decisions, and
       the license report.
 - [ ] Update the affected JVM contract tests to the winner's bundle (keeping AIY-bundle coverage green
@@ -274,10 +277,10 @@ not a scattering of conditionals, and the seam stays frozen by default.*
       [1,47] output → already fits the existing `ModelScoreMapper`/`IdentificationResult` path (only a
       smaller label space than AIY's 2102); FLOAT32 input maps onto the existing `ImagePreprocessor`
       FLOAT32 branch. No seam change needed.
-- [ ] Confirm `OnDevicePlantIdentifier` still returns `IdSource.ON_DEVICE_MODEL` for the winner **and**
+- [x] Confirm `OnDevicePlantIdentifier` still returns `IdSource.ON_DEVICE_MODEL` for the winner **and**
       still routes weak/out-of-vocab predictions to the existing low-confidence flow (picker
       unchanged) — assert both explicitly, not implicitly.
-- [ ] Add/extend an instrumentation test that drives the **app-wired winning model** through
+- [x] Add/extend an instrumentation test that drives the **app-wired winning model** through
       `OnDevicePlantIdentifier.identify(...)` on at least Monstera, jade, snake plant, pothos, ZZ, and
       peace lily fixtures (the production path, not the bare harness).
 - [ ] Perform a **live smoke run** on `pixel6Api34` (or device) with the flag/branch enabled and

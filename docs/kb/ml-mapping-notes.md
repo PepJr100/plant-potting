@@ -141,3 +141,60 @@ V0.1 multi-species sweep is complete and the map is empty by design, not by omis
   `LowConfidencePickerScreen.kt`'s chip-text builder (`probabilityPct > 0`). It added no new
   knob or interface to `FakeFixedIdentifier` (still 5 ctor params + 2 interfaces), so the
   fake was left intact per the gate. Deferred.
+
+### PLANTPOTTING-0007 — House Plant Species MobileNetV2 swap candidate
+
+**Winning vocabulary.** `house_plant_species_mobilenetv2` — a MobileNetV2 (TF-Hub feature
+vector + dense head) trained on the Kaggle **"House Plant Species" 47-class** dataset
+(Apache-2.0; `github.com/Vatsalyakrish02/House_plant_species`). Input 224×224 RGB, `/255 →
+[0,1]` (the app's FLOAT32 `ImagePreprocessor` branch, `NormalizeOp(mean=0,std=255)`). Output
+`[1,47]`. Survey + shortlist: `docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md`.
+
+**Coverage change vs AIY — the headline.** AIY V1/3 = **2 of 16** KB species in-vocab
+(monstera-deliciosa, crassula-ovata). This candidate = **10 of 16** (8 exact + 2 coarse),
+and covers the common houseplants AIY is blind to:
+
+| KB species | Model label | Type |
+|---|---|---|
+| monstera-deliciosa | `Monstera Deliciosa (Monstera deliciosa)` | exact |
+| epipremnum-aureum | `Pothos (Ivy arum)` | alias (Pothos ≡ Epipremnum aureum) |
+| spathiphyllum-wallisii | `Peace lily` | alias (common name) |
+| ficus-elastica | `Rubber Plant (Ficus elastica)` | exact |
+| dracaena-trifasciata | `Snake plant (Sanseviera)` | alias (Sansevieria ≡ Dracaena trifasciata) |
+| zamioculcas-zamiifolia | `ZZ Plant (Zamioculcas zamiifolia)` | exact |
+| crassula-ovata | `Jade plant (Crassula ovata)` | exact |
+| saintpaulia-ionantha | `African Violet (Saintpaulia ionantha)` | exact |
+| phalaenopsis | `Orchid` | **coarse** (Orchid ⊃ Phalaenopsis) |
+| goeppertia-orbifolia | `Calathea` | **coarse/genus** (Goeppertia ex Calathea) |
+
+**Alias decisions — re-derived from the winner's *own* labels (not AIY's set).** The AIY map
+keyed scientific synonyms (`Sansevieria trifasciata`, `Calathea orbifolia`). This model labels
+in **common names**, so the aliases differ: `Pothos`, `Peace lily`, `Snake plant`,
+`Jade plant`, `African Violet` map by common name; `Rubber Plant (Ficus elastica)` and
+`Monstera Deliciosa` carry the binomial. Two **coarse** mappings are flagged explicitly:
+
+- `Orchid` → `phalaenopsis`: the model has a single generic `Orchid` class; Phalaenopsis is the
+  KB's only (and the most common houseplant) orchid, so the coarse map is acceptable — but a
+  non-Phalaenopsis orchid would map here. Recorded, not hidden.
+- `Calathea` → `goeppertia-orbifolia`: genus-level (Goeppertia was split from Calathea). The
+  **separate** `Rattlesnake Plant (Calathea lancifolia)` class is deliberately **left unmapped**
+  — it is a different species, and mapping it to orbifolia would be wrong.
+
+The other 6 KB species (monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess,
+ficus-lyrata, chlorophytum-comosum, hoya-carnosa) are **not** in the 47-class vocabulary → they
+route through `LowConfidencePicker` exactly as before (unmapped path unchanged). Closing those is
+the case for a dedicated fine-tuning sprint.
+
+**Per-fixture outcomes — PENDING Phase 3 probe (`pixel6Api34`).** The swap-eval harness
+(`ModelSwapEvaluationTest`) writes `model-swap-eval.csv` once the converted `model.tflite` is
+installed. Fill the per-fixture top-1/top-3/score/route/latency table here from that CSV.
+
+**Per-species threshold decisions — PENDING probe; default empty by design.** Thresholds ship
+identical to AIY policy (plain 0.55 / margin_min 0.45 / delta 0.18). `per_species_thresholds`
+stays `{}` until the probe shows an in-vocab species whose correct class falls short of the
+global by a *closeable* gap (the 0006 discipline: never seed to bless a ~10% prediction).
+Record each decision (and the deciding number) here after the probe.
+
+**License report.** Model weights Apache-2.0 (repo `LICENSE`; README's "NONE License" line is an
+unfilled template). Dataset-vs-weights nuance recorded: we bundle the **weights**, not the
+community-collected training images. See `LICENSE-house-plant-species.txt`.
