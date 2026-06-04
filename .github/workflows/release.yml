@@ -1,0 +1,51 @@
+name: Release
+
+# Publishes a downloadable, debug-signed APK to a GitHub Release when a version
+# tag (v*) is pushed. The per-push CI in ci.yml is branch-filtered to `main`, so
+# a tag push does not double-trigger it — the two workflows stay independent.
+on:
+  push:
+    tags:
+      - "v*"
+
+# Required for softprops/action-gh-release to create the Release and upload assets.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: true
+
+      # Quick gate only: the full lint/ktlint/GMD emulator suite already ran on
+      # `main` for this commit, so re-running the ~8-min emulator on a tag adds no
+      # signal. Keep the networking guard + unit tests as a fast sanity check.
+      - name: Networking guard
+        run: ./gradlew --no-daemon verifyNoNetworking
+
+      - name: Build debug APK + unit tests
+        run: ./gradlew --no-daemon assembleDebug testDebugUnitTest
+
+      - name: Name the APK after the tag
+        run: cp app/build/outputs/apk/debug/app-debug.apk "plantpotting-${{ github.ref_name }}-debug.apk"
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: plantpotting-${{ github.ref_name }}-debug.apk
+          generate_release_notes: true
