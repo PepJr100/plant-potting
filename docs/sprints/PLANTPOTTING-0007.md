@@ -176,15 +176,14 @@ unwinding.*
       `TfLiteInterpreterFacade`, `ImagePreprocessor`, `ModelScoreMapper`, `ModelLabelMapReader`.
       → `ModelUnderTest(modelId, root)` in `ModelSwapEvaluationTest`; pipelines built from the root
       via the production readers/facade/preprocessor/mapper.
-- [ ] Add candidate bundles under `app/src/main/assets/ml/<candidate_id>/` (`model.tflite`,
+- [x] Add candidate bundles under `app/src/main/assets/ml/<candidate_id>/` (`model.tflite`,
       `labels.csv`, `model_manifest.json`, `plant_class_map.json`, license file) **only** for a
       candidate that is bundle-ready and will be probed/wired. If a candidate is too large or its
       weights aren't redistributable, keep the conversion script + evidence under
       `docs/sprints/evidence/PLANTPOTTING-0007/`, mark it "not bundle-ready", and exclude it from the
-      running prototype. → **STAGED** under `evidence/PLANTPOTTING-0007/house_plant_species_mobilenetv2/`
-      (labels/mapping/manifest-template/license + `convert_house_plant_model.py` + `ACQUISITION.md`);
-      becomes bundle-ready when the user runs the `.h5`→TFLite conversion and copies it into assets.
-      The harness auto-probes it the moment `model.tflite` lands.
+      running prototype. → **INSTALLED** at `app/src/main/assets/ml/house_plant_species_mobilenetv2/`
+      (float16 `model.tflite` 10.92 MB, sha256 `19ab94be…` verified; labels/mapping/manifest/license).
+      Converted out-of-band (`CONVERSION-RESULT.md`); harness auto-discovers it.
 - [x] **Run `verifyNoNetworking` immediately** after the first candidate dependency / asset /
       acquisition script lands — and re-run it after each subsequent one. Treat any new network
       surface as a stop-and-fix before continuing (do **not** wait for Phase 6).
@@ -225,13 +224,13 @@ unwinding.*
 *Why: mapping + thresholds are part of the swap, not later doc cleanup — and they must be settled
 **before** wiring so the app path and harness share identical assets (no app/harness drift).*
 
-- [ ] Author `app/src/main/assets/ml/<winning_model>/model_manifest.json`: source URL, variant,
+- [x] Author `app/src/main/assets/ml/<winning_model>/model_manifest.json`: source URL, variant,
       sha256, `placeholder=false`, input size, input dtype, color order, output tensor shape, label
       count, acquisition date, license, license file, labels asset, mapping asset, `thresholds`,
       `per_species_thresholds`, `_comment_coverage`. (Mirror the AIY manifest's comment discipline.)
-      → **TEMPLATE staged** (`evidence/.../house_plant_species_mobilenetv2/model_manifest.template.json`);
-      all fields authored except `sha256`/`acquisition_date`/`output_tensor_shape` (printed by the
-      conversion script). **Remaining = the post-conversion fill + install.**
+      → **FINALIZED & INSTALLED**: `placeholder=false`, sha256 `19ab94be…`, input_dtype `float32` +
+      normalization (mean=0,std=255) for the float16 path, output `[1,47]`, label_count 47,
+      acquisition_date 2026-06-05.
 - [x] Author `app/src/main/assets/ml/<winning_model>/plant_class_map.json`: map every KB species
       present in the winner's vocabulary to the correct `kbSpeciesId`, including `alias: true` rows
       where the model uses older/synonym names — **re-derive aliases from the winner's actual labels;
