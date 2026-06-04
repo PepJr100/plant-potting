@@ -53,8 +53,16 @@ license file).
       find / evaluate / integrate *pre-trained* TFLite classifiers only. If the survey finds **no**
       viable public model, the **negative result plus a recommendation to spin a dedicated
       fine-tuning sprint IS the deliverable** — do not start collecting training data or training a
-      model here. (This is the deliberate cut of the drafts' "KB16 project-trained fallback": two of
-      the three reviews flagged it as scope-creep that would derail the sprint into data collection.)
+      model here.
+      > **Reviewed trade-off (not an oversight).** Two of the three drafts (CODEX, CLAUDE) included a
+      > "KB16 project-trained head" as a *last-resort* fallback to guarantee a running prototype if no
+      > public model is redistributable; the CODEX critique re-argued for it on delivery-certainty
+      > grounds. It is **deliberately cut** because training a model in-sprint (licensed data sourcing,
+      > disjoint-from-fixtures split, INT8 export, validation) is a different, sprint-busting
+      > undertaking, and the no-public-winner case already has a concrete deliverable (negative finding
+      > + fine-tuning-sprint recommendation + a demonstrated swap *mechanism*). If the principal would
+      > rather guarantee a *better-model* prototype this sprint even at that cost, this is the line to
+      > reopen.
 - [ ] **No net-new screens** (`CaptureFailedScreen`, `Settings`, `ModelInfoScreen`, model-picker UI).
       The prototype switch is a `BuildConfig`/constant or branch, **not** user-facing chrome — no "UI
       toggle".
@@ -81,12 +89,15 @@ and weight-redistribution status are reported in the matrix, not used as a hard 
 
 - [ ] **`aiy_plants_v1` (baseline, frozen).** The control column. Carry its known numbers into every
       report: Monstera **0.8984** high-conf, jade **0.1055** low-conf, **2/16** KB species in-vocab.
-- [ ] **PlantNet-300K MobileNetV3-Small INT8** (`plantnet_300k_mobilenetv3s_int8`). Primary candidate
-      — small, mobile-first, plant-domain. Source: `github.com/plantnet/PlantNet-300K` + Zenodo
-      weights; verify the TFLite export path and label availability. **Note the trap:** the *dataset*
-      being public does **not** mean the *weights* are redistributable — record those separately.
-- [ ] **PlantNet-300K EfficientNet-Lite0 INT8** (`plantnet_300k_efflite0_int8`). Quality-vs-size
-      comparator if MobileNetV3-Small underperforms KB coverage.
+- [ ] **PlantNet-300K MobileNetV3-Small INT8** (`plantnet_300k_mobilenet_v3_small_int8`). Primary
+      candidate — small, mobile-first, plant-domain. Source: `github.com/plantnet/PlantNet-300K` +
+      Zenodo weights; verify the TFLite export path and label availability. **Two traps to record
+      separately:** (a) the *dataset* being public does **not** mean the *weights* are
+      redistributable; (b) a published checkpoint may be a *training* architecture (PyTorch/research
+      head), not a clean mobile export — "nominally available" ≠ "converts to bundle-fit INT8 TFLite
+      without unsupported ops or a retrain." Capture conversion effort, not just availability.
+- [ ] **PlantNet-300K EfficientNet-Lite0 INT8** (`plantnet_300k_efficientnet_lite0_int8`).
+      Quality-vs-size comparator if MobileNetV3-Small underperforms KB coverage.
 - [ ] **iNaturalist / Google "on-device plants" TFLite** (`inat_plants_tflite`) — evaluate **only** if
       a downloadable, redistributable `.tflite` + labelmap exists; otherwise record as reference-only,
       not a bundle candidate.
@@ -136,10 +147,12 @@ overfitting the model **choice** to the 2 species AIY happens to know (see R4).*
 - [ ] Source **2 more** KB-species fixtures to broaden coverage, preferring non-aroid:
       `ficus-lyrata`, `chlorophytum-comosum`, `phalaenopsis`, or `goeppertia-orbifolia`.
 - [ ] Store each new fixture at the existing canonical convention (**480×480, JPEG q80**) as the
-      on-disk form; confirm dims/encoding with `file(1)` against `monstera-deliciosa.jpg`. **The
-      fixture is the canonical capture — each model's *own* native input size (e.g. 224×224 for
-      MobileNetV3) is produced by that model's preprocessor at probe time, not baked into the
-      fixture.** (This keeps one fixture set comparable across models with different input sizes.)
+      on-disk form; confirm dims/encoding with a **portable** check (decode in the harness and assert
+      width/height/format, or `magick identify` — **not** `file(1)`, which is unreliable on this
+      Windows-heavy repo) against `monstera-deliciosa.jpg`. **The fixture is the canonical capture —
+      each model's *own* native input size (e.g. 224×224 for MobileNetV3) is produced by that model's
+      preprocessor at probe time, not baked into the fixture.** (This keeps one fixture set comparable
+      across models with different input sizes.)
 - [ ] Append a complete provenance block per new fixture to
       `app/src/androidTest/assets/identify-fixtures/LICENSE.txt`, mirroring the Monstera/jade blocks
       verbatim in structure (Title / Depicts / Source page / Original file / Author / Date taken /
@@ -191,7 +204,10 @@ unwinding.*
       `docs/sprints/evidence/PLANTPOTTING-0007/model-swap-eval-summary.md` comparing AIY vs candidates
       on top-1 count, top-3 count, in-vocab KB coverage, mean correct-class score, **median inference
       latency**, asset-size delta, and license status — and name the winner with rationale (or record
-      "no public winner" with the fine-tuning-sprint recommendation).
+      "no public winner" with the fine-tuning-sprint recommendation). **Size and latency are
+      selection-time criteria that can disqualify an otherwise-accurate candidate here, at the
+      summary** — not just things measured later in Phase 6. A model that wins on top-1 but blows the
+      bundle-size or latency budget is not the winner; record the trade-off explicitly.
 
 ## Phase 4 — Winning-model manifest & mapping (re-baseline)
 
@@ -317,9 +333,13 @@ Phase 2 (fixtures) ───────> Phase 3 (harness: baseline + candidate
       and bundle-fit, the running prototype demonstrates the *swap mechanism* with the best probeable
       candidate (worst case AIY), and the deliverable becomes the negative finding + a recommendation
       to spin a dedicated fine-tuning sprint.
-- [ ] **R2 — High-accuracy checkpoint (PlantCLEF/ViT) too large or uses unsupported TFLite ops.**
-      *Mitigation:* treat as stretch; require a clean conversion proof + bundle-plausible size *before*
-      it earns a fixture probe; prefer MobileNetV3-Small/EfficientNet-Lite for bundle fit.
+- [ ] **R2 — Acquisition/conversion fragility: a "nominally available" checkpoint isn't a
+      bundle-ready TFLite model.** Even PlantNet-300K (not just PlantCLEF/ViT) may publish a *training*
+      architecture that needs nontrivial conversion, hits unsupported TFLite ops, or won't compress to
+      a bundle-plausible INT8. *Mitigation:* record **conversion effort + result** in the matrix, not
+      just availability; require a clean conversion proof + bundle-plausible size *before* a candidate
+      earns a fixture probe; prefer MobileNetV3-Small/EfficientNet-Lite for bundle fit; time-box
+      conversion spelunking and fall back to the next candidate rather than sinking the sprint into it.
 - [ ] **R3 — A model wins on accuracy but is too slow on-device.** *Mitigation:* capture inference
       latency as a first-class evaluation axis (Phase 3 CSV + summary); an accurate-but-slow model
       (multi-second inference) is recorded as a regression and weighed against the AIY baseline before
@@ -375,9 +395,12 @@ Phase 2 (fixtures) ───────> Phase 3 (harness: baseline + candidate
       from the results doc.
 - [ ] `PlantIdentifier` / `IdentificationResult` remain unchanged — or the results doc carries a
       strong justification for the seam change and all callers/tests are updated in the same sprint.
-- [ ] The winning model's `plant_class_map.json` (`_comment_coverage`) and `model_manifest.json`
-      (`per_species_thresholds`) are re-baselined from its actual vocabulary + fixture probes, with
-      every threshold decision (and deciding number) recorded.
+- [ ] The winning model's `plant_class_map.json` (`_comment_coverage`) is re-baselined from its actual
+      vocabulary, and `model_manifest.json` (`per_species_thresholds`) is **re-evaluated** from the
+      fixture probes — seeded **only** where the evidence clearly warrants it and explicitly left
+      "empty by design" otherwise. (6–8 fixtures is thin evidence for per-class thresholds; do not let
+      "re-baselined" overstate what the data supports — the 0006 discipline holds.) Every threshold
+      decision (and deciding number) is recorded.
 - [ ] `docs/kb/ml-mapping-notes.md` has a PLANTPOTTING-0007 section: coverage delta, fixture outcomes,
       alias decisions, threshold decisions, latency, and license notes.
 - [ ] `verifyNoNetworking` (run continuously through Phase 3 **and** at close-out),
