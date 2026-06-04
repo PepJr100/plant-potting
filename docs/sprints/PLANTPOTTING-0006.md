@@ -111,27 +111,28 @@ on the `CameraUiState.Failure` live visual (user-waived — JVM coverage accepte
 
 ### Phase 4 — UX fix A (subtitle jargon)
 
-- [ ] Rewrite `R.string.low_conf_subtitle` in `app/src/main/res/values/strings.xml` to drop "model".
+- [x] Rewrite `R.string.low_conf_subtitle` in `app/src/main/res/values/strings.xml` to drop "model".
       Use: **"We're best at common houseplants — confirm or pick from the list below."**
-- [ ] Update `LowConfidencePickerSubtitleContractTest` (and any other usage of `low_conf_subtitle`)
+- [x] Update `LowConfidencePickerSubtitleContractTest` (and any other usage of `low_conf_subtitle`)
       so the suite asserts the new copy — the rewrite turns this contract test red otherwise.
 
 ### Phase 5 — UX fix B (`(0%)` chips)
 
-- [ ] Implement the merge-decided behaviour: when a candidate's `probabilityPct` floors to `0`, render
+- [x] Implement the merge-decided behaviour: when a candidate's `probabilityPct` floors to `0`, render
       the chip as the **name with no `(x%)` suffix** (e.g. "Jade plant"), not "Jade plant (0%)". Change
       is localized to the chip-text builder in `LowConfidencePickerScreen.kt`; keep the suffix for all
       `>= 1%` candidates unchanged. (Rationale recorded in §"UX fix B decision" below.)
-- [ ] Keep the candidate **selectable** — the fix is presentational only. A zero-score candidate must
+- [x] Keep the candidate **selectable** — the fix is presentational only. A zero-score candidate must
       remain present and pickable; this is a *picker*, so dropping/disabling the chip would be a
       functional regression.
-- [ ] Extend `LowConfidencePickerScreenTest` to cover: (a) a `0%` candidate renders the name with **no**
+- [x] Extend `LowConfidencePickerScreenTest` to cover: (a) a `0%` candidate renders the name with **no**
       `(…%)` suffix and is still present/clickable, and (b) a normal candidate (e.g. `(72%)`) still
       renders its suffix. Use the existing `testTagsAsResourceId` bridge for node matching.
-- [ ] **Conditional — only if Phase 5 would add a third knob/interface to `FakeFixedIdentifier`:** split
+- [x] **Conditional — only if Phase 5 would add a third knob/interface to `FakeFixedIdentifier`:** split
       it into focused fakes (`FakeLowConfidenceIdentifier`, `FakeUnmappedIdentifier`) rather than
       accumulating (it is already at 5 ctor params + 2 interfaces). If no new knob is needed, leave it
-      and note "not forced" in the mapping notes.
+      and note "not forced" in the mapping notes. → **Not forced** — the chip fix added no fake knob;
+      logged in `docs/kb/ml-mapping-notes.md`.
 
 ### Phase 6 — Close-out gates (cheap-failure-first ordering)
 

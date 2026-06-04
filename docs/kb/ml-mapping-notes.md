@@ -99,3 +99,22 @@ when an in-vocab species *fails* the global threshold by a closeable margin. Mon
 clears 0.55 outright (0.8984), so `per_species_thresholds` ships as an empty object;
 seeding it would be anti-overfitting (§5.6 prohibition). The multi-species calibration
 sweep remains PLANTPOTTING-0006's to own if the data ever forces per-class tuning.
+
+### PLANTPOTTING-0006 — `crassula-ovata` probe (second & final in-vocab overlap)
+
+**Probe outcome.** _(pending GMD run — Phase 2 will fill in measured top-1 id + p,
+lowConfidence, source, other mapped candidates, route taken.)_
+
+**Seeding decision.** _(pending — Phase 3 will record seeded-with-value or
+not-warranted, with the deciding number.)_
+
+**Conditional cleanups (gated — log if not forced).**
+
+- *`perSpeciesThresholds` margin / lower-ranked-candidate semantics (Phase 3 conditional).*
+  _(pending — revisited only if real crassula seeding forces it; otherwise logged here as an
+  open question, not built.)_
+- *Splitting `FakeFixedIdentifier` into focused fakes (Phase 5 conditional).* **Not forced.**
+  The §5 `(0%)`-chip fix is presentational only — a single branch in
+  `LowConfidencePickerScreen.kt`'s chip-text builder (`probabilityPct > 0`). It added no new
+  knob or interface to `FakeFixedIdentifier` (still 5 ctor params + 2 interfaces), so the
+  fake was left intact per the gate. Deferred.
