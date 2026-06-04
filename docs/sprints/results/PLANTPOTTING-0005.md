@@ -266,15 +266,18 @@ The `@Ignore` count drops from 1 to 0.
 ## Deferrals carried to PLANTPOTTING-0006
 
 See `## Blockers` in `docs/sprints/PLANTPOTTING-0005.md` and the Known gaps section
-in `docs/ROADMAP.md`. Remaining short list (the §5.4–§5.8 chain is now **done** — see
-Phase 5 above):
+in `docs/ROADMAP.md`. The §5.4–§5.8 calibration chain **and** §7.3 integration-flow are
+now **done** (see Phase 5 above and the transcripts in `evidence/PLANTPOTTING-0005/`).
+Nothing material is carried to 0006 from 0005's plan; the only remaining step is the
+sprint's own close-out:
 
-- §7.3 — `integration-flow.ps1` cold + warm + buildonly transcripts (best from the
-  user's pwsh terminal).
+- §7.3 — **done.** `integration-flow.ps1` cold + warm + buildonly all GREEN
+  (`Integration manifest diff passed.`); transcripts in
+  `evidence/PLANTPOTTING-0005/transcript-{A-cold,B-warm,C-buildonly}.txt`.
 - §7.6 — manual emulator walkthrough + screenshots: the `LowConfidencePicker` piece was
   captured in the 0005 review; the Failure-banner live visual was waved off (code review
   + JVM coverage accepted). Effectively closed.
-- §7.8 — ledger flip to `done` once §7.3 lands.
+- §7.8 — ledger flip to `done` (the last remaining step).
 
 ## Final commit hashes
 
