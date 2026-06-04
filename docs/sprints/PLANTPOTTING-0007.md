@@ -136,30 +136,30 @@ weight availability, size, latency profile, and KB-vocabulary overlap are known.
 *Why: the fixtures are the ruler. A wider, model-agnostic fixture set is the only thing that stops us
 overfitting the model **choice** to the 2 species AIY happens to know (see R4).*
 
-- [ ] Audit `app/src/androidTest/assets/identify-fixtures/`: keep `monstera-deliciosa.jpg` and
+- [x] Audit `app/src/androidTest/assets/identify-fixtures/`: keep `monstera-deliciosa.jpg` and
       `crassula-ovata.jpg` **byte-unchanged** so AIY baseline comparisons stay stable.
-- [ ] Source a canonical CC/CC0 `dracaena-trifasciata` (snake plant) fixture — upright banded leaves;
+- [x] Source a canonical CC/CC0 `dracaena-trifasciata` (snake plant) fixture — upright banded leaves;
       avoid mixed planters / cultivar-only close-ups.
-- [ ] Source a canonical CC/CC0 `epipremnum-aureum` (pothos) fixture — heart leaves + vine habit;
+- [x] Source a canonical CC/CC0 `epipremnum-aureum` (pothos) fixture — heart leaves + vine habit;
       avoid philodendron/scindapsus ambiguity.
-- [ ] Source a canonical CC/CC0 `zamioculcas-zamiifolia` (ZZ) fixture — glossy pinnate leaflets +
+- [x] Source a canonical CC/CC0 `zamioculcas-zamiifolia` (ZZ) fixture — glossy pinnate leaflets +
       stems; avoid cropped single-leaf shots.
-- [ ] Source a canonical CC/CC0 `spathiphyllum-wallisii` (peace lily) fixture — foliage and/or spathe;
+- [x] Source a canonical CC/CC0 `spathiphyllum-wallisii` (peace lily) fixture — foliage and/or spathe;
       avoid generic-aroid close-ups.
-- [ ] Source **2 more** KB-species fixtures to broaden coverage, preferring non-aroid:
+- [x] Source **2 more** KB-species fixtures to broaden coverage, preferring non-aroid:
       `ficus-lyrata`, `chlorophytum-comosum`, `phalaenopsis`, or `goeppertia-orbifolia`.
-- [ ] Store each new fixture at the existing canonical convention (**480×480, JPEG q80**) as the
+- [x] Store each new fixture at the existing canonical convention (**480×480, JPEG q80**) as the
       on-disk form; confirm dims/encoding with a **portable** check (decode in the harness and assert
       width/height/format, or `magick identify` — **not** `file(1)`, which is unreliable on this
       Windows-heavy repo) against `monstera-deliciosa.jpg`. **The fixture is the canonical capture —
       each model's *own* native input size (e.g. 224×224 for MobileNetV3) is produced by that model's
       preprocessor at probe time, not baked into the fixture.** (This keeps one fixture set comparable
       across models with different input sizes.)
-- [ ] Append a complete provenance block per new fixture to
+- [x] Append a complete provenance block per new fixture to
       `app/src/androidTest/assets/identify-fixtures/LICENSE.txt`, mirroring the Monstera/jade blocks
       verbatim in structure (Title / Depicts / Source page / Original file / Author / Date taken /
       Retrieved / Modifications / License + attribution string + test-only/not-in-APK note).
-- [ ] Confirm all new fixtures live under `app/src/androidTest/` **only** (not in the production APK),
+- [x] Confirm all new fixtures live under `app/src/androidTest/` **only** (not in the production APK),
       and add a fixture-readability guard in the harness so a missing/corrupt/misnamed image fails
       loudly before inference.
 
