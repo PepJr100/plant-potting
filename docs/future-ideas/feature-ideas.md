@@ -13,7 +13,7 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none open)_
+- small UX issue, taking picture then going back from results screen causes the "take picture" button to grey out. 
 
 ## developed idea
 

@@ -94,10 +94,11 @@ evidence, but left as an explicit decision.
 
 ## Size report (R10)
 
-`model.tflite` 10.42 MiB (vs AIY 4.82 MiB; +5.87 MiB). `noCompress "tflite"` set → APK grows by
-~stored size; both bundles ship (AIY kept as baseline) ≈ 15.5 MiB `ml/` assets. Bundle-plausible
-(≪ the ViT 85 MiB that disqualified PlantCLEF/dima806). Future `--quant int8` (~3–4 MB, UINT8
-path) is the size win if needed.
+- candidate `model.tflite` 10,923,936 B (10.42 MiB) vs AIY 5,056,146 B (4.82 MiB); +5.87 MiB.
+- `noCompress "tflite"` set → stored, not compressed; APK grows by ~the raw size.
+- **assembled debug APK = 44,092,414 B (42.05 MiB)** with both bundles shipping (AIY kept as the
+  baseline asset). Bundle-plausible — ≪ the ViT ~85 MiB that disqualified PlantCLEF/dima806.
+- Follow-up size win if needed: `--quant int8` (~3–4 MB, UINT8 path).
 
 ## Gate results
 
@@ -106,9 +107,12 @@ path) is the size win if needed.
 - Focused JVM (manifest/label/score/threshold) + full `testDebugUnitTest` — GREEN.
 - `ktlintCheck` — GREEN.
 - Instrumented `pixel6Api34`: `OnDeviceModelRealInterpreterTest` (AIY anchor), `ModelSwapEvaluationTest`
-  (candidate assertions), `OnDeviceModelAppWiredPrototypeTest` (G4 live) — GREEN.
-- `scripts/integration-flow.ps1` cold/warm/buildonly — expected artifacts unchanged (AIY remains
-  the default identifier; no integration-output change).
+  (candidate assertions), `OnDeviceModelAppWiredPrototypeTest` (G4 live) — GREEN (7 tests, 1
+  intentionally skipped — the out-of-vocab case self-skips with no ficus-lyrata fixture).
+- `scripts/integration-flow.ps1 -BuildOnly` — GREEN ("Integration manifest diff passed";
+  expected build artifacts **unchanged**: AIY stays the default identifier, no integration-output
+  change). The device-aware cold/warm modes need a persistent adb device; on-device verification is
+  already covered by the green GMD instrumented suite above (GMD tears its own emulator down).
 
 ## Recommendation / follow-ups
 

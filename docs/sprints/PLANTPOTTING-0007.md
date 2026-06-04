@@ -45,11 +45,11 @@ license file).
 
 ## Non-goals / scope boundaries
 
-- [ ] **No production networking.** No cloud ID, API calls, runtime remote model download, telemetry,
+- [x] **No production networking.** No cloud ID, API calls, runtime remote model download, telemetry,
       or Firebase ML. Any model-acquisition/conversion script lives under
       `docs/sprints/evidence/PLANTPOTTING-0007/` or `scripts/`, is **never** invoked from a Gradle app
       task, and does not run on device — `verifyNoNetworking` must stay GREEN.
-- [ ] **No ML training or fine-tuning — including a KB-specific head — in this sprint.** We
+- [x] **No ML training or fine-tuning — including a KB-specific head — in this sprint.** We
       find / evaluate / integrate *pre-trained* TFLite classifiers only. If the survey finds **no**
       viable public model, the **negative result plus a recommendation to spin a dedicated
       fine-tuning sprint IS the deliverable** — do not start collecting training data or training a
@@ -63,23 +63,23 @@ license file).
       > + fine-tuning-sprint recommendation + a demonstrated swap *mechanism*). If the principal would
       > rather guarantee a *better-model* prototype this sprint even at that cost, this is the line to
       > reopen.
-- [ ] **No net-new screens** (`CaptureFailedScreen`, `Settings`, `ModelInfoScreen`, model-picker UI).
+- [x] **No net-new screens** (`CaptureFailedScreen`, `Settings`, `ModelInfoScreen`, model-picker UI).
       The prototype switch is a `BuildConfig`/constant or branch, **not** user-facing chrome — no "UI
       toggle".
-- [ ] **No KB edits.** `species.json` / `archetypes.json` are locked; only the new model's
+- [x] **No KB edits.** `species.json` / `archetypes.json` are locked; only the new model's
       `plant_class_map.json` mapping + coverage comment change.
-- [ ] **No recommendation-logic changes.** Success is *better identification* feeding the existing
+- [x] **No recommendation-logic changes.** Success is *better identification* feeding the existing
       KB-driven recipe path unchanged.
-- [ ] **`PlantIdentifier` / `IdentificationResult` seam frozen by default** (0003 §4.4). Changing it
+- [x] **`PlantIdentifier` / `IdentificationResult` seam frozen by default** (0003 §4.4). Changing it
       requires a strong, documented justification in the results doc **plus** updating every
       caller/test in the same phase.
-- [ ] **No AGP/Kotlin/Compose/Hilt/TFLite version bumps** unless a selected TFLite candidate genuinely
+- [x] **No AGP/Kotlin/Compose/Hilt/TFLite version bumps** unless a selected TFLite candidate genuinely
       cannot run on the current stack; if so, document it as explicit blocker-removal.
-- [ ] **No `expected-artifacts` re-baselining** unless the prototype intentionally changes integration
+- [x] **No `expected-artifacts` re-baselining** unless the prototype intentionally changes integration
       output, with the reason recorded.
-- [ ] **Do not delete the AIY bundle.** It stays as the baseline asset **and the default
+- [x] **Do not delete the AIY bundle.** It stays as the baseline asset **and the default
       `ACTIVE_MODEL_ROOT` target** through close-out — keep its manifest/coverage tests green.
-- [ ] **Do not lower thresholds to make a weak model look good.** Routing honesty is non-negotiable
+- [x] **Do not lower thresholds to make a weak model look good.** Routing honesty is non-negotiable
       (the 0006 discipline).
 
 ## Candidate models to evaluate
@@ -207,10 +207,10 @@ unwinding.*
 - [x] Add a regression assertion pinning the **AIY baseline rows** (Monstera high-conf @ ~**0.8984**,
       jade low-conf @ ~**0.1055**) so the harness can't silently mask a plumbing regression.
       → asserts AIY monstera mapped=monstera-deliciosa/high-conf/score≈0.8984 and jade low-conf/top-mapped=crassula-ovata.
-- [ ] Add **evidence-driven** candidate assertions *after* the probe (do not pre-commit a form):
+- [x] Add **evidence-driven** candidate assertions *after* the probe (do not pre-commit a form):
       preferred = correct top-1 high-confidence for the required fixtures; acceptable documented
       fallback = correct species in top-3 with a recorded threshold/mapping reason.
-- [ ] Write the human summary at
+- [x] Write the human summary at
       `docs/sprints/evidence/PLANTPOTTING-0007/model-swap-eval-summary.md` comparing AIY vs candidates
       on top-1 count, top-3 count, in-vocab KB coverage, mean correct-class score, **median inference
       latency**, asset-size delta, and license status — and name the winner with rationale (or record
@@ -238,14 +238,14 @@ unwinding.*
 - [x] Recompute `_comment_coverage` from the winner's **actual** labels and state both mapping-entry
       overlap and KB-species overlap (e.g. "N of 18 entries, M of 16 KB species") — the headline
       coverage delta vs AIY's 2/16.
-- [ ] Re-baseline `per_species_thresholds` from the expanded fixture scores: seed an override **only**
+- [x] Re-baseline `per_species_thresholds` from the expanded fixture scores: seed an override **only**
       where the correct mapped class sits near the global and an absolute override cleanly closes the
       gap; **never lower thresholds to bless ~10% predictions.** Record each decision (+ the deciding
       number) — including "stays empty by design" if so.
 - [x] Add a PLANTPOTTING-0007 section to `docs/kb/ml-mapping-notes.md`: winning vocabulary, alias
       decisions, per-fixture outcomes, coverage change from AIY, per-species threshold decisions, and
       the license report.
-- [ ] Update the affected JVM contract tests to the winner's bundle (keeping AIY-bundle coverage green
+- [x] Update the affected JVM contract tests to the winner's bundle (keeping AIY-bundle coverage green
       because AIY stays the default flag target): `ModelManifestTest`, `ModelAssetsPresenceTest`,
       `ModelLabelMappingValidationTest`, `PerSpeciesThresholdsContractTest`,
       `ModelScoreMapperPerSpeciesThresholdTest`, `ModelManifestDtypeContractTest`.
@@ -282,7 +282,7 @@ not a scattering of conditionals, and the seam stays frozen by default.*
 - [x] Add/extend an instrumentation test that drives the **app-wired winning model** through
       `OnDevicePlantIdentifier.identify(...)` on at least Monstera, jade, snake plant, pothos, ZZ, and
       peace lily fixtures (the production path, not the bare harness).
-- [ ] Perform a **live smoke run** on `pixel6Api34` (or device) with the flag/branch enabled and
+- [x] Perform a **live smoke run** on `pixel6Api34` (or device) with the flag/branch enabled and
       capture evidence (logcat/screenshot) that the app identifies **≥3 houseplant fixtures directly**
       through the production identifier path. This is the "not a paper spike" gate.
 
@@ -291,24 +291,27 @@ not a scattering of conditionals, and the seam stays frozen by default.*
 *Why: order gates cheap→expensive so the sprint fails fast — a broken contract test should never wait
 behind a 20-minute integration transcript.*
 
-- [ ] Focused JVM tests first: manifest parsing, label mapping, score mapping, per-species thresholds,
+- [x] Focused JVM tests first: manifest parsing, label mapping, score mapping, per-species thresholds,
       and `VerifyNoNetworkingRegressionTest` — all green.
-- [ ] `verifyNoNetworking` GREEN at close-out (it was already run continuously in Phase 3 as each
+- [x] `verifyNoNetworking` GREEN at close-out (it was already run continuously in Phase 3 as each
       candidate dep/script landed; this is the final confirmation).
-- [ ] `scripts/check-stub-isolation.sh` GREEN — the production swap must not leak fake/test
+- [x] `scripts/check-stub-isolation.sh` GREEN — the production swap must not leak fake/test
       identifiers into app wiring.
-- [ ] Measure **asset/APK size impact**: raw winner model size, compressed APK delta vs AIY, and any
+- [x] Measure **asset/APK size impact**: raw winner model size, compressed APK delta vs AIY, and any
       `noCompress`/`aaptOptions` implication; record in `model-swap-eval-summary.md`.
-- [ ] Instrumented tests on `pixel6Api34`: `OnDeviceModelRealInterpreterTest` (AIY baseline rows still
+- [x] Instrumented tests on `pixel6Api34`: `OnDeviceModelRealInterpreterTest` (AIY baseline rows still
       green), `ModelSwapEvaluationTest`, and the Phase 5 app-wired prototype test.
-- [ ] Full `testDebugUnitTest` + `ktlintCheck` GREEN.
-- [ ] `scripts/integration-flow.ps1` cold / warm / buildonly — record whether expected artifacts stay
-      unchanged or why a re-baseline is intentionally required.
-- [ ] Write `docs/sprints/results/PLANTPOTTING-0007.md`: selected model (or "no public winner +
+- [x] Full `testDebugUnitTest` + `ktlintCheck` GREEN.
+- [x] `scripts/integration-flow.ps1` cold / warm / buildonly — record whether expected artifacts stay
+      unchanged or why a re-baseline is intentionally required. → **`-BuildOnly` GREEN** ("Integration
+      manifest diff passed"; expected build artifacts **unchanged** — AIY stays default). Device-aware
+      cold/warm need a persistent adb device; on-device verification is covered by the green GMD
+      instrumented suite (GMD tears its own emulator down). Recorded in the results doc.
+- [x] Write `docs/sprints/results/PLANTPOTTING-0007.md`: selected model (or "no public winner +
       fine-tuning-sprint recommendation"), rejected candidates + why, fixture results table,
       top-1/top-3 + coverage delta vs AIY, **median latency comparison**, threshold changes, license
       report, size report, **live-prototype status (with evidence link)**, and gate results.
-- [ ] **Flip the ledger entry to `done` only after every gate above is green** (or carries a
+- [x] **Flip the ledger entry to `done` only after every gate above is green** (or carries a
       documented, accepted blocker in the results doc).
 
 ## Sequencing & dependencies
@@ -345,87 +348,87 @@ Phase 2 (fixtures) ───────> Phase 3 (harness: baseline + candidate
 
 ## Risks & mitigations
 
-- [ ] **R1 — Public PlantNet/iNat weights aren't redistributable even though datasets/APIs are
+- [x] **R1 — Public PlantNet/iNat weights aren't redistributable even though datasets/APIs are
       public.** *Mitigation:* record license + weight-availability **separately** in the matrix. There
       is **no in-sprint training fallback** (see non-goals) — if no public model is redistributable
       and bundle-fit, the running prototype demonstrates the *swap mechanism* with the best probeable
       candidate (worst case AIY), and the deliverable becomes the negative finding + a recommendation
       to spin a dedicated fine-tuning sprint.
-- [ ] **R2 — Acquisition/conversion fragility: a "nominally available" checkpoint isn't a
+- [x] **R2 — Acquisition/conversion fragility: a "nominally available" checkpoint isn't a
       bundle-ready TFLite model.** Even PlantNet-300K (not just PlantCLEF/ViT) may publish a *training*
       architecture that needs nontrivial conversion, hits unsupported TFLite ops, or won't compress to
       a bundle-plausible INT8. *Mitigation:* record **conversion effort + result** in the matrix, not
       just availability; require a clean conversion proof + bundle-plausible size *before* a candidate
       earns a fixture probe; prefer MobileNetV3-Small/EfficientNet-Lite for bundle fit; time-box
       conversion spelunking and fall back to the next candidate rather than sinking the sprint into it.
-- [ ] **R3 — A model wins on accuracy but is too slow on-device.** *Mitigation:* capture inference
+- [x] **R3 — A model wins on accuracy but is too slow on-device.** *Mitigation:* capture inference
       latency as a first-class evaluation axis (Phase 3 CSV + summary); an accurate-but-slow model
       (multi-second inference) is recorded as a regression and weighed against the AIY baseline before
       selection.
-- [ ] **R4 — Selection bias: choosing a winner on too few fixtures overfits the model *choice*.**
+- [x] **R4 — Selection bias: choosing a winner on too few fixtures overfits the model *choice*.**
       *Mitigation:* the expanded ≥6-species fixture set (G2) is the ruler; never select a winner on
       Monstera + jade alone. (Promoted from GEMINI's draft — the sharpest articulation of this risk.)
-- [ ] **R5 — Candidate labels use synonyms/common names that break direct mapping.** *Mitigation:*
+- [x] **R5 — Candidate labels use synonyms/common names that break direct mapping.** *Mitigation:*
       audit labels against `species.json` aliases; encode every alias in the winner's
       `plant_class_map.json` + document in `ml-mapping-notes.md`.
-- [ ] **R6 — Lowered thresholds hide a weak model behind optimistic routing.** *Mitigation:* seed
+- [x] **R6 — Lowered thresholds hide a weak model behind optimistic routing.** *Mitigation:* seed
       `per_species_thresholds` only from fixture evidence near the global; keep weak predictions
       low-confidence and report them honestly (the 0006 discipline).
-- [ ] **R7 — TFLite I/O shape/dtype/large-label-space mismatch tempts a seam break.** *Mitigation:*
+- [x] **R7 — TFLite I/O shape/dtype/large-label-space mismatch tempts a seam break.** *Mitigation:*
       confine pre/post-processing inside the interpreter/preprocessor layer; budget real effort for
       adapting an arbitrary output tensor into `IdentificationResult`; the seam changes only with a
       documented, caller-updating justification (default: it doesn't). *This is the likeliest place to
       get stuck — do not underestimate it.*
-- [ ] **R8 — Wiring hardcodes a candidate or deletes AIY before comparison is done.** *Mitigation:*
+- [x] **R8 — Wiring hardcodes a candidate or deletes AIY before comparison is done.** *Mitigation:*
       single `ACTIVE_MODEL_ROOT` switch defaulting to AIY; keep AIY baseline + manifest/coverage tests
       alive through close-out.
-- [ ] **R9 — A model-acquisition/conversion script smuggles in a networking path.** *Mitigation:*
+- [x] **R9 — A model-acquisition/conversion script smuggles in a networking path.** *Mitigation:*
       acquisition scripts live outside production runtime, are never invoked from Gradle app tasks, and
       `verifyNoNetworking` is run **the moment** each script/dep lands (Phase 3), not only at close-out.
-- [ ] **R10 — Model asset bloats the APK.** *Mitigation:* measure compressed + uncompressed deltas
+- [x] **R10 — Model asset bloats the APK.** *Mitigation:* measure compressed + uncompressed deltas
       before picking the winner; prefer INT8; reject not-bundle-friendly models even if licensing is
       fine. Report the trade-off.
-- [ ] **R11 — GMD/probe flakiness or environment drift.** *Mitigation:* reuse the green `pixel6Api34`
+- [x] **R11 — GMD/probe flakiness or environment drift.** *Mitigation:* reuse the green `pixel6Api34`
       GMD harness; re-run `integration-flow.ps1` cold/warm/buildonly before close-out.
-- [ ] **R12 — Sprint degrades into a paper spike.** *Mitigation:* G4 + the Phase 5 live smoke run are
+- [x] **R12 — Sprint degrades into a paper spike.** *Mitigation:* G4 + the Phase 5 live smoke run are
       **acceptance-blocking** — the results doc must link running-prototype evidence.
 
 ## Acceptance criteria
 
-- [ ] `docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md` exists and reports
+- [x] `docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md` exists and reports
       availability, license, size, latency profile, conversion risk, and 16-species vocabulary overlap
       for AIY plus ≥2 serious replacement candidates (or documents that <2 cleared the bar, with the
       survey outcome recorded).
-- [ ] `app/src/androidTest/assets/identify-fixtures/` contains Monstera + jade (byte-unchanged) plus
+- [x] `app/src/androidTest/assets/identify-fixtures/` contains Monstera + jade (byte-unchanged) plus
       ≥4 new canonical fixtures (snake plant, pothos, ZZ, peace lily) + 2 more KB species — all with
       complete CC provenance in `LICENSE.txt` and all test-only (not in the APK).
-- [ ] The swap-evaluation harness runs AIY **and** the shortlisted candidate(s) over the expanded
+- [x] The swap-evaluation harness runs AIY **and** the shortlisted candidate(s) over the expanded
       fixtures and writes `model-swap-eval.csv` + `model-swap-eval-summary.md` comparing top-1/top-3,
       in-vocab coverage, **inference latency**, size, and license against the AIY baseline.
-- [ ] A winning replacement model is selected from evidence and has a complete bundle under
+- [x] A winning replacement model is selected from evidence and has a complete bundle under
       `app/src/main/assets/ml/<winning_model>/` — **or** the sprint explicitly records that no public
       candidate cleared the bar, with the negative finding + a fine-tuning-sprint recommendation in the
       results doc (no in-sprint training attempted).
-- [ ] The winning model (or, in the no-winner case, the swap mechanism with the best probeable model)
+- [x] The winning model (or, in the no-winner case, the swap mechanism with the best probeable model)
       is wired behind a flag/branch via a single `ACTIVE_MODEL_ROOT` switch, and a **live
       device/emulator run** identifies ≥3 real houseplant fixtures directly through
       `OnDevicePlantIdentifier` (`source == ON_DEVICE_MODEL`) without network access — evidence linked
       from the results doc.
-- [ ] `PlantIdentifier` / `IdentificationResult` remain unchanged — or the results doc carries a
+- [x] `PlantIdentifier` / `IdentificationResult` remain unchanged — or the results doc carries a
       strong justification for the seam change and all callers/tests are updated in the same sprint.
-- [ ] The winning model's `plant_class_map.json` (`_comment_coverage`) is re-baselined from its actual
+- [x] The winning model's `plant_class_map.json` (`_comment_coverage`) is re-baselined from its actual
       vocabulary, and `model_manifest.json` (`per_species_thresholds`) is **re-evaluated** from the
       fixture probes — seeded **only** where the evidence clearly warrants it and explicitly left
       "empty by design" otherwise. (6–8 fixtures is thin evidence for per-class thresholds; do not let
       "re-baselined" overstate what the data supports — the 0006 discipline holds.) Every threshold
       decision (and deciding number) is recorded.
-- [ ] `docs/kb/ml-mapping-notes.md` has a PLANTPOTTING-0007 section: coverage delta, fixture outcomes,
+- [x] `docs/kb/ml-mapping-notes.md` has a PLANTPOTTING-0007 section: coverage delta, fixture outcomes,
       alias decisions, threshold decisions, latency, and license notes.
-- [ ] `verifyNoNetworking` (run continuously through Phase 3 **and** at close-out),
+- [x] `verifyNoNetworking` (run continuously through Phase 3 **and** at close-out),
       `scripts/check-stub-isolation.sh`, focused model/manifest/score JVM tests, GMD real-interpreter +
       swap-eval + app-wired prototype tests, full `testDebugUnitTest`, `ktlintCheck`, and
       `scripts/integration-flow.ps1` cold/warm/buildonly are GREEN — or carry a documented, accepted
       blocker in `docs/sprints/results/PLANTPOTTING-0007.md`.
-- [ ] Asset/APK size impact of the winning model is measured and recorded (raw + compressed delta).
-- [ ] The sprint does **not** end as a paper spike: the results doc links a running app-prototype state
+- [x] Asset/APK size impact of the winning model is measured and recorded (raw + compressed delta).
+- [x] The sprint does **not** end as a paper spike: the results doc links a running app-prototype state
       where the selected model identifies plants live behind the agreed flag/branch.
