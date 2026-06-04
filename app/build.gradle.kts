@@ -22,12 +22,14 @@ android {
             useSupportLibrary = true
         }
 
-        // PLANTPOTTING-0007 §Phase 5 — single model-root selection point. The on-device
-        // identifier reads its manifest/labels/mapping/model from this assets root. Defaults
-        // to the frozen AIY baseline; the swap prototype flips it to the winning model's root
-        // (e.g. "ml/house_plant_species_mobilenetv2") via a prototype build/branch. One switch,
-        // no scattered conditionals, no second PlantIdentifier implementation.
-        buildConfigField("String", "ACTIVE_MODEL_ROOT", "\"ml/aiy_plants_v1\"")
+        // PLANTPOTTING-0007 — single model-root selection point. The on-device identifier reads
+        // its manifest/labels/mapping/model from this assets root. Shipped default is the House
+        // Plant Species MobileNetV2 (the swap winner: 6 high-conf correct vs AIY's 1, 10/16 KB
+        // coverage vs 2/16, 33ms vs 43ms — see docs/sprints/results/PLANTPOTTING-0007.md). The
+        // frozen AIY baseline bundle stays in assets as the regression anchor; point this back to
+        // "ml/aiy_plants_v1" to revert. One switch, no scattered conditionals, no second
+        // PlantIdentifier implementation.
+        buildConfigField("String", "ACTIVE_MODEL_ROOT", "\"ml/house_plant_species_mobilenetv2\"")
     }
 
     buildTypes {

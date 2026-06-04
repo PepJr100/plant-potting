@@ -16,14 +16,13 @@ import org.robolectric.annotation.Config
  * PLANTPOTTING-0007 §Phase 5 — locks the single `ACTIVE_MODEL_ROOT` switch.
  *
  * Two guarantees:
- *  1. **R8 — the committed default stays AIY.** A prototype build/branch flips
- *     `BuildConfig.ACTIVE_MODEL_ROOT` to the winning model's root, but `main` must never ship
- *     it flipped (that would silently swap the production model without the comparison gate).
+ *  1. **The committed default is the swap winner.** PLANTPOTTING-0007 shipped the House Plant
+ *     Species MobileNetV2 as the production default (it beat AIY 6 high-conf to 1; see the results
+ *     doc). This pins that decision — a silent revert to AIY (or to any other root) breaks here.
  *  2. **Root-threading derives the right asset paths.** The production providers
  *     (`OnDeviceIdentifyProvidersModule`) build the manifest/labels/mapping/model paths as
  *     `"$root/..."`. This test exercises that exact derivation against the default root and
- *     confirms it resolves the real AIY bundle — so a future flip to a candidate root only
- *     needs that bundle present at the same layout.
+ *     confirms it resolves the shipped candidate bundle at the expected layout.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [34])
@@ -31,8 +30,8 @@ class ActiveModelRootContractTest {
     private val assets get() = ApplicationProvider.getApplicationContext<Context>().assets
 
     @Test
-    fun committedDefaultRootIsTheFrozenAiyBaseline() {
-        assertThat(BuildConfig.ACTIVE_MODEL_ROOT).isEqualTo("ml/aiy_plants_v1")
+    fun committedDefaultRootIsTheSwapWinner() {
+        assertThat(BuildConfig.ACTIVE_MODEL_ROOT).isEqualTo("ml/house_plant_species_mobilenetv2")
     }
 
     @Test
@@ -41,15 +40,15 @@ class ActiveModelRootContractTest {
 
         // Mirrors provideModelManifest(assets, root).
         val manifest = ModelManifestReader(assets, root).read()
-        assertThat(manifest.labelCount).isEqualTo(2102)
+        assertThat(manifest.labelCount).isEqualTo(47)
 
         // Mirrors provideModelLabels(assets, "$root/labels.csv").
         val labels = ModelLabelsReader(assets, "$root/labels.csv").read()
         assertThat(labels).hasSize(manifest.labelCount)
 
-        // Mirrors provideModelLabelMap(assets, root).
+        // Mirrors provideModelLabelMap(assets, root). The candidate labels in common names.
         val labelMap = ModelLabelMapReader(assets, root).read()
-        assertThat(labelMap.lookup("Monstera deliciosa")?.kbSpeciesId).isEqualTo("monstera-deliciosa")
+        assertThat(labelMap.lookup("Snake plant (Sanseviera)")?.kbSpeciesId).isEqualTo("dracaena-trifasciata")
     }
 
     @Test

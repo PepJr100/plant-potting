@@ -86,11 +86,16 @@ No seam change, no new `PlantIdentifier` implementation — one `ACTIVE_MODEL_RO
 G4 ≥3 floor), and peace lily routes low-confidence. Evidence: GMD logcat under
 `app/build/outputs/androidTest-results/managedDevice/`.
 
-**`ACTIVE_MODEL_ROOT` committed default stays `ml/aiy_plants_v1`** (non-goal: "AIY stays the
-default target through close-out"; AIY bundle + its tests remain green). The candidate is
-demonstrated flag-flipped. **Shipping it as the production default is a one-line follow-up**
-(`buildConfigField` default → `ml/house_plant_species_mobilenetv2`) — recommended given the
-evidence, but left as an explicit decision.
+At sprint close the committed default was `ml/aiy_plants_v1` (non-goal: "AIY stays the default
+target through close-out") and the candidate was demonstrated flag-flipped.
+
+> **Post-sprint ship decision (2026-06-05).** On the conclusive probe evidence, `ACTIVE_MODEL_ROOT`
+> was flipped to **`ml/house_plant_species_mobilenetv2`** — the House Plant Species model is now the
+> production default. The AIY bundle stays in assets as the regression anchor;
+> `OnDeviceModelRealInterpreterTest` now pins `ACTIVE_MODEL_ROOT=ml/aiy_plants_v1` so the AIY
+> baseline assertions stay valid, and `ActiveModelRootContractTest` pins the new default. All JVM +
+> `pixel6Api34` instrumented gates re-run GREEN after the flip. To revert: point the
+> `buildConfigField` default back to `ml/aiy_plants_v1`.
 
 ## Size report (R10)
 
