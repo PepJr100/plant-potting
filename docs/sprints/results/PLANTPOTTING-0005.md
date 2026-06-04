@@ -1,10 +1,10 @@
 # PLANTPOTTING-0005 — Results
 
-**Status:** `in-progress`, but materially closer. Mechanism + tests + docs landed in
-the opus session; the §5.4–§5.8 real-photo calibration chain (real fixture → GMD probe
-→ preferred accuracy assertion → no-seed decision → green GMD capture) was completed in
-a follow-up session. Only §7.3 (`integration-flow.ps1` transcripts) and the §7.8 ledger
-flip to `done` remain — see `## Blockers` in `docs/sprints/PLANTPOTTING-0005.md`.
+**Status:** `done` (ledger flipped 2026-06-04). Mechanism + tests + docs landed in the
+opus session; the §5.4–§5.8 real-photo calibration chain (real fixture → GMD probe →
+preferred accuracy assertion → no-seed decision → green GMD capture) and §7.3
+integration-flow (cold + warm + buildonly, all GREEN) were completed in a follow-up
+session. All gated work has landed; nothing material is carried forward to 0006.
 
 **Executor:** opus.
 
