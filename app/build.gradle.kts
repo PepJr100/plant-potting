@@ -21,6 +21,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // PLANTPOTTING-0007 §Phase 5 — single model-root selection point. The on-device
+        // identifier reads its manifest/labels/mapping/model from this assets root. Defaults
+        // to the frozen AIY baseline; the swap prototype flips it to the winning model's root
+        // (e.g. "ml/house_plant_species_mobilenetv2") via a prototype build/branch. One switch,
+        // no scattered conditionals, no second PlantIdentifier implementation.
+        buildConfigField("String", "ACTIVE_MODEL_ROOT", "\"ml/aiy_plants_v1\"")
     }
 
     buildTypes {

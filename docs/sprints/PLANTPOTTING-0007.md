@@ -244,22 +244,27 @@ unwinding.*
 *Why: G4 is the whole point — the swap must run in the real app, not just the harness. One switch,
 not a scattering of conditionals, and the seam stays frozen by default.*
 
-- [ ] Add a single model-root selection point: a `BuildConfig` field (or top-level constant)
+- [x] Add a single model-root selection point: a `BuildConfig` field (or top-level constant)
       `ACTIVE_MODEL_ROOT` defaulting to `ml/aiy_plants_v1`, flipped to `ml/<winning_model>` on the
       prototype build/branch. **One switch — no scattered conditionals, no second `PlantIdentifier`
-      implementation.**
-- [ ] Refactor `OnDeviceIdentifyProvidersModule` (`OnDeviceIdentifyModule.kt`) so
+      implementation.** → `buildConfigField` in `app/build.gradle.kts`; locked by
+      `ActiveModelRootContractTest` (R8: default stays AIY).
+- [x] Refactor `OnDeviceIdentifyProvidersModule` (`OnDeviceIdentifyModule.kt`) so
       `provideModelManifest`, `provideModelLabels`, `provideModelLabelMap`, and
       `provideInterpreterFacade` read from `ACTIVE_MODEL_ROOT` instead of hardcoding
       `ml/aiy_plants_v1/...`. (`ModelManifestReader` / `ModelLabelsReader` / `ModelLabelMapReader`
-      already take asset paths — thread the root through.)
-- [ ] Keep `PlantIdentifier.identify(jpeg): IdentificationResult` and `IdentificationResult`
+      already take asset paths — thread the root through.) → done via `@ActiveModelRoot` qualifier;
+      `compileDebugKotlin`, the 4 focused JVM tests, `ktlintCheck`, `verifyNoNetworking` all GREEN.
+- [x] Keep `PlantIdentifier.identify(jpeg): IdentificationResult` and `IdentificationResult`
       **unchanged**. Confine all tensor-shape/dtype/preprocessing differences inside the
       interpreter/preprocessor layer behind the seam. **Budget real effort here** — adapting an
       arbitrary model's output tensor (e.g. PlantNet's large label space) into the existing
       `IdentificationResult` without a seam break is the likeliest place to get stuck (see R7). If the
       winner genuinely can't fit the seam, **stop**, record the exact reason in the results doc, then
-      update all callers/tests in this phase.
+      update all callers/tests in this phase. → **Seam unchanged.** The candidate is MobileNetV2 →
+      [1,47] output → already fits the existing `ModelScoreMapper`/`IdentificationResult` path (only a
+      smaller label space than AIY's 2102); FLOAT32 input maps onto the existing `ImagePreprocessor`
+      FLOAT32 branch. No seam change needed.
 - [ ] Confirm `OnDevicePlantIdentifier` still returns `IdSource.ON_DEVICE_MODEL` for the winner **and**
       still routes weak/out-of-vocab predictions to the existing low-confidence flow (picker
       unchanged) — assert both explicitly, not implicitly.

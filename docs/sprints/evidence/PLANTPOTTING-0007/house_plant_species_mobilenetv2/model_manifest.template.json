@@ -1,0 +1,33 @@
+{
+  "_comment_top": "PLANTPOTTING-0007 — manifest TEMPLATE for the House Plant Species MobileNetV2 candidate. Authored pre-conversion; the conversion script (convert_house_plant_model.py) prints the values to fill in below: sha256, output_tensor_shape, label_count, and (if you choose int8 full-integer quant) input_dtype. DEFAULT path = float16/float32 TFLite → FLOAT32 input tensor → the app's existing FLOAT32 ImagePreprocessor branch applies NormalizeOp(mean,std) below, reproducing the model's x/255 -> [0,1] training preprocessing. If you instead build int8 full-integer (inference_input_type=uint8), set input_dtype='uint8' and DELETE the normalization stanza (quant params encode it, like AIY). Rename this file to model_manifest.json when complete.",
+  "source_url": "https://github.com/Vatsalyakrish02/House_plant_species",
+  "variant": "mobilenetv2-full-image-set-Adam (TF-Hub feature vector + dense head), converted to TFLite",
+  "sha256": "PENDING_CONVERSION_fill_from_script_output",
+  "placeholder": true,
+  "_comment_placeholder": "true until model.tflite is produced by convert_house_plant_model.py, sha256 is filled, and this bundle is copied into app/src/main/assets/ml/house_plant_species_mobilenetv2/. Flip to false then.",
+  "input_size": 224,
+  "input_dtype": "float32",
+  "color_order": "RGB",
+  "normalization": {
+    "mean": [0.0, 0.0, 0.0],
+    "std": [255.0, 255.0, 255.0]
+  },
+  "_comment_normalization": "Reproduces the upstream app.py preprocessing: img/255.0 -> [0,1]. NormalizeOp computes (x-mean)/std, so mean=0,std=255 yields x/255. This is the TF-Hub MobileNetV2 feature-vector input convention. (FLOAT32 path only; for int8 builds, drop this and set input_dtype=uint8.)",
+  "output_tensor_shape": [1, 47],
+  "label_count": 47,
+  "acquisition_date": "PENDING_CONVERSION",
+  "license": "Apache-2.0",
+  "license_file": "ml/house_plant_species_mobilenetv2/LICENSE-house-plant-species.txt",
+  "labels_asset": "ml/house_plant_species_mobilenetv2/labels.csv",
+  "mapping_asset": "ml/house_plant_species_mobilenetv2/plant_class_map.json",
+  "thresholds": {
+    "high_confidence_plain": 0.55,
+    "high_confidence_margin_min": 0.45,
+    "high_confidence_margin_delta": 0.18,
+    "top_k_candidates": 3
+  },
+  "_comment_thresholds": "Identical policy to AIY (PLANTPOTTING-0003 §4.3). Do NOT lower these to flatter the candidate (0006 discipline). Per-species overrides are seeded ONLY from Phase 3 fixture evidence near the global — see Phase 4.",
+  "per_species_thresholds": {},
+  "_comment_per_species_thresholds": "Empty by design until the Phase 3 swap-eval probe shows an in-vocab species fails the global threshold by a margin a per-class override would cleanly close. Never seed to bless a weak (~10%) prediction.",
+  "_comment_coverage": "RECOMPUTE in Phase 4 from the model's actual 47 labels: 10 of 47 mapping entries resolve to KB species; 10 of 16 KB species covered (8 exact + 2 coarse: Orchid->phalaenopsis, Calathea->goeppertia-orbifolia). Headline coverage delta vs AIY: 2/16 -> 10/16. 6 KB species remain out-of-vocab (monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess, ficus-lyrata, chlorophytum-comosum, hoya-carnosa) and route to LowConfidencePicker as before."
+}

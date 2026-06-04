@@ -1,0 +1,38 @@
+House Plant Species — MobileNetV2 classifier (on-device model asset)
+====================================================================
+
+Model
+-----
+- Architecture:  MobileNetV2 (TensorFlow Hub feature-vector module) + dense
+                 classification head, 47 house-plant classes.
+- Upstream file: model/20240921-2014-full-image-set-mobilenetv2-Adam.h5
+- Source repo:   https://github.com/Vatsalyakrish02/House_plant_species
+- Converted to:  model.tflite (see convert_house_plant_model.py in
+                 docs/sprints/evidence/PLANTPOTTING-0007/) — PLANTPOTTING-0007.
+
+License
+-------
+Apache License 2.0. The source repository ships an Apache-2.0 LICENSE file
+(GitHub license detection: apache-2.0). The repository README contains an
+unfilled "NONE License" template line; the authoritative term is the committed
+Apache-2.0 LICENSE. Attribution: "Vatsalyakrish02 / House_plant_species,
+Apache-2.0".
+
+A copy of the Apache-2.0 license text governs this asset; see
+https://www.apache.org/licenses/LICENSE-2.0 .
+
+Dataset-vs-weights note
+-----------------------
+The model was trained on the Kaggle "House Plant Species" 47-class image set
+(https://www.kaggle.com/datasets/kacpergregorowicz/house-plant-species), whose
+images were community-collected. What is bundled here is the TRAINED MODEL
+(weights), redistributed under the repository's Apache-2.0 license — NOT the
+training images. This mirrors the standard situation for ImageNet-pretrained
+models. Recorded per PLANTPOTTING-0007 Phase 1 (dataset-public ≠ weights-
+redistributable) for transparency.
+
+Status
+------
+Evaluated in PLANTPOTTING-0007 as the houseplant-coverage replacement candidate
+for the AIY Plants V1 baseline (which stays Apache-2.0 and remains the default
+ACTIVE_MODEL_ROOT). See docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md.

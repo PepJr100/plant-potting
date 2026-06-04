@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "modelLabelsAsset": "ml/house_plant_species_mobilenetv2/labels.csv",
+  "_comment": "PLANTPOTTING-0007 — maps the House Plant Species (47-class) MobileNetV2 model labels to KB speciesIds. Labels are the model's exact output-index order (see labels.csv). 8 exact + 2 coarse = 10 of 16 KB species covered (vs AIY's 2/16). Coarse rows (alias:true with a _note) map a broader model class onto the KB's single representative species; routing honesty still applies (a coarse high-confidence hit maps, a weak one routes low-confidence). 'Rattlesnake Plant (Calathea lancifolia)' is deliberately NOT mapped to goeppertia-orbifolia — it is a different Calathea species. See docs/kb/ml-mapping-notes.md.",
+  "mapping": {
+    "Monstera Deliciosa (Monstera deliciosa)": { "kbSpeciesId": "monstera-deliciosa" },
+    "Pothos (Ivy arum)":                        { "kbSpeciesId": "epipremnum-aureum", "alias": true, "_note": "Pothos common-name == Epipremnum aureum" },
+    "Peace lily":                               { "kbSpeciesId": "spathiphyllum-wallisii", "alias": true, "_note": "Peace lily common-name == Spathiphyllum wallisii" },
+    "Rubber Plant (Ficus elastica)":            { "kbSpeciesId": "ficus-elastica" },
+    "Snake plant (Sanseviera)":                 { "kbSpeciesId": "dracaena-trifasciata", "alias": true, "_note": "Snake plant / Sansevieria trifasciata == Dracaena trifasciata" },
+    "ZZ Plant (Zamioculcas zamiifolia)":        { "kbSpeciesId": "zamioculcas-zamiifolia" },
+    "Jade plant (Crassula ovata)":              { "kbSpeciesId": "crassula-ovata" },
+    "African Violet (Saintpaulia ionantha)":    { "kbSpeciesId": "saintpaulia-ionantha" },
+    "Orchid":                                   { "kbSpeciesId": "phalaenopsis", "alias": true, "_note": "COARSE: model class 'Orchid' is broader than the KB's Phalaenopsis; mapped because Phalaenopsis is the KB's only (and the most common houseplant) orchid. Flagged in ml-mapping-notes." },
+    "Calathea":                                 { "kbSpeciesId": "goeppertia-orbifolia", "alias": true, "_note": "COARSE/genus: Goeppertia orbifolia was formerly Calathea orbifolia; the model's generic 'Calathea' class is mapped to the KB's only Calathea/Goeppertia. The separate 'Rattlesnake Plant (Calathea lancifolia)' class is intentionally left unmapped (different species)." }
+  }
+}
