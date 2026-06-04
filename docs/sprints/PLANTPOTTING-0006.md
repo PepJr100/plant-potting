@@ -50,19 +50,23 @@ on the `CameraUiState.Failure` live visual (user-waived — JVM coverage accepte
 
 ### Phase 1 — Fixture & provenance
 
-- [ ] Select a `crassula-ovata` (jade plant) photo on Wikimedia Commons under CC-BY-SA / CC-BY / CC0,
+- [x] Select a `crassula-ovata` (jade plant) photo on Wikimedia Commons under CC-BY-SA / CC-BY / CC0,
       depicting an **unambiguous** jade plant (fleshy oval leaves, woody stem; avoid flowering
       close-ups or mixed-succulent arrangements that could pull top-1 to a neighbouring class).
-- [ ] Centre-crop and scale to **480×480**, re-encode **JPEG quality 80**, to match the Monstera
+      → **CC0** "Jade Plant, Crassula ovata IMG 3632" by S.G.S.; visually verified frame-filling
+      fleshy red-edged oval leaves + potted, no flowers/mixed succulents.
+- [x] Centre-crop and scale to **480×480**, re-encode **JPEG quality 80**, to match the Monstera
       fixture's dimensions/encoding exactly; save as
       `app/src/androidTest/assets/identify-fixtures/crassula-ovata.jpg`. (Confirm the Monstera
       fixture's actual dims/encoding first and mirror them if they differ from 480×480/q80.)
-- [ ] Append a `crassula-ovata.jpg` provenance block to
+      → ~30 KB baseline JPEG, 480×480, RGB — `file(1)` output matches monstera-deliciosa.jpg exactly.
+- [x] Append a `crassula-ovata.jpg` provenance block to
       `app/src/androidTest/assets/identify-fixtures/LICENSE.txt`, following the 0005 Monstera block
       **verbatim in structure**: Title / Depicts / Source page / Original file / Author / Date taken /
       Retrieved / Modifications / License + full attribution string + test-only/not-in-APK note.
-- [ ] Confirm the asset lives under `app/src/androidTest/` **only** (test-only; not bundled into the
+- [x] Confirm the asset lives under `app/src/androidTest/` **only** (test-only; not bundled into the
       production APK) and that the merged-androidTest-assets copy picks it up on the next build.
+      → `find app/src/main -iname '*crassula*.jpg'` is empty; lives only under `app/src/androidTest/`.
 - [ ] Verify the fixture is readable at runtime from androidTest assets via the **same code path** as
       `monstera-deliciosa.jpg` (load it in the probe test before asserting on it), so a bad
       crop/encoding fails loudly rather than silently mis-probing.
