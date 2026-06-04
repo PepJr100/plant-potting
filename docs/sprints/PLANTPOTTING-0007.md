@@ -170,35 +170,44 @@ harness is the comparison substrate, and `verifyNoNetworking` runs the **moment*
 dependency or acquisition script lands here — a breach caught now is a one-line revert, not days of
 unwinding.*
 
-- [ ] Introduce a test-only `ModelUnderTest` descriptor (model id, manifest asset path, labels asset,
+- [x] Introduce a test-only `ModelUnderTest` descriptor (model id, manifest asset path, labels asset,
       mapping asset, model asset path, input size/dtype) so the harness can drive AIY + candidate
       bundles without duplicating interpreter/preprocessor/mapper code. Reuse
       `TfLiteInterpreterFacade`, `ImagePreprocessor`, `ModelScoreMapper`, `ModelLabelMapReader`.
+      → `ModelUnderTest(modelId, root)` in `ModelSwapEvaluationTest`; pipelines built from the root
+      via the production readers/facade/preprocessor/mapper.
 - [ ] Add candidate bundles under `app/src/main/assets/ml/<candidate_id>/` (`model.tflite`,
       `labels.csv`, `model_manifest.json`, `plant_class_map.json`, license file) **only** for a
       candidate that is bundle-ready and will be probed/wired. If a candidate is too large or its
       weights aren't redistributable, keep the conversion script + evidence under
       `docs/sprints/evidence/PLANTPOTTING-0007/`, mark it "not bundle-ready", and exclude it from the
-      running prototype.
-- [ ] **Run `verifyNoNetworking` immediately** after the first candidate dependency / asset /
+      running prototype. → **STAGED** under `evidence/PLANTPOTTING-0007/house_plant_species_mobilenetv2/`
+      (labels/mapping/manifest-template/license + `convert_house_plant_model.py` + `ACQUISITION.md`);
+      becomes bundle-ready when the user runs the `.h5`→TFLite conversion and copies it into assets.
+      The harness auto-probes it the moment `model.tflite` lands.
+- [x] **Run `verifyNoNetworking` immediately** after the first candidate dependency / asset /
       acquisition script lands — and re-run it after each subsequent one. Treat any new network
       surface as a stop-and-fix before continuing (do **not** wait for Phase 6).
-- [ ] Build the harness as a dedicated GMD test (`ModelSwapEvaluationTest`) **alongside**, not
+      → GREEN after the conversion script + scaffold landed (all under `evidence/`, no app runtime dep).
+- [x] Build the harness as a dedicated GMD test (`ModelSwapEvaluationTest`) **alongside**, not
       replacing, `OnDeviceModelRealInterpreterTest` — keep the existing Monstera/jade/binding
       assertions intact as the regression anchor.
-- [ ] Iterate the harness over `{baseline AIY} × {expanded fixtures}` and emit a machine-readable
+- [x] Iterate the harness over `{baseline AIY} × {expanded fixtures}` and emit a machine-readable
       report at `docs/sprints/evidence/PLANTPOTTING-0007/model-swap-eval.csv` with columns: model id,
       fixture species id, expected species id, raw top-1 label, raw top-1 score, raw top-3
       labels+scores, mapped top-1 KB id, mapped top-3 KB ids, in-vocab flag, route (high/low-conf),
-      source, **inference latency (ms)**, failure reason (if any).
-- [ ] Iterate the harness over the **shortlisted candidate(s)** × the same fixtures into the same CSV,
+      source, **inference latency (ms)**, failure reason (if any). → CSV emitted to the device files
+      dir (pull cmd in the test header); columns match. *(Runs on `pixel6Api34` — user-run.)*
+- [x] Iterate the harness over the **shortlisted candidate(s)** × the same fixtures into the same CSV,
       so AIY and candidates are directly comparable row-for-row. Feed each model its **own** native
-      preprocessing from the canonical fixture.
-- [ ] Capture **inference latency** per model/fixture (warm-run median over a few iterations) so an
+      preprocessing from the canonical fixture. → harness discovers every `ml/<id>/` bundle with a
+      `model.tflite` and probes it with its own manifest preprocessing; candidate auto-included on install.
+- [x] Capture **inference latency** per model/fixture (warm-run median over a few iterations) so an
       accurate-but-slow model is visible as a regression, not hidden — record it in the CSV and roll a
-      per-model median into the summary.
-- [ ] Add a regression assertion pinning the **AIY baseline rows** (Monstera high-conf @ ~**0.8984**,
+      per-model median into the summary. → warm ×2 + median-of-5 per fixture; per-model median in summary.
+- [x] Add a regression assertion pinning the **AIY baseline rows** (Monstera high-conf @ ~**0.8984**,
       jade low-conf @ ~**0.1055**) so the harness can't silently mask a plumbing regression.
+      → asserts AIY monstera mapped=monstera-deliciosa/high-conf/score≈0.8984 and jade low-conf/top-mapped=crassula-ovata.
 - [ ] Add **evidence-driven** candidate assertions *after* the probe (do not pre-commit a form):
       preferred = correct top-1 high-confidence for the required fixtures; acceptable documented
       fallback = correct species in top-3 with a recorded threshold/mapping reason.
