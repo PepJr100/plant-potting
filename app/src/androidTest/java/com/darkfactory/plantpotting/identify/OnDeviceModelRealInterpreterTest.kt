@@ -45,7 +45,7 @@ class OnDeviceModelRealInterpreterTest {
     }
 
     @Test
-    fun realJpegFedThroughRealInterpreterDoesNotThrow() =
+    fun realMonsteraPhotoRoutesHighConfidenceToMonstera() =
         runBlocking {
             val ctx = InstrumentationRegistry.getInstrumentation().context
             val bytes =
@@ -55,11 +55,15 @@ class OnDeviceModelRealInterpreterTest {
 
             val result = identifier.identify(bytes)
 
-            // No assertion on speciesId — AIY V1/3 maps only 2 of 16 KB species verbatim,
-            // so the result may legitimately route to lowConfidence = true. The falsifiable
-            // claim is "returns without throwing through the real native interpreter" — the
-            // exact failure mode of Bug 1.
+            // PLANTPOTTING-0005 §5.6 — accuracy-bearing assertion against the real
+            // CC-licensed Monstera deliciosa fixture (§5.4). The §5.5 GMD probe measured
+            // top-1 = monstera-deliciosa at p=0.8984, clearing the 0.55 global threshold
+            // cleanly, so the *preferred* form applies: direct species id + high confidence.
+            // (Falsifiability §4.6: reverting the §1.5 UINT8 preprocessor branch to FLOAT32
+            // fails this test with the verbatim Bug 1 "Cannot convert … UINT8" error.)
             assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL)
+            assertThat(result.speciesId).isEqualTo("monstera-deliciosa")
+            assertThat(result.lowConfidence).isFalse()
             assertThat(identifier::class.java).isEqualTo(OnDevicePlantIdentifier::class.java)
         }
 

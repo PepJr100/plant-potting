@@ -84,16 +84,18 @@ PLANTPOTTING-0005 §5 introduced the *per-species threshold override* mechanism 
 to the `_plain` (top-1 vs threshold) path; the margin path (`_margin_min` / `_margin_delta`)
 is intentionally not overridable — see PLANTPOTTING-0005 §4.3 (premature surface).
 
-**Probe outcome.** Pending. The §5.5 probe — running `OnDeviceModelRealInterpreterTest`
-against a real CC-licensed Monstera deliciosa photograph and recording top-1 species id
-+ score, top-3, `result.lowConfidence`, and `result.source` — has not yet run. The plan
-gates the §5.6 accuracy-bearing assertion (preferred form: `speciesId == "monstera-deliciosa"
-&& !lowConfidence`; fallback: source-only + top-3 contains the species) on the probe's
-verdict, and gates §5.7's optional seeding on whether the probe shows an in-vocab
-species fails the global threshold by a margin a per-class override would close.
+**Probe outcome.** Run on the `pixel6Api34` GMD against the real CC-licensed
+Monstera deliciosa fixture (§5.4). Measured: top-1 = `monstera-deliciosa` at
+p = **0.8984**, `lowConfidence = false`, `source = ON_DEVICE_MODEL`; the only other
+mapped candidate was `crassula-ovata` at p ≈ 0.0000 (the AIY V1/3 vocabulary maps
+just these two KB species). The top-1 probability clears the global
+`high_confidence_plain = 0.55` threshold cleanly (+0.35 margin), so the photo routes
+**high-confidence direct** to Monstera. Per §5.6 this selects the *preferred*
+assertion form (`speciesId == "monstera-deliciosa" && !lowConfidence`), now committed
+in `OnDeviceModelRealInterpreterTest.realMonsteraPhotoRoutesHighConfidenceToMonstera`.
 
-**Seeded values.** None. `per_species_thresholds` ships as an empty object with a
-breadcrumb comment in `model_manifest.json`. When PLANTPOTTING-0006 (or whoever
-picks up the deferred §5.4–§5.8 work) runs the probe and decides to seed, this entry
-should be updated to name the species, the chosen threshold, and the probe numbers
-that justified the deviation from the global 0.55.
+**Seeded values.** None — and correctly so. §5.7 seeds a per-species override only
+when an in-vocab species *fails* the global threshold by a closeable margin. Monstera
+clears 0.55 outright (0.8984), so `per_species_thresholds` ships as an empty object;
+seeding it would be anti-overfitting (§5.6 prohibition). The multi-species calibration
+sweep remains PLANTPOTTING-0006's to own if the data ever forces per-class tuning.
