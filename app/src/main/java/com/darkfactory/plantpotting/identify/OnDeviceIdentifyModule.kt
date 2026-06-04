@@ -1,6 +1,7 @@
 package com.darkfactory.plantpotting.identify
 
 import android.content.res.AssetManager
+import com.darkfactory.plantpotting.BuildConfig
 import com.darkfactory.plantpotting.identify.model.InterpreterFacade
 import com.darkfactory.plantpotting.identify.model.ModelLabelMap
 import com.darkfactory.plantpotting.identify.model.ModelLabelMapReader
@@ -38,21 +39,46 @@ abstract class OnDeviceIdentifyModule {
     abstract fun bindPlantIdentifier(impl: OnDevicePlantIdentifier): PlantIdentifier
 }
 
+/**
+ * PLANTPOTTING-0007 §Phase 5 — the one model-root switch, isolated in its own module so an
+ * instrumentation test can `@UninstallModules(ActiveModelRootModule::class)` + `@BindValue` a
+ * different root (e.g. the prototype candidate) without disturbing any other provider.
+ * Production reads `BuildConfig.ACTIVE_MODEL_ROOT` (default `ml/aiy_plants_v1`, flipped to the
+ * winning model's root on the prototype build/branch).
+ */
+@Module
+@InstallIn(SingletonComponent::class)
+object ActiveModelRootModule {
+    @Provides
+    @Singleton
+    @ActiveModelRoot
+    fun provideActiveModelRoot(): String = BuildConfig.ACTIVE_MODEL_ROOT
+}
+
 @Module
 @InstallIn(SingletonComponent::class)
 object OnDeviceIdentifyProvidersModule {
     @Provides
     @Singleton
-    fun provideModelManifest(assets: AssetManager): ModelManifest = ModelManifestReader(assets).read()
+    fun provideModelManifest(
+        assets: AssetManager,
+        @ActiveModelRoot root: String,
+    ): ModelManifest = ModelManifestReader(assets, root).read()
 
     @Provides
     @Singleton
     @ModelLabelsList
-    fun provideModelLabels(assets: AssetManager): List<String> = ModelLabelsReader(assets).read()
+    fun provideModelLabels(
+        assets: AssetManager,
+        @ActiveModelRoot root: String,
+    ): List<String> = ModelLabelsReader(assets, "$root/labels.csv").read()
 
     @Provides
     @Singleton
-    fun provideModelLabelMap(assets: AssetManager): ModelLabelMap = ModelLabelMapReader(assets).read()
+    fun provideModelLabelMap(
+        assets: AssetManager,
+        @ActiveModelRoot root: String,
+    ): ModelLabelMap = ModelLabelMapReader(assets, root).read()
 
     @Provides
     @Singleton
@@ -68,10 +94,11 @@ object OnDeviceIdentifyProvidersModule {
     fun provideInterpreterFacade(
         assets: AssetManager,
         manifest: ModelManifest,
+        @ActiveModelRoot root: String,
     ): InterpreterFacade =
         TfLiteInterpreterFacade(
             assets = assets,
-            modelPath = "ml/aiy_plants_v1/model.tflite",
+            modelPath = "$root/model.tflite",
             labelCount = manifest.labelCount,
             inputSize = manifest.inputSize,
             expectedInputDtype = manifest.inputDtype,

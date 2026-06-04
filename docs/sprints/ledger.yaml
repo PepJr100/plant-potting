@@ -37,6 +37,7 @@ sprints:
     updated: "2026-06-04T19:11:07+00:00"
   - id: PLANTPOTTING-0007
     title: Houseplant model swap (V1 entry) - survey, eval harness, running prototype
-    status: planned
+    status: done
+    executor: opus (claude-opus-4-8)
     created: "2026-06-04T20:36:43+00:00"
-    updated: "2026-06-04T20:49:18+00:00"
+    updated: "2026-06-04T23:27:09+00:00"

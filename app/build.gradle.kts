@@ -14,13 +14,22 @@ android {
         applicationId = "com.darkfactory.plantpotting"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "com.darkfactory.plantpotting.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // PLANTPOTTING-0007 — single model-root selection point. The on-device identifier reads
+        // its manifest/labels/mapping/model from this assets root. Shipped default is the House
+        // Plant Species MobileNetV2 (the swap winner: 6 high-conf correct vs AIY's 1, 10/16 KB
+        // coverage vs 2/16, 33ms vs 43ms — see docs/sprints/results/PLANTPOTTING-0007.md). The
+        // frozen AIY baseline bundle stays in assets as the regression anchor; point this back to
+        // "ml/aiy_plants_v1" to revert. One switch, no scattered conditionals, no second
+        // PlantIdentifier implementation.
+        buildConfigField("String", "ACTIVE_MODEL_ROOT", "\"ml/house_plant_species_mobilenetv2\"")
     }
 
     buildTypes {

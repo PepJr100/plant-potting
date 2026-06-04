@@ -2,8 +2,10 @@ package com.darkfactory.plantpotting.identify
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -28,8 +30,17 @@ import javax.inject.Inject
  * (`"Cannot convert between a TensorFlowLite tensor with type UINT8 …"`).
  */
 @HiltAndroidTest
+@UninstallModules(ActiveModelRootModule::class)
 class OnDeviceModelRealInterpreterTest {
     @get:Rule val hiltRule = HiltAndroidRule(this)
+
+    // PLANTPOTTING-0007 — the production default is now the House Plant Species MobileNetV2.
+    // This test is the AIY baseline regression anchor (Monstera 0.8984 high-conf, jade 0.1055
+    // low-conf), so it pins `ACTIVE_MODEL_ROOT` to the frozen AIY bundle regardless of the
+    // shipped default. The candidate's own behaviour is covered by ModelSwapEvaluationTest and
+    // OnDeviceModelAppWiredPrototypeTest.
+    @BindValue @ActiveModelRoot
+    val activeModelRoot: String = "ml/aiy_plants_v1"
 
     @Inject lateinit var identifier: OnDevicePlantIdentifier
 

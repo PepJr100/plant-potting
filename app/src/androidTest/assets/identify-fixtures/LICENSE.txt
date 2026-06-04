@@ -85,3 +85,125 @@ The author dedicated this work to the public domain. No attribution is legally
 required; "S.G.S., CC0, via Wikimedia Commons" is recorded here as a courtesy.
 It is a test-only asset under app/src/androidTest/ and is NOT bundled into the
 production APK.
+
+
+================================================================================
+PLANTPOTTING-0007 §Phase 2 — expanded real-photo fixture set
+================================================================================
+
+Six additional canonical houseplant fixtures broaden the swap-evaluation ruler
+beyond Monstera + jade so a model swap is not selected on two species alone
+(§R4). Each is centre-cropped to a square, scaled to 480×480, and re-encoded as
+JPEG quality 80 — matching monstera-deliciosa.jpg's dimensions/encoding exactly.
+All are test-only assets under app/src/androidTest/ and are NOT bundled into the
+production APK.
+
+
+dracaena-trifasciata.jpg   (snake plant / Sansevieria trifasciata)
+------------------------------------------------------------------
+
+- Title:         Snake plant (Sansevieria trifasciata) Waoleona Buton Island 01
+- Depicts:       Dracaena trifasciata (≡ Sansevieria trifasciata) — upright
+                 variegated yellow-margined banded leaves
+- Source page:   https://commons.wikimedia.org/wiki/File:Snake_plant_(Sansevieria_trifasciata)_Waoleona_Buton_Island_01.jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/e/ed/Snake_plant_%28Sansevieria_trifasciata%29_Waoleona_Buton_Island_01.jpg
+- Author:        David E Mead (Wikimedia Commons)
+- Date taken:    19 October 2019
+- Retrieved:     4 June 2026
+- Original:      3477×4636
+- License:       Creative Commons Zero v1.0 Universal (CC0 1.0) — Public Domain.
+                 https://creativecommons.org/publicdomain/zero/1.0/
+                 No attribution legally required; "David E Mead, CC0, via
+                 Wikimedia Commons" recorded as a courtesy.
+
+
+epipremnum-aureum.jpg   (pothos / Epipremnum aureum)
+----------------------------------------------------
+
+- Title:         Golden Pothos (Money Plant)
+- Depicts:       Epipremnum aureum (golden pothos) — heart-shaped leaves with
+                 golden variegation (distinguishes from philodendron/scindapsus)
+- Source page:   https://commons.wikimedia.org/wiki/File:Golden_Pothos_(Money_Plant).jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/9/98/Golden_Pothos_%28Money_Plant%29.jpg
+- Author:        Kuttykrishnan Photos (Wikimedia Commons)
+- Date taken:    15 October 2024
+- Retrieved:     4 June 2026
+- Original:      1920×1820
+- License:       Creative Commons Zero v1.0 Universal (CC0 1.0) — Public Domain.
+                 https://creativecommons.org/publicdomain/zero/1.0/
+                 No attribution legally required; "Kuttykrishnan Photos, CC0, via
+                 Wikimedia Commons" recorded as a courtesy.
+
+
+zamioculcas-zamiifolia.jpg   (ZZ plant / Zamioculcas zamiifolia)
+----------------------------------------------------------------
+
+- Title:         "Zamio Mater" Zamioculcas zamiifolia communis plant
+- Depicts:       Zamioculcas zamiifolia (ZZ plant) — glossy pinnate leaflets on
+                 arching stems, potted
+- Source page:   https://commons.wikimedia.org/wiki/File:%22Zamio_Mater%22_Zamioculcas_zamiifolia_communis_plant.jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/7/7f/%22Zamio_Mater%22_Zamioculcas_zamiifolia_communis_plant.jpg
+- Author:        O fungo azul (Wikimedia Commons)
+- Date taken:    1 July 2025
+- Retrieved:     4 June 2026
+- Original:      2576×1932
+- License:       Creative Commons Zero v1.0 Universal (CC0 1.0) — Public Domain.
+                 https://creativecommons.org/publicdomain/zero/1.0/
+                 No attribution legally required; "O fungo azul, CC0, via
+                 Wikimedia Commons" recorded as a courtesy.
+
+
+spathiphyllum-wallisii.jpg   (peace lily / Spathiphyllum wallisii)
+------------------------------------------------------------------
+
+- Title:         Spathiphyllum Wallisii - Peace Lily Plant at Wayanad (3)
+- Depicts:       Spathiphyllum wallisii (peace lily) — diagnostic white spathe +
+                 spadix with foliage behind
+- Source page:   https://commons.wikimedia.org/wiki/File:Spathiphyllum_Wallisii_-_Peace_Lily_Plant_at_Wayanad_(3).jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/5/57/Spathiphyllum_Wallisii_-_Peace_Lily_Plant_at_Wayanad_%283%29.jpg
+- Author:        Vinayaraj (Wikimedia Commons)
+- Date taken:    3 February 2019
+- Retrieved:     4 June 2026
+- Original:      4608×3456
+- License:       Creative Commons Attribution-ShareAlike 4.0 International
+                 (CC BY-SA 4.0). https://creativecommons.org/licenses/by-sa/4.0/
+                 Attribution: "Vinayaraj, CC BY-SA 4.0, via Wikimedia Commons".
+                 Per share-alike, this fixture and modified copies remain
+                 available under the same (or a compatible) license.
+
+
+phalaenopsis.jpg   (moth orchid / Phalaenopsis)
+-----------------------------------------------
+
+- Title:         Phalaenopsis orchid plant
+- Depicts:       Phalaenopsis (moth orchid) — white bloom with yellow lip
+- Source page:   https://commons.wikimedia.org/wiki/File:Phalaenopsis_orchid_plant.jpeg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/5/54/Phalaenopsis_orchid_plant.jpeg
+- Author:        Danesman1 (Wikimedia Commons)
+- Date taken:    11 October 2012
+- Retrieved:     4 June 2026
+- Original:      3264×2448
+- License:       Creative Commons Attribution-ShareAlike 3.0 Unported
+                 (CC BY-SA 3.0). https://creativecommons.org/licenses/by-sa/3.0/
+                 Attribution: "Danesman1, CC BY-SA 3.0, via Wikimedia Commons".
+                 Per share-alike, this fixture and modified copies remain
+                 available under the same (or a compatible) license.
+
+
+goeppertia-orbifolia.jpg   (Calathea orbifolia / Goeppertia orbifolia)
+----------------------------------------------------------------------
+
+- Title:         Prayer plant (Calathea orbifolia)
+- Depicts:       Goeppertia orbifolia (≡ Calathea orbifolia) — large rounded
+                 leaves with silvery-green stripes
+- Source page:   https://commons.wikimedia.org/wiki/File:Prayer_plant_(Calathea_orbifolia).jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/9/92/Prayer_plant_%28Calathea_orbifolia%29.jpg
+- Author:        Mokkie (Wikimedia Commons)
+- Date taken:    20 March 2014
+- Retrieved:     4 June 2026
+- Original:      3920×2204
+- License:       Creative Commons Attribution-ShareAlike 3.0 Unported
+                 (CC BY-SA 3.0). https://creativecommons.org/licenses/by-sa/3.0/
+                 Attribution: "Mokkie, CC BY-SA 3.0, via Wikimedia Commons".
+                 Per share-alike, this fixture and modified copies remain
+                 available under the same (or a compatible) license.

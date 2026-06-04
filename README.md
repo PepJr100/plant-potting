@@ -53,14 +53,18 @@ Five sprints landed on `main`:
 
 What you can do today:
 
-- **Identify a plant on-device.** Camera capture → JPEG → AIY Plants V1/3
-  TensorFlow Lite model (~5 MB, UINT8-quantized, bundled in
-  `app/src/main/assets/ml/aiy_plants_v1/`). Inference runs entirely on-device;
+- **Identify a plant on-device.** Camera capture → JPEG → House Plant Species
+  MobileNetV2 TensorFlow Lite model (~10.9 MB, float16, 47 houseplant classes,
+  bundled in `app/src/main/assets/ml/house_plant_species_mobilenetv2/` —
+  PLANTPOTTING-0007). It covers **10 of the 16** KB species (vs the AIY Plants
+  V1/3 baseline's 2 — which stays bundled in `app/src/main/assets/ml/aiy_plants_v1/`
+  as the regression anchor; the active model is selected by the
+  `ACTIVE_MODEL_ROOT` `BuildConfig` switch). Inference runs entirely on-device;
   the network policy is enforced at build time by `verifyNoNetworking`.
 - **Get a routing decision.** The model's top-1 score is compared to the
-  per-class threshold in `model_manifest.json`; the result is either
+  threshold policy in `model_manifest.json`; the result is either
   `ResultScreen` (high-confidence direct match) or `LowConfidencePicker`
-  (model unsure or species not in the AIY vocabulary — the user picks from a
+  (model unsure or species not in the model's vocabulary — the user picks from a
   short list).
 - **See an evidence-tagged recommendation.** `ResultScreen` shows a source
   badge — `on-device match`, `on-device match (low confidence)`, or
@@ -85,7 +89,7 @@ PlantIdentifier (interface)
             │
             ▼
    ImagePreprocessor → TfLiteInterpreterFacade → ModelScoreMapper
-            │              (AIY Plants V1/3, UINT8 in + out)
+            │   (House Plant Species MobileNetV2, FLOAT32; AIY V1/3 baseline also bundled)
             ▼
    IdentificationResult { speciesId, displayName, source, lowConfidence }
         │
@@ -255,14 +259,14 @@ Then walk through the flow on the emulator:
 3. **One of two outcomes**, both expected and correct:
    - **High-confidence path:** lands on `ResultScreen` directly with source
      badge `on-device match`. Most common when the model is confident
-     (real-device photo of an in-vocabulary species like *Monstera deliciosa*
-     or *Crassula ovata*).
+     (real-device photo of an in-vocabulary species — the House Plant Species
+     model covers 10 of the 16 KB species, e.g. *Monstera deliciosa*, snake
+     plant, ZZ, peace lily, jade).
    - **Low-confidence path:** lands on `LowConfidencePicker`. The model
-     couldn't pick a single species above its threshold — the AIY V1/3 model
-     covers only 2 of the 16 KB species verbatim, and the AOSP emulator's
-     synthetic camera scene rarely passes that threshold. Pick a species row
-     to continue. `ResultScreen` shows next with badge
-     `on-device match (low confidence)`.
+     couldn't pick a single species above its threshold — 6 of the 16 KB
+     species are still out-of-vocab, and the AOSP emulator's synthetic camera
+     scene rarely passes the threshold anyway. Pick a species row to continue.
+     `ResultScreen` shows next with badge `on-device match (low confidence)`.
 4. Tap **See potting mix** → `RecommendationScreen`. Archetype name, rationale,
    and a recipe table with proportions summing to 100%.
 5. Tap **Retake** to return to the camera.
