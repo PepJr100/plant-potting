@@ -13,7 +13,13 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none yet — drop one-line thoughts here)_
+- **PLANTPOTTING-0006 = multi-species calibration sweep + 2 UX fixes.** With 0005 fully
+  closed (real-photo probe confirmed `monstera-deliciosa @ 0.8984`, high-conf, no seeding
+  needed), 0006 is no longer "finish 0005" — it's narrower: (1) extend the probe to the
+  other in-vocab species (`crassula-ovata`) so `perSpeciesThresholds` gains real
+  evidence across ≥2 species; (2) fix the two 0005-review UX findings in
+  `docs/sprints/feedback/PLANTPOTTING-0005/feedback.md` — `LowConfidencePicker` subtitle
+  leaks "model" jargon, and candidate chips render "(0%)" on degenerate captures.
 
 ## developed idea
 
