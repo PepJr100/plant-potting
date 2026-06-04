@@ -7,7 +7,16 @@ houseplant-weighted vocabularies. Score each on KB-vocabulary overlap (vs the 16
 species), model size, inference latency profile, conversion risk, and license.
 **License is a reported axis, not a hard gate** (per plan Phase 1 / G1).
 
-> **Headline outcome:** **No public, redistributable, bundle-ready, houseplant-weighted
+> **⚠️ SUPERSEDED — see the ADDENDUM at the bottom of this file (2026-06-04, post-survey).**
+> A reviewer-surfaced candidate (`house_plant_species_mobilenetv2`, a houseplant-specific,
+> Apache-2.0, MobileNetV2 model covering ~10/16 KB species) was **missed** by the initial
+> sweep below because the first pass dismissed houseplant-specific GitHub repos as "hobby /
+> not production-credible" without inspecting their committed model artifacts. That
+> dismissal was wrong. The "no public winner" conclusion in this header **no longer holds**;
+> the corrected outcome is **one viable candidate, pending an `.h5`→TFLite conversion**.
+> The original survey text is retained below unedited for provenance.
+>
+> **Original (now-corrected) headline outcome:** **No public, redistributable, bundle-ready, houseplant-weighted
 > TFLite classifier was found that clears the bar.** All serious public plant models are
 > either (a) the AIY baseline itself, (b) PyTorch *research* checkpoints with wild-flora
 > vocabularies that need nontrivial conversion and are far over the bundle-size budget, or
@@ -130,7 +139,78 @@ back at AIY for now.
    the repeatable swap-evaluation harness (Phase 3), and the proven one-switch swap mechanism
    (Phase 5) — all reusable by the recommended fine-tuning sprint.
 
+---
+
+## ADDENDUM (2026-06-04, post-survey) — viable houseplant-specific candidate found
+
+The initial sweep above **wrongly dismissed houseplant-specific GitHub repos** as "hobby /
+not production-credible" without inspecting their committed artifacts. A review pass found a
+genuine candidate that **changes the survey outcome from "no winner" to "one viable
+candidate, pending conversion."**
+
+### Candidate: `house_plant_species_mobilenetv2`
+
+| Axis | Finding |
+|---|---|
+| Source | [Vatsalyakrish02/House_plant_species](https://github.com/Vatsalyakrish02/House_plant_species) (this is the trained model + the Kaggle "House Plant Species" 47-class dataset) |
+| Artifact | **Committed model:** `model/20240921-2014-full-image-set-mobilenetv2-Adam.h5` — **22.5 MB**, Keras `.h5`, full-47-class training run (a 1000-image variant is also present) |
+| Architecture | **MobileNetV2** backbone via a TF-Hub `hub.KerasLayer` feature-vector module + classification head (47 classes) |
+| Input / preprocessing | **224×224**, RGB, normalized **/255 → [0,1]** (the TF-Hub convention). Maps cleanly onto the app's existing **FLOAT32** `ImagePreprocessor` branch (`NormalizeOp`), so no new preprocessing code path. |
+| Labels | 47 hardcoded class names with scientific names in the folder/label strings (e.g. `Snake plant (Sanseviera)`, `ZZ Plant (Zamioculcas zamiifolia)`) — trivial to author `plant_class_map.json` from. |
+| Format / conversion risk | `.h5` → TFLite. MobileNetV2 + TF-Hub feature vector are all standard TFLite-supported ops → **LOW–MEDIUM risk** (far easier than PlantNet's PyTorch-ResNet or PlantCLEF's ViT). Path: `load_model(..., custom_objects={'KerasLayer': hub.KerasLayer})` → `tf.lite.TFLiteConverter.from_keras_model`. INT8 needs a representative-image set (a handful of dataset images). **Blocked in *this* sandbox** (no TF; Python 3.13) — must be run once offline by the user, output checked into `app/src/main/assets/ml/<id>/` (the script lives in `scripts/` or `evidence/`, never a Gradle task → `verifyNoNetworking` stays GREEN). |
+| Size (estimated post-conversion) | fp32 TFLite ≈ 9–14 MB; **fp16 ≈ ~7 MB; INT8 ≈ ~3.5 MB** (could be *smaller* than AIY's 5.06 MB). Must be confirmed by actually converting. |
+| Latency | unmeasured; MobileNetV2 @224 is a standard fast mobile model — expected comparable to AIY (measure in Phase 3 harness). |
+| Accuracy | **unverified** — single-developer training run, no reported metrics. The Phase 3 harness over the expanded fixtures is exactly how we'd measure it before selecting. It could underperform; that's measurable, not assumed. |
+| License | Repo `LICENSE` file is **Apache-2.0** (GitHub license detection; full 11 KB text committed). README has an unfilled "NONE License" *template* line — cosmetic, not the actual license. **Weights-vs-dataset nuance:** the 47-class image set was community/Kaggle-collected; we bundle the **model weights** (Apache-2.0 repo artifact), not the images — record the nuance, same as any ImageNet-pretrained model. |
+
+### KB overlap: **~10 of 16** (vs AIY's 2/16) — and it covers the *common* houseplants AIY misses
+
+| KB species | 47-class match | Strength |
+|---|---|---|
+| monstera-deliciosa | Monstera Deliciosa (Monstera deliciosa) | ✅ exact |
+| epipremnum-aureum | Pothos (Ivy arum) | ✅ (Pothos = Epipremnum aureum) |
+| spathiphyllum-wallisii | Peace lily | ✅ (Spathiphyllum) |
+| ficus-elastica | Rubber Plant (Ficus elastica) | ✅ exact |
+| dracaena-trifasciata | Snake plant (Sanseviera) | ✅ (≡ Sansevieria/Dracaena trifasciata) |
+| zamioculcas-zamiifolia | ZZ Plant (Zamioculcas zamiifolia) | ✅ exact |
+| crassula-ovata | Jade plant (Crassula ovata) | ✅ exact |
+| saintpaulia-ionantha | African Violet (Saintpaulia ionantha) | ✅ exact |
+| phalaenopsis | Orchid | ⚠️ coarse (Orchid ⊃ Phalaenopsis) |
+| goeppertia-orbifolia | Calathea | ⚠️ genus (Goeppertia split from Calathea); also "Rattlesnake Plant (Calathea lancifolia)" = different species |
+| monstera-adansonii | — | ❌ absent (only deliciosa) |
+| philodendron-hederaceum | — | ❌ absent |
+| philodendron-pink-princess | — | ❌ absent |
+| ficus-lyrata | — | ❌ absent (only elastica) |
+| chlorophytum-comosum | — | ❌ absent (spider plant not in 47) |
+| hoya-carnosa | — | ❌ absent |
+
+**8 strong + 2 coarse/genus ≈ 10/16**, a 5× coverage jump over AIY, concentrated in the
+high-traffic species (snake plant, ZZ, pothos, peace lily, rubber, jade, african violet).
+
+### Equivalents to also consider (the user asked)
+The underlying **Kaggle "House Plant Species" (47-class)** dataset is widely reused, so other
+trained models exist on the same labels (HuggingFace image-classification models, other
+GitHub repos — some possibly already in a non-`.h5` format, or PyTorch/timm). Worth a short
+Phase-1b shortlist pass so the harness can compare ≥2 houseplant-specific candidates rather
+than betting on one developer's training run. Net: at least **one** clears the bar; likely
+**more** among same-dataset siblings.
+
+### Corrected recommendation
+1. **A viable houseplant-specific swap candidate exists** (`house_plant_species_mobilenetv2`,
+   Apache-2.0, ~10/16, MobileNetV2/224/[0,1], bundle-plausible after conversion). The original
+   "no public winner" finding is **withdrawn**.
+2. **The one gating step** is an offline `.h5`→TFLite (ideally INT8) conversion the user runs
+   (no TF toolchain in this sandbox), with the converted model + a representative-image
+   calibration set checked in. Everything else (fixtures, harness, mapping, `ACTIVE_MODEL_ROOT`
+   wiring, gates) is unchanged from the plan.
+3. **Quality is unverified** — the Phase 3 harness over the expanded fixtures decides whether it
+   actually beats AIY on the in-vocab species before it's selected (R4 discipline holds).
+4. A **dedicated fine-tuning sprint** remains the path to covering the **6 missing** KB species
+   (both Philodendrons, monstera-adansonii, ficus-lyrata, chlorophytum, hoya) — but it is no
+   longer the *only* path to a better-than-AIY prototype.
+
 ## Sources
+- House Plant Species (model + 47-class dataset, Apache-2.0): https://github.com/Vatsalyakrish02/House_plant_species
 - AIY Plants V1: https://www.kaggle.com/models/google/aiy/tfLite/vision-classifier-plants-v1/3
 - Google Nature Explorer (iNaturalist plants): https://aiyprojects.withgoogle.com/model/nature-explorer/
 - PlantNet-300K repo & README: https://github.com/plantnet/PlantNet-300K — https://github.com/plantnet/PlantNet-300K/blob/main/README.md
