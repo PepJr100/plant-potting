@@ -87,21 +87,21 @@ license file).
 Named starting points — Phase 1 confirms availability/redistribution before any download. *Licensing
 and weight-redistribution status are reported in the matrix, not used as a hard gate.*
 
-- [ ] **`aiy_plants_v1` (baseline, frozen).** The control column. Carry its known numbers into every
+- [x] **`aiy_plants_v1` (baseline, frozen).** The control column. Carry its known numbers into every
       report: Monstera **0.8984** high-conf, jade **0.1055** low-conf, **2/16** KB species in-vocab.
-- [ ] **PlantNet-300K MobileNetV3-Small INT8** (`plantnet_300k_mobilenet_v3_small_int8`). Primary
+- [x] **PlantNet-300K MobileNetV3-Small INT8** (`plantnet_300k_mobilenet_v3_small_int8`). Primary
       candidate — small, mobile-first, plant-domain. Source: `github.com/plantnet/PlantNet-300K` +
       Zenodo weights; verify the TFLite export path and label availability. **Two traps to record
       separately:** (a) the *dataset* being public does **not** mean the *weights* are
       redistributable; (b) a published checkpoint may be a *training* architecture (PyTorch/research
       head), not a clean mobile export — "nominally available" ≠ "converts to bundle-fit INT8 TFLite
       without unsupported ops or a retrain." Capture conversion effort, not just availability.
-- [ ] **PlantNet-300K EfficientNet-Lite0 INT8** (`plantnet_300k_efficientnet_lite0_int8`).
+- [x] **PlantNet-300K EfficientNet-Lite0 INT8** (`plantnet_300k_efficientnet_lite0_int8`).
       Quality-vs-size comparator if MobileNetV3-Small underperforms KB coverage.
-- [ ] **iNaturalist / Google "on-device plants" TFLite** (`inat_plants_tflite`) — evaluate **only** if
+- [x] **iNaturalist / Google "on-device plants" TFLite** (`inat_plants_tflite`) — evaluate **only** if
       a downloadable, redistributable `.tflite` + labelmap exists; otherwise record as reference-only,
       not a bundle candidate.
-- [ ] **PlantCLEF-derived mobile/distilled INT8** (`plantclef_mobile_int8`) — **stretch only**; many
+- [x] **PlantCLEF-derived mobile/distilled INT8** (`plantclef_mobile_int8`) — **stretch only**; many
       public checkpoints are ViT-scale. Require a clean TFLite conversion (no unsupported ops) and a
       bundle-plausible size *before* it earns a fixture probe.
 
@@ -110,24 +110,26 @@ and weight-redistribution status are reported in the matrix, not used as a hard 
 *Why this phase first: no model should be downloaded, converted, or checked in before its license,
 weight availability, size, latency profile, and KB-vocabulary overlap are known.*
 
-- [ ] Create `docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md` with one row per
+- [x] Create `docs/sprints/evidence/PLANTPOTTING-0007/model-candidate-matrix.md` with one row per
       candidate above (including the AIY baseline).
-- [ ] For each candidate record: source URL, weight availability, **redistribution status**
+- [x] For each candidate record: source URL, weight availability, **redistribution status**
       (dataset-public ≠ weights-redistributable), labels availability, input size + dtype, output
       shape, label count, expected preprocessing, est. compressed & uncompressed size, conversion risk
       (already-TFLite vs needs-conversion / unsupported-ops risk), and license.
-- [ ] For each candidate, compute vocabulary overlap against the **16 KB species** in
+- [x] For each candidate, compute vocabulary overlap against the **16 KB species** in
       `app/src/main/assets/kb/species.json`, honouring the aliases already encoded in the AIY
       `plant_class_map.json` (e.g. `Sansevieria trifasciata` → `dracaena-trifasciata`,
       `Calathea orbifolia` → `goeppertia-orbifolia`). Report overlap as "M of 16 KB species".
-- [ ] Record licensing as a **reported axis, not a gate**: license name, attribution requirement,
+      (AIY = 2/16; PlantNet/PlantCLEF overlap not independently verifiable from public metadata —
+      recorded as qualitatively low, wild-flora-weighted.)
+- [x] Record licensing as a **reported axis, not a gate**: license name, attribution requirement,
       commercial-use note, weight-redistribution status, dataset-vs-weight ambiguity.
-- [ ] Shortlist **at most 2** candidates for full fixture probing (default: PlantNet-300K
+- [x] Shortlist **at most 2** candidates for full fixture probing (default: PlantNet-300K
       MobileNetV3-Small INT8 + the best ready-made public TFLite alternative). Record the shortlist
       rationale in the matrix. **If zero candidates clear the redistribution/size/conversion bar,
       record that as the survey outcome** and proceed to Phase 2–3 with whatever is probeable
       (worst case: AIY only, with a documented "no viable public swap; recommend a fine-tuning
-      sprint" finding for Phase 6).
+      sprint" finding for Phase 6). → **ZERO cleared the bar; "no public winner" recorded.**
 
 ## Phase 2 — Expanded real-photo fixture set
 
