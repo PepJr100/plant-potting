@@ -177,7 +177,7 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 - [x] **7.5 (audit)** Confirm: `grep -R "TestIdentifyModule" app/src/androidTest/` → 0 hits; `grep -R "@Ignore" app/src/androidTest/` → 0 hits; `grep -R "testTagsAsResourceId" app/src/main/` → exactly 1 hit at `MainActivity.kt`; **`grep -RE "println|@Ignore\\(\"probe" app/src/androidTest/` → 0 hits** (probe-code removal audit).
 - [ ] **7.6 (Codex addition — manual emulator walkthrough)** On a booted emulator, walk: grant permission → camera → shutter → land on `LowConfidencePicker` (verify sub-headline + chevron chips + outlined archetype CTA + working search/empty-states) → pick a species → `ResultScreen` (source badge: `on-device match (low confidence)`) → `RecommendationScreen` (archetype name + recipe table summing to 100%) → retake. Then manually trigger a capture failure (e.g. block `ImageCapture` momentarily or use a forced-failure debug toggle if one exists; otherwise simulate by injecting `Failure` state via a debug-only path) and verify the polished bottom-anchored banner is legible and the `Try again` button restores `Idle`. Capture screenshots of the polished `LowConfidencePicker` and `Failure` banner to `evidence/PLANTPOTTING-0005/`. **Partially completed in /sprint-review 2026-05-16:** `LowConfidencePicker` + search-empty + ResultScreen low-confidence badge walked and screencaps saved to `docs/sprints/evidence/PLANTPOTTING-0005/01..05-*.png`. `Failure` banner live visual still pending — see `docs/sprints/feedback/PLANTPOTTING-0005/feedback.md` "Missing Features" for the dead-end attempts and the user's decision to accept code + JVM-test coverage in lieu.
 - [x] **7.7** Write `docs/sprints/results/PLANTPOTTING-0005.md`. Cover: baseline, per-phase diff summary, contract-lock RED→GREEN evidence, the seven-test migration list (per §0.4 reconciliation), §5.5 probe numbers, §5.6 accuracy-assertion decision, §5.7 seeding decision, final-verify gates, files added/modified/deleted, deferrals carried to PLANTPOTTING-0006.
-- [ ] **7.8** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, refresh `updated`.
+- [x] **7.8** Update `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, refresh `updated`.
 - [x] **7.9** Tick every `- [ ]` in this plan to `- [x]` as work lands (the executor should be doing this incrementally; final pass at close-out catches strays).
 - [x] **7.10** Record final commit hash(es) in the results doc.
 
@@ -310,7 +310,7 @@ The sprint is `done` when every one of these holds:
 - [x] `docs/kb/ml-mapping-notes.md` carries the calibration provenance entry.
 - [x] `README.md` links `docs/ROADMAP.md` and reflects post-0005 state.
 - [x] `docs/sprints/results/PLANTPOTTING-0005.md` covers baseline, per-phase diffs, contract-lock evidence, probe numbers, accuracy-assertion decision, seeding decision (§5.7), final-verify gates, files-added/modified/deleted, deferrals to 0006.
-- [ ] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, `executor` stamped.
+- [x] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, `executor` stamped.
 - [ ] §7.6 manual emulator walkthrough completed; screenshots captured.
 - [x] **No new** `@Ignore`s, dependencies, model swaps, KB edits, interface changes, or `expected-artifacts` re-baselining.
 

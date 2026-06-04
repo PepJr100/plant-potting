@@ -39,9 +39,9 @@ recommendation drawn from a bundled knowledge base.
 
 <p align="center"><img src="docs/images/result-screen.png" alt="ResultScreen showing a Monstera deliciosa identification and potting-mix recipe" width="320"></p>
 
-## Current state (post PLANTPOTTING-0005 mechanism, 2026-05-16)
+## Current state (post PLANTPOTTING-0005, 2026-06-04)
 
-Five sprints in flight on `main`:
+Five sprints landed on `main`:
 
 | Sprint | Title | Status |
 | --- | --- | --- |
@@ -49,7 +49,7 @@ Five sprints in flight on `main`:
 | PLANTPOTTING-0002 | Fix sprint for 0001 review bugs | done |
 | PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | done |
 | PLANTPOTTING-0004 | Fix sprint for 0003 review bugs (UINT8 dtype + testTagsAsResourceId bridge) | done |
-| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | in-progress (mechanism + tests landed; real-photo probe + GMD gates pending — see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
+| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | done (calibration mechanism + real-photo probe + integration-flow all landed — see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 
 What you can do today:
 
