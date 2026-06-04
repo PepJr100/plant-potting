@@ -1,0 +1,35 @@
+06-04 19:52:31.318  2404  2560 I TestRunner: started: probeCrassula(com.darkfactory.plantpotting.identify.OnDeviceModelRealInterpreterTest)
+06-04 19:52:31.341  1113  1113 I Telephony: AccountEntry: registerPstnPhoneAccount: Registering account=[[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, 1, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with Telecom. subId=1
+06-04 19:52:31.350  1113  1113 I PhoneInterfaceManager: setVoiceServiceStateOverride: subId=1, phone=Handler (com.android.internal.telephony.GsmCdmaPhone) {37e69ca}, hasService=false, callingPackage=com.android.server.telecom
+06-04 19:52:31.353  1113  1113 D TelephonyProvider: subId:1 mccmnc=310260 carrierId=1, match current APN size:  1
+06-04 19:52:31.354  1113  1113 D TelephonyProvider: match MNO APN: 1
+06-04 19:52:31.355  1113  1113 D TelephonyProvider: match carrier id APN: 0
+06-04 19:52:31.358  1113  1113 D TelephonyProvider: subIdString = 1 subId = 1
+06-04 19:52:31.360  1113  1113 D TelephonyProvider: subIdString = 1 subId = 1
+06-04 19:52:31.371  1113  1113 I CallNotifier: onCallForwardingIndicatorChanged(): subId=1, visible=N
+06-04 19:52:31.377  1113  1113 D CallNotifier: updatePhoneStateListeners: update CF notifications.
+06-04 19:52:31.388  1113  1113 I NotificationMgr: updateCfi: subId= 1, visible=N
+06-04 19:52:31.395  1113  1113 I NotificationMgr: updateMwi(): subId 1 update to false
+06-04 19:52:31.412   887   993 D EGL_emulation: app_time_stats: avg=342.20ms min=125.99ms max=499.67ms count=3
+06-04 19:52:31.424  1113  2305 D com.android.ons.ONSProfileActivator: ERR_AUTO_PROVISIONING_DISABLED
+06-04 19:52:31.466  1113  1113 D CompatibilityChangeReporter: Compat change id reported: 186082280; UID 1001; state: ENABLED
+06-04 19:52:31.498  1113  1123 W System  : A resource failed to call AbstractCursor.close. 
+06-04 19:52:31.498  1113  1123 W System  : A resource failed to call AbstractCursor.close. 
+06-04 19:52:31.498  1113  1123 W System  : A resource failed to call AbstractCursor.close. 
+06-04 19:52:31.766   533  1260 D WifiNl80211Manager: Scan result ready event
+06-04 19:52:31.766   533  1260 D WifiNative: Scan result ready event
+06-04 19:52:31.825   887   984 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+06-04 19:52:31.971   887   984 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+06-04 19:52:32.011   887   984 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+06-04 19:52:32.028   887   984 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+06-04 19:52:32.058  2404  2563 I InterpreterApi: Loaded native library: tensorflowlite_jni
+06-04 19:52:32.062  2404  2563 I InterpreterApi: Didn't load native library: tensorflowlite_jni_gms_client
+06-04 19:52:32.068  2404  2563 I tflite  : Initialized TensorFlow Lite runtime.
+06-04 19:52:32.070   887   896 W ndroid.systemui: Cleared Reference was only reachable from finalizer (only reported once)
+06-04 19:52:32.072  2404  2563 I tflite  : Created TensorFlow Lite XNNPACK delegate for CPU.
+06-04 19:52:32.075  2404  2563 I tflite  : Replacing 63 out of 65 node(s) with delegate (TfLiteXNNPackDelegate) node, yielding 4 partitions for the whole graph.
+06-04 19:52:32.080   887   896 I ndroid.systemui: Background young concurrent copying GC freed 194402(8806KB) AllocSpace objects, 12(304KB) LOS objects, 34% free, 15MB/24MB, paused 422us,38us total 249.726ms
+06-04 19:52:32.208   887   887 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+06-04 19:52:32.412  2404  2560 W PLANTPOTTING_PROBE: PROBE speciesId= lowConf=true source=ON_DEVICE_MODEL :: mappedCandidates=[crassula-ovata=0.1055 | monstera-deliciosa=0.0000]
+06-04 19:52:32.412  2404  2560 I System.out: PROBE speciesId= lowConf=true source=ON_DEVICE_MODEL :: mappedCandidates=[crassula-ovata=0.1055 | monstera-deliciosa=0.0000]
+06-04 19:52:32.413  2404  2560 I TestRunner: finished: probeCrassula(com.darkfactory.plantpotting.identify.OnDeviceModelRealInterpreterTest)

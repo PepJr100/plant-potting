@@ -43,3 +43,45 @@ app/src/androidTest/ and is NOT bundled into the production APK.
 
 The model under test (AIY Plants V1) is Apache-2.0; see
 app/src/main/assets/ml/aiy_plants_v1/LICENSE-aiy-plants-v1.txt.
+
+
+crassula-ovata.jpg
+==================
+
+A real photograph of Crassula ovata (jade plant), sourced from Wikimedia
+Commons. PLANTPOTTING-0006 §G1 — the second and final in-vocabulary species in
+the AIY V1/3 ↔ KB overlap (the other being Monstera deliciosa), so that
+OnDeviceModelRealInterpreterTest can make an accuracy-bearing assertion against
+a genuine in-vocabulary species, completing the V0.1 multi-species calibration
+sweep (Phase 2 probe + assertion).
+
+Provenance
+----------
+
+- Title:        Jade Plant, Crassula ovata IMG 3632
+- Depicts:      Crassula ovata (potted jade plant, top-down view of fleshy
+                oval red-edged leaves)
+- Source page:  https://commons.wikimedia.org/wiki/File:Jade_Plant,_Crassula_ovata_IMG_3632.jpg
+- Original file: https://upload.wikimedia.org/wikipedia/commons/8/84/Jade_Plant%2C_Crassula_ovata_IMG_3632.jpg
+- Author:       S.G.S. (Wikimedia Commons)
+- Date taken:   17 May 2018
+- Retrieved:    4 June 2026
+
+Modifications
+-------------
+
+The original (6000×4000, "own work") was centre-cropped to a square and scaled
+to 480×480 and re-encoded as JPEG quality 80 (~30 KB) for use as a compact test
+fixture, matching the monstera-deliciosa.jpg fixture's dimensions/encoding
+exactly. No other alterations.
+
+License
+-------
+
+Creative Commons Zero v1.0 Universal (CC0 1.0) — Public Domain Dedication.
+  https://creativecommons.org/publicdomain/zero/1.0/
+
+The author dedicated this work to the public domain. No attribution is legally
+required; "S.G.S., CC0, via Wikimedia Commons" is recorded here as a courtesy.
+It is a test-only asset under app/src/androidTest/ and is NOT bundled into the
+production APK.

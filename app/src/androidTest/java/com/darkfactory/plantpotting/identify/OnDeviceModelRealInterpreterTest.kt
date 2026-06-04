@@ -72,4 +72,37 @@ class OnDeviceModelRealInterpreterTest {
         assertThat(boundIdentifier::class.qualifiedName)
             .isEqualTo("com.darkfactory.plantpotting.identify.OnDevicePlantIdentifier")
     }
+
+    @Test
+    fun realCrassulaPhotoRanksJadeTopMappedButRoutesLowConfidence() =
+        runBlocking {
+            val ctx = InstrumentationRegistry.getInstrumentation().context
+            val bytes =
+                ctx.assets
+                    .open("identify-fixtures/crassula-ovata.jpg")
+                    .use { it.readBytes() }
+
+            val result = identifier.identify(bytes)
+            val candidates = identifier.mostRecentCandidates
+
+            // PLANTPOTTING-0006 §Phase 2 — accuracy-bearing assertion against the real
+            // CC0 Crassula ovata fixture (§Phase 1), DOCUMENTED HONEST FALLBACK form.
+            // The §Phase 2 GMD probe measured the top *mapped* candidate as
+            // crassula-ovata at p ≈ 0.1055 (monstera-deliciosa ≈ 0.0000) — far below the
+            // global high_confidence_plain = 0.55 and below margin_min = 0.45 — so the
+            // photo routes LOW-CONFIDENCE, NOT the preferred high-confidence-direct form.
+            // The AIY V1/3 vocabulary contains "Crassula ovata" but the model does not
+            // confidently recognise this canonical jade photo as that class (contrast the
+            // Monstera fixture at 0.8984). Seeding a per-species threshold to rescue a
+            // ~10%-confidence prediction would be egregious overfitting (§5.6 prohibition),
+            // so per_species_thresholds ships empty — see docs/kb/ml-mapping-notes.md and
+            // docs/sprints/evidence/PLANTPOTTING-0006/probe-outcome.md.
+            assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL)
+            assertThat(result.lowConfidence).isTrue()
+            assertThat(result.speciesId).isEmpty()
+            // The mapping + scoring wiring is exercised end-to-end: among the two in-vocab
+            // mapped KB species, the real jade photo ranks crassula-ovata first.
+            assertThat(candidates).isNotEmpty()
+            assertThat(candidates.first().speciesId).isEqualTo("crassula-ovata")
+        }
 }

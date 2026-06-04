@@ -3,7 +3,9 @@ package com.darkfactory.plantpotting.result
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -115,6 +117,44 @@ class LowConfidencePickerScreenTest {
             .onNodeWithTag(LowConfidencePickerTags.speciesTag("ficus-lyrata"))
             .performClick()
         assertThat(picked).isEqualTo("ficus-lyrata")
+    }
+
+    // -- PLANTPOTTING-0006 §5 — (0%) chip suffix suppression -------------------
+
+    @Test
+    fun zeroPercentCandidateRendersNameWithoutSuffixAndStaysSelectable() {
+        val v = vm("ficus-lyrata|0")
+        var picked: String? = null
+        composeRule.setContent {
+            LowConfidencePickerScreen(
+                viewModel = v,
+                onSpeciesPicked = { picked = it },
+                onPickByArchetype = {},
+            )
+        }
+        // No chip anywhere renders the degenerate "(0%)" suffix.
+        composeRule.onNodeWithText("(0%)", substring = true).assertDoesNotExist()
+        // The candidate chip is still present, shows the name, and remains pickable —
+        // dropping the suffix is presentational only; this is a picker.
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.candidateTag("ficus-lyrata"))
+            .assertIsDisplayed()
+            .assertHasClickAction()
+            .assertTextContains("Fiddle-leaf fig", substring = true)
+        composeRule
+            .onNodeWithTag(LowConfidencePickerTags.candidateTag("ficus-lyrata"))
+            .performClick()
+        assertThat(picked).isEqualTo("ficus-lyrata")
+    }
+
+    @Test
+    fun nonZeroPercentCandidateKeepsItsSuffix() {
+        val v = vm("monstera-deliciosa|72")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        // A normal candidate is unchanged — the (x%) suffix is preserved for >= 1%.
+        composeRule.onNodeWithText("Swiss cheese plant (72%)").assertIsDisplayed()
     }
 
     // -- §1.2 / §1.3 — empty-candidate info card -------------------------------

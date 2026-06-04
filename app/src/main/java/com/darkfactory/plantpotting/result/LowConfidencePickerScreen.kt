@@ -77,8 +77,13 @@ fun LowConfidencePickerScreen(
                     AssistChip(
                         onClick = { onSpeciesPicked(c.speciesId) },
                         label = {
+                            val name = c.commonName.ifBlank { c.scientificName }
                             Text(
-                                text = "${c.commonName.ifBlank { c.scientificName }} (${c.probabilityPct}%)",
+                                // PLANTPOTTING-0006 §5 — a degenerate/black capture can floor a tiny
+                                // score to 0, producing "Jade plant (0%)" which reads as broken. Drop
+                                // the (x%) suffix only when it floors to zero; the percentage was never
+                                // the point of these chips — selection is. Suffix kept for all >= 1%.
+                                text = if (c.probabilityPct > 0) "$name (${c.probabilityPct}%)" else name,
                             )
                         },
                         trailingIcon = {
