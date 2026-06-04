@@ -67,51 +67,63 @@ on the `CameraUiState.Failure` live visual (user-waived — JVM coverage accepte
 - [x] Confirm the asset lives under `app/src/androidTest/` **only** (test-only; not bundled into the
       production APK) and that the merged-androidTest-assets copy picks it up on the next build.
       → `find app/src/main -iname '*crassula*.jpg'` is empty; lives only under `app/src/androidTest/`.
-- [ ] Verify the fixture is readable at runtime from androidTest assets via the **same code path** as
+- [x] Verify the fixture is readable at runtime from androidTest assets via the **same code path** as
       `monstera-deliciosa.jpg` (load it in the probe test before asserting on it), so a bad
       crop/encoding fails loudly rather than silently mis-probing.
+      → loads cleanly via `ctx.assets.open("identify-fixtures/crassula-ovata.jpg")` and decodes
+      through the real preprocessor on the GMD (probe ran end-to-end, 3/3 green).
 
 ### Phase 2 — Probe, record, assert
 
-- [ ] Add a crassula probe path to `OnDeviceModelRealInterpreterTest` that loads
+- [x] Add a crassula probe path to `OnDeviceModelRealInterpreterTest` that loads
       `identify-fixtures/crassula-ovata.jpg`, runs the real `OnDevicePlantIdentifier.identify(...)`,
       and surfaces top-1 id, top-1 score, the top-3 candidates, `lowConfidence`, and `source`.
-- [ ] Run the test on the `pixel6Api34` Gradle Managed Device and capture the raw probe numbers
+      → temporary `probeCrassula` (removed before commit, per 0005 §5.5).
+- [x] Run the test on the `pixel6Api34` Gradle Managed Device and capture the raw probe numbers
       (top-1 / top-3 / score / route / source) into the sprint evidence trail
-      (`docs/sprints/evidence/PLANTPOTTING-0006/`).
-- [ ] Record the crassula probe outcome in `docs/kb/ml-mapping-notes.md` under the existing
+      (`docs/sprints/evidence/PLANTPOTTING-0006/`). → `probe-crassula-logcat.txt`, `probe-outcome.md`.
+- [x] Record the crassula probe outcome in `docs/kb/ml-mapping-notes.md` under the existing
       `Crassula ovata → crassula-ovata` section, mirroring the Monstera "Probe outcome" paragraph
       (measured top-1 id + p, lowConfidence, source, other mapped candidates, route taken).
-- [ ] Record the same outcome in the sprint results doc `docs/sprints/results/PLANTPOTTING-0006.md`,
+- [x] Record the same outcome in the sprint results doc `docs/sprints/results/PLANTPOTTING-0006.md`,
       co-located with the 0005 Monstera result, so the multi-species sweep evidence sits together.
-- [ ] Commit the accuracy-bearing assertion in `OnDeviceModelRealInterpreterTest`: **preferred form**
+- [x] Commit the accuracy-bearing assertion in `OnDeviceModelRealInterpreterTest`: **preferred form**
       `speciesId == "crassula-ovata" && lowConfidence == false && source == ON_DEVICE_MODEL` if the
       probe clears the 0.55 global cleanly. **Only if** the probe data requires it, commit the
       documented honest fallback instead and record *why* in the test comment + mapping notes — no
       silent weakening. **Do not pre-commit the assertion form before the probe number is in hand.**
+      → probe measured **0.1055** (low-conf), so the **honest fallback** is committed
+      (`realCrassulaPhotoRanksJadeTopMappedButRoutesLowConfidence`): asserts low-conf + crassula is
+      top mapped candidate. *Why* recorded in the test comment, mapping notes, and results doc.
 
 ### Phase 3 — `perSpeciesThresholds` decision (evidence-gated)
 
-- [ ] Decide whether `crassula-ovata` warrants a `per_species_thresholds` entry: justified **only** if
+- [x] Decide whether `crassula-ovata` warrants a `per_species_thresholds` entry: justified **only** if
       top-1 is the correct class but its score falls below the 0.55 global by a margin an absolute
       per-class override would cleanly close (per `model_manifest.json`
       `_comment_per_species_thresholds`). If it clears the global, the map stays empty by design.
-- [ ] If justified: seed `per_species_thresholds["crassula-ovata"] = <value>` in
+      → **NOT warranted.** Top mapped p = 0.1055; a 0.1055→0.55 gap is not "cleanly closeable" — it is a
+      ~10%-confidence prediction. Map stays empty.
+- [x] If justified: seed `per_species_thresholds["crassula-ovata"] = <value>` in
       `app/src/main/assets/ml/aiy_plants_v1/model_manifest.json`; confirm `ModelManifest.kt` parses it
       and `ModelScoreMapper.kt` applies override-then-global. Update the threshold contract tests
       (`PerSpeciesThresholdsContractTest`, `ModelScoreMapperPerSpeciesThresholdTest`) to reflect the
-      now-populated map. Otherwise leave the map empty.
-- [ ] **Cross-class regression guard (neither draft had this — load-bearing).** Immediately after any
+      now-populated map. Otherwise leave the map empty. → **map left empty** (not justified); manifest
+      and contract tests unchanged.
+- [x] **Cross-class regression guard (neither draft had this — load-bearing).** Immediately after any
       seeding, **re-run the Monstera assertion** in `OnDeviceModelRealInterpreterTest` and confirm
       `monstera-deliciosa` still probes @ ~0.8984, `lowConfidence=false` via the global path. This map's
       first-ever populated state is the moment to prove `ModelScoreMapper`'s override-then-global doesn't
       perturb the other class. If the map stays empty, this is a no-op (note it).
-- [ ] Record the seeding decision (seeded-with-value **or** not-warranted, with the deciding number) in
-      `docs/kb/ml-mapping-notes.md` regardless of outcome.
-- [ ] **Conditional — only if real crassula seeding forces it:** revisit `perSpeciesThresholds`
+      → **no-op** (no seeding). Monstera nonetheless re-ran green in the same GMD invocation (@ 0.8984,
+      global path), so cross-class behaviour is confirmed unperturbed.
+- [x] Record the seeding decision (seeded-with-value **or** not-warranted, with the deciding number) in
+      `docs/kb/ml-mapping-notes.md` regardless of outcome. → recorded (not-warranted, 0.1055).
+- [x] **Conditional — only if real crassula seeding forces it:** revisit `perSpeciesThresholds`
       top-1-only override semantics (margin path `_margin_min` / `_margin_delta`, and lower-ranked
       mapped candidates when top-1 is unmapped). If the data does not force a decision, **log the open
-      question in the mapping notes and do not build it.**
+      question in the mapping notes and do not build it.** → **not forced** (no seeding); logged as an
+      open question in the mapping notes, not built.
 
 ### Phase 4 — UX fix A (subtitle jargon)
 

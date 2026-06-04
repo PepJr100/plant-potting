@@ -54,6 +54,16 @@ Direct rank-match under the *current* name. Companion to the Calathea alias abov
 ### `Crassula ovata` → `crassula-ovata`
 Direct rank-match. Jade plant cultivars are visually similar; species-rank is fine. The substrate envelope (succulent-gritty) is identical across cultivars.
 
+**Probe outcome (PLANTPOTTING-0006 §Phase 2).** Run on the `pixel6Api34` GMD against the real
+CC0 *Crassula ovata* fixture. Measured: the result routed **low-confidence**
+(`lowConfidence = true`, `speciesId = ""`, `source = ON_DEVICE_MODEL`), with `crassula-ovata` the
+**top mapped candidate at p ≈ 0.1055** (the only other mapped candidate, `monstera-deliciosa`,
+≈ 0.0000). 0.1055 sits far below the global `high_confidence_plain = 0.55` (deficit ≈ 0.44) and
+below `high_confidence_margin_min = 0.45`, so neither high-confidence path fires. Unlike Monstera
+(0.8984), the AIY V1/3 model contains the `Crassula ovata` label but does **not** confidently
+recognise this canonical jade photograph as that class — it routes to `LowConfidencePicker` by the
+unmapped/weak path. See the Calibration provenance §PLANTPOTTING-0006 below for the seeding decision.
+
 ### `Saintpaulia ionantha` → `saintpaulia-ionantha`
 Direct rank-match. African violet hybrids are sold under the species name even when they are interspecific crosses; we follow the trade convention.
 
@@ -102,17 +112,30 @@ sweep remains PLANTPOTTING-0006's to own if the data ever forces per-class tunin
 
 ### PLANTPOTTING-0006 — `crassula-ovata` probe (second & final in-vocab overlap)
 
-**Probe outcome.** _(pending GMD run — Phase 2 will fill in measured top-1 id + p,
-lowConfidence, source, other mapped candidates, route taken.)_
+**Probe outcome.** GMD (`pixel6Api34`) against the real CC0 jade fixture: routed
+**low-confidence** — `lowConfidence = true`, `speciesId = ""`, `source = ON_DEVICE_MODEL`;
+top mapped candidate `crassula-ovata` @ **p ≈ 0.1055**, `monstera-deliciosa` ≈ 0.0000. Below
+the 0.55 global and the 0.45 margin floor. Raw transcript + interpretation:
+`docs/sprints/evidence/PLANTPOTTING-0006/probe-outcome.md`.
 
-**Seeding decision.** _(pending — Phase 3 will record seeded-with-value or
-not-warranted, with the deciding number.)_
+**Seeding decision — NOT warranted (ships empty).** The deciding number is the measured top
+mapped probability **0.1055**. The §Phase 3 gate seeds a per-species override only when an
+in-vocab top-1 is the correct class but falls *short of the global by a margin an absolute
+override would cleanly close*. 0.1055 → 0.55 is not a "close" gap; it is a ~10%-confidence
+prediction. Seeding a threshold ≤ 0.1055 to call that "high confidence" would label
+near-random predictions as confident jade — exactly the §5.6 anti-overfit prohibition. So
+`per_species_thresholds` remains `{}`. (Monstera at 0.8984 already ships empty for the
+opposite reason — it clears the global outright. Both in-vocab overlaps are now probed; the
+V0.1 multi-species sweep is complete and the map is empty by design, not by omission.)
 
 **Conditional cleanups (gated — log if not forced).**
 
 - *`perSpeciesThresholds` margin / lower-ranked-candidate semantics (Phase 3 conditional).*
-  _(pending — revisited only if real crassula seeding forces it; otherwise logged here as an
-  open question, not built.)_
+  **Not forced.** No crassula seeding occurred (decision above), so the trigger ("real
+  crassula seeding forces it") never fired. The top-1-only override semantics and
+  lower-ranked-mapped-candidate handling remain an **open question**, deferred — not built.
+  If a future in-vocab species ever *does* warrant seeding, revisit `_margin_min` /
+  `_margin_delta` override semantics then.
 - *Splitting `FakeFixedIdentifier` into focused fakes (Phase 5 conditional).* **Not forced.**
   The §5 `(0%)`-chip fix is presentational only — a single branch in
   `LowConfidencePickerScreen.kt`'s chip-text builder (`probabilityPct > 0`). It added no new
