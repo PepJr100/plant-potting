@@ -1,0 +1,9 @@
+# Conversion scratch — upstream weights + local toolchain, never committed.
+# These are reproducible offline dev artifacts (see ACQUISITION.md); the committed
+# deliverable is the bundle under app/src/main/assets/ml/house_plant_species_mobilenetv2/.
+*.h5
+venv/
+
+# The converted model.tflite is committed ONCE, in app/src/main/assets/ml/...; the
+# staged copy here is a redundant 10.9 MB duplicate — keep it out of git.
+house_plant_species_mobilenetv2/model.tflite
