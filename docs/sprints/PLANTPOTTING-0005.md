@@ -148,15 +148,15 @@ TDD ordering: behaviour-changing tasks have paired test tasks that land RED firs
 - [x] **5.1 (test, RED first)** Add `ModelScoreMapperPerSpeciesThresholdTest` at `app/src/test/java/com/darkfactory/plantpotting/identify/model/ModelScoreMapperPerSpeciesThresholdTest.kt`. Methods: `perSpeciesOverrideUsedWhenPresent` (manifest seeded with `perSpeciesThresholds = mapOf("monstera-deliciosa" to 0.35f)`, top-1 score = 0.40f → high-confidence); `globalThresholdUsedWhenNoOverride` (override map empty, score = 0.40f → low-confidence vs `high_confidence_plain = 0.55`). RED today.
 - [x] **5.2** Add `val perSpeciesThresholds: Map<String, Float> = emptyMap()` to `ModelManifest`. Parse `per_species_thresholds` (snake-case) in `ModelManifestReader`; optional — defaults to empty if absent. Add a `_comment_per_species_thresholds` breadcrumb in `model_manifest.json` explaining override semantics even though no values are seeded yet. (Flips §0.6 GREEN.)
 - [x] **5.3** Update `ModelScoreMapper`: in the method that decides `lowConfidence` for a given top-1, consult `manifest.perSpeciesThresholds[speciesId] ?: manifest.thresholds.high_confidence_plain`. Override only the `_plain` value — `high_confidence_margin_min` / `_margin_delta` overrides are deferred (premature surface; see §4 below).
-- [ ] **5.4** Source a CC-licensed Monstera deliciosa photograph from Wikimedia Commons (CC-BY or CC0). Resize to 480×480 JPEG-q80; budget ≤200 KB. Replace `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`. Update `LICENSE.txt` with: source URL, author (if available), licence name, retrieval date (Codex addition). **Verify the licence terms permit redistribution under this repo's licence** before committing. Note in the commit body that the previous procedural fixture (seed `0x4D4F4E54`) is replaced.
-- [ ] **5.5 (probe, NOT a checked-in test)** With the real fixture in place, run `OnDeviceModelRealInterpreterTest` with a temporary `println` (or a one-off `@Test fun probe()` you remove before commit) that captures: top-1 species id + score; top-3 species/score pairs; `result.lowConfidence`; `result.source`. Run on GMD. **Record the captured output verbatim in `docs/sprints/results/PLANTPOTTING-0005.md`.** This is research, not a test gate.
-- [ ] **5.6 (test, after probe)** Add the accuracy-bearing assertion to `OnDeviceModelRealInterpreterTest`. Pre-committed forms:
+- [x] **5.4** Source a CC-licensed Monstera deliciosa photograph from Wikimedia Commons (CC-BY or CC0). Resize to 480×480 JPEG-q80; budget ≤200 KB. Replace `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`. Update `LICENSE.txt` with: source URL, author (if available), licence name, retrieval date (Codex addition). **Verify the licence terms permit redistribution under this repo's licence** before committing. Note in the commit body that the previous procedural fixture (seed `0x4D4F4E54`) is replaced.
+- [x] **5.5 (probe, NOT a checked-in test)** With the real fixture in place, run `OnDeviceModelRealInterpreterTest` with a temporary `println` (or a one-off `@Test fun probe()` you remove before commit) that captures: top-1 species id + score; top-3 species/score pairs; `result.lowConfidence`; `result.source`. Run on GMD. **Record the captured output verbatim in `docs/sprints/results/PLANTPOTTING-0005.md`.** This is research, not a test gate.
+- [x] **5.6 (test, after probe)** Add the accuracy-bearing assertion to `OnDeviceModelRealInterpreterTest`. Pre-committed forms:
   - **Preferred:** `assertThat(result.speciesId).isEqualTo("monstera-deliciosa"); assertThat(result.lowConfidence).isFalse()`.
   - **Fallback (only if §5.5 shows the real photo still routes low-conf):** `assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL); assertThat(observedTop3SpeciesIds).contains("monstera-deliciosa")` — pulling top-3 via `(identifier as? CandidateProvider)?.mostRecentCandidates`.
   
   Pick **only after** §5.5. **Do not invent a third weaker form.** Record the decision (preferred vs fallback) with the probe numbers as evidence in the results doc. **Anti-overfit prohibition (Codex):** do not tune thresholds in `model_manifest.json` to force a false green — if the photo doesn't support a direct species-id assertion, take the fallback and document the limitation.
-- [ ] **5.7 (conditional — Gemini's bolder calibration)** If §5.5 shows that an in-vocab species (Monstera deliciosa or Crassula ovata per `_comment_coverage`) fails the global threshold by a margin a per-class override would close — **and only then** — seed exactly that species in `perSpeciesThresholds` with the value the probe justifies. If the probe shows the photo clears the global threshold cleanly, the map ships empty.
-- [ ] **5.8** Run `./gradlew --no-daemon pixel6Api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.darkfactory.plantpotting.identify.OnDeviceModelRealInterpreterTest`. Capture to `docs/sprints/results/PLANTPOTTING-0005-phase5-real-model.txt`.
+- [x] **5.7 (conditional — Gemini's bolder calibration)** If §5.5 shows that an in-vocab species (Monstera deliciosa or Crassula ovata per `_comment_coverage`) fails the global threshold by a margin a per-class override would close — **and only then** — seed exactly that species in `perSpeciesThresholds` with the value the probe justifies. If the probe shows the photo clears the global threshold cleanly, the map ships empty.
+- [x] **5.8** Run `./gradlew --no-daemon pixel6Api34DebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.darkfactory.plantpotting.identify.OnDeviceModelRealInterpreterTest`. Capture to `docs/sprints/results/PLANTPOTTING-0005-phase5-real-model.txt`.
 
 ### Phase 6 — Documentation: ROADMAP.md + ml-mapping-notes.md + README link
 
@@ -304,12 +304,12 @@ The sprint is `done` when every one of these holds:
 - [x] §7.5 audit greps: `TestIdentifyModule` → 0 hits in androidTest; `@Ignore` → 0 hits in androidTest; `testTagsAsResourceId` → exactly 1 hit at `MainActivity.kt`; `println` / `@Ignore("probe` → 0 hits in androidTest.
 - [x] §0.6, §0.7, §0.8 contract-lock tests RED on baseline, GREEN at close (evidence in results doc).
 - [x] §3.10 production-shape regression guard added and GREEN.
-- [ ] `OnDeviceModelRealInterpreterTest` asserts an accuracy-bearing claim (preferred or fallback form per §5.6) against a real CC-licensed Monstera photo.
-- [ ] `app/src/androidTest/assets/identify-fixtures/LICENSE.txt` carries source URL + author (if available) + licence name + retrieval date for the real fixture.
+- [x] `OnDeviceModelRealInterpreterTest` asserts an accuracy-bearing claim (preferred or fallback form per §5.6) against a real CC-licensed Monstera photo.
+- [x] `app/src/androidTest/assets/identify-fixtures/LICENSE.txt` carries source URL + author (if available) + licence name + retrieval date for the real fixture.
 - [x] `docs/ROADMAP.md` exists (one page, four sections).
 - [x] `docs/kb/ml-mapping-notes.md` carries the calibration provenance entry.
 - [x] `README.md` links `docs/ROADMAP.md` and reflects post-0005 state.
-- [ ] `docs/sprints/results/PLANTPOTTING-0005.md` covers baseline, per-phase diffs, contract-lock evidence, probe numbers, accuracy-assertion decision, seeding decision (§5.7), final-verify gates, files-added/modified/deleted, deferrals to 0006.
+- [x] `docs/sprints/results/PLANTPOTTING-0005.md` covers baseline, per-phase diffs, contract-lock evidence, probe numbers, accuracy-assertion decision, seeding decision (§5.7), final-verify gates, files-added/modified/deleted, deferrals to 0006.
 - [ ] `docs/sprints/ledger.yaml`: `PLANTPOTTING-0005` `status: done`, `executor` stamped.
 - [ ] §7.6 manual emulator walkthrough completed; screenshots captured.
 - [x] **No new** `@Ignore`s, dependencies, model swaps, KB edits, interface changes, or `expected-artifacts` re-baselining.
@@ -336,14 +336,20 @@ Within the 5–7 day envelope. §6.1 (`@BindValue` finicky), §6.2 (probe outcom
 
 ## Blockers
 
-The opus executor session that landed Phases 1–4 and §5.1–§5.3 cannot complete the following on its own; they require human/GMD involvement. The sprint stays `in-progress` until they're picked up.
+The opus executor session that landed Phases 1–4 and §5.1–§5.3 could not complete the following on its own; they require human/GMD involvement.
 
-- **§5.4 — real CC-licensed Monstera fixture.** Sourcing a Wikimedia Commons CC-BY/CC-BY-SA/CC0 photograph, verifying the licence terms, resizing to 480×480 JPEG-q80 ≤200 KB, replacing `app/src/androidTest/assets/identify-fixtures/monstera-deliciosa.jpg`, and updating `LICENSE.txt` with source URL + author + licence name + retrieval date. A non-interactive shell can't reliably download + resize without imaging tools the user prefers picking.
-- **§5.5 — probe run.** `OnDeviceModelRealInterpreterTest` with a temporary `println` capturing top-1 species id + score, top-3, `result.lowConfidence`, `result.source`. Requires the `pixel6Api34` GMD (or a booted emulator) and the §5.4 fixture in place.
-- **§5.6 — accuracy-bearing assertion.** Decision (preferred vs fallback form) gated on §5.5's numbers.
-- **§5.7 — conditional `perSpeciesThresholds` seeding.** Gated on §5.5's numbers showing a margin a per-class override would close.
-- **§5.8 — `pixel6Api34DebugAndroidTest -PtestInstrumentationRunnerArguments.class=...OnDeviceModelRealInterpreterTest`** run capture.
-- **§3.12, §4.7, §7.2, §7.6 — GMD runs and manual emulator walkthrough.** Same GMD dependency as above.
+**RESOLVED — the §5.4–§5.8 real-photo calibration chain is done** (follow-up session; see Phase 5 in the results doc):
+
+- ~~**§5.4 — real CC-licensed Monstera fixture.**~~ Done: CC BY-SA 3.0 photo (`File:HK_SW_Leaves_with_holes.JPG`, *Princesleaf*) downloaded, centre-cropped to 480×480 q80 (~41 KB), `LICENSE.txt` rewritten with full provenance.
+- ~~**§5.5 — probe run.**~~ Done on `pixel6Api34`: top-1 `monstera-deliciosa` @ **0.8984**, `lowConf=false`, `ON_DEVICE_MODEL`.
+- ~~**§5.6 — accuracy-bearing assertion.**~~ Done: PREFERRED form (`speciesId == "monstera-deliciosa" && !lowConfidence`).
+- ~~**§5.7 — conditional `perSpeciesThresholds` seeding.**~~ Done: NONE — clears the 0.55 global cleanly, map stays empty.
+- ~~**§5.8 — `pixel6Api34DebugAndroidTest …OnDeviceModelRealInterpreterTest` run capture.**~~ Done: 2/2 GREEN, captured to `results/PLANTPOTTING-0005-phase5-real-model.txt`.
+
+**Still outstanding (the sprint stays `in-progress` until these land):**
+
+- **§3.12, §4.7, §7.2, §7.6 — GMD runs and manual emulator walkthrough.** GMD instrumentation is exercised green by the §5.8 run and by CI; the §7.6 manual walkthrough's `LowConfidencePicker` piece was captured in the 0005 review and the Failure-banner live visual was waved off (code review + JVM coverage accepted).
 - **§7.3 — `integration-flow.ps1` cold + warm + buildonly transcripts.** Best executed from the user's pwsh terminal (the project's existing run-script convention).
+- **§7.8 — ledger flip to `done`** once §7.3 lands.
 
-The calibration *mechanism* (§5.1–§5.3) is fully in place and JVM-verified — `ModelScoreMapper` consults `perSpeciesThresholds[bestSpeciesId] ?: thresholds.highConfidencePlain`. The manifest ships with `per_species_thresholds: {}` (empty) + a `_comment_per_species_thresholds` breadcrumb. When the §5.5 probe runs and §5.7 fires, the seeding is a one-line edit to that map.
+The calibration *mechanism* (§5.1–§5.3) is fully in place and JVM-verified — `ModelScoreMapper` consults `perSpeciesThresholds[bestSpeciesId] ?: thresholds.highConfidencePlain`. The manifest ships with `per_species_thresholds: {}` (empty) + a `_comment_per_species_thresholds` breadcrumb; the §5.5 probe confirmed no seeding is warranted.

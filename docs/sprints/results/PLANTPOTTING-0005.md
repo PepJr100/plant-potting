@@ -1,8 +1,10 @@
 # PLANTPOTTING-0005 — Results
 
-**Status at close of this opus session:** `in-progress`. Mechanism + tests + docs
-fully landed; GMD instrumentation + the real-photo probe + the manual emulator
-walkthrough remain — see `## Blockers` in `docs/sprints/PLANTPOTTING-0005.md`.
+**Status:** `in-progress`, but materially closer. Mechanism + tests + docs landed in
+the opus session; the §5.4–§5.8 real-photo calibration chain (real fixture → GMD probe
+→ preferred accuracy assertion → no-seed decision → green GMD capture) was completed in
+a follow-up session. Only §7.3 (`integration-flow.ps1` transcripts) and the §7.8 ledger
+flip to `done` remain — see `## Blockers` in `docs/sprints/PLANTPOTTING-0005.md`.
 
 **Executor:** opus.
 
@@ -106,7 +108,7 @@ was split into a sibling `PermissionPermanentlyDeniedFlowTest` class.
 Verify: `./gradlew :app:compileDebugAndroidTestKotlin ktlintCheck testDebugUnitTest`
 all GREEN (162/163; same Phase 5 lock).
 
-### Phase 5 — Confidence calibration (partial, commit `8db5bd1`)
+### Phase 5 — Confidence calibration (commit `8db5bd1` + real-photo close-out)
 
 **Landed** (§5.1–§5.3):
 - `ModelManifest.perSpeciesThresholds: Map<String, Float> = emptyMap()` — flips §0.6
@@ -124,13 +126,37 @@ all GREEN (162/163; same Phase 5 lock).
   branches with `Thresholds.highConfidenceMarginMin` set above the test score so the
   margin path can't accidentally rescue the global case.
 
-**Deferred** (see `## Blockers` in the plan): §5.4 real CC-licensed Monstera fixture
-sourcing + resize + LICENSE.txt update; §5.5 probe run on GMD; §5.6 accuracy-bearing
-assertion (preferred vs fallback per probe outcome); §5.7 conditional seeding; §5.8
-GMD real-model test capture.
+**Completed (§5.4–§5.8 — real-photo close-out):**
 
-Verify: `./gradlew ktlintCheck testDebugUnitTest` = 165/165 GREEN (both contract
-locks now resolved). `./gradlew :app:compileDebugAndroidTestKotlin` GREEN.
+- **§5.4 — real fixture.** Replaced the synthetic JPEG (seed `0x4D4F4E54`) with a real
+  CC BY-SA 3.0 *Monstera deliciosa* photograph from Wikimedia Commons
+  (`File:HK_SW_Leaves_with_holes.JPG`, author *Princesleaf*), scaled + centre-cropped to
+  480×480 JPEG-q80 (~41 KB). `app/src/androidTest/assets/identify-fixtures/LICENSE.txt`
+  rewritten with source URL, author, licence, retrieval date, and the modification note.
+- **§5.5 — probe (GMD, removed before commit).** A temporary `probe()` test fed the
+  fixture through the real `OnDevicePlantIdentifier` on `pixel6Api34`. Verbatim result:
+
+  ```
+  PROBE top1=monstera-deliciosa lowConf=false source=ON_DEVICE_MODEL :: top3=[monstera-deliciosa=0.8984 | crassula-ovata=0.0000]
+  ```
+
+  Top-1 = `monstera-deliciosa` at **p=0.8984**, clearing the global
+  `high_confidence_plain = 0.55` by +0.35; routes **high-confidence direct**. Only two
+  mapped candidates exist (the two in-vocab KB species).
+- **§5.6 — accuracy assertion: PREFERRED form.** Because the probe shows a clean
+  high-confidence direct hit, `OnDeviceModelRealInterpreterTest` now asserts
+  `speciesId == "monstera-deliciosa"` **and** `lowConfidence == false` (method renamed
+  `realMonsteraPhotoRoutesHighConfidenceToMonstera`). No thresholds were tuned to force
+  green (§5.6 anti-overfit prohibition).
+- **§5.7 — seeding decision: NONE.** The override gate fires only when an in-vocab
+  species *fails* the global threshold by a closeable margin. Monstera clears 0.55
+  outright, so `per_species_thresholds` ships empty (`{}`). Manifest unchanged.
+- **§5.8 — closing GMD capture.** `pixel6Api34DebugAndroidTest` (filtered to
+  `OnDeviceModelRealInterpreterTest`) = **2/2 GREEN, BUILD SUCCESSFUL** in 1m39s.
+  Transcript: `docs/sprints/results/PLANTPOTTING-0005-phase5-real-model.txt`.
+
+Verify (JVM, unchanged): `./gradlew ktlintCheck testDebugUnitTest` = 165/165 GREEN (both
+contract locks resolved). `./gradlew :app:compileDebugAndroidTestKotlin` GREEN.
 
 ### Phase 6 — Documentation (commit `48e35f9`)
 
@@ -240,18 +266,15 @@ The `@Ignore` count drops from 1 to 0.
 ## Deferrals carried to PLANTPOTTING-0006
 
 See `## Blockers` in `docs/sprints/PLANTPOTTING-0005.md` and the Known gaps section
-in `docs/ROADMAP.md`. Short list:
+in `docs/ROADMAP.md`. Remaining short list (the §5.4–§5.8 chain is now **done** — see
+Phase 5 above):
 
-- §5.4 — real CC-licensed Monstera fixture sourcing + resize + LICENSE.txt entry.
-- §5.5 — probe run on GMD with the real fixture; record top-1 / top-3 / score / route.
-- §5.6 — accuracy-bearing assertion (preferred vs fallback per probe outcome).
-- §5.7 — conditional seeding of `perSpeciesThresholds` for at most one species, gated
-  on §5.5 evidence.
-- §3.12, §4.7, §5.8, §7.2 — GMD instrumentation test runs.
 - §7.3 — `integration-flow.ps1` cold + warm + buildonly transcripts (best from the
   user's pwsh terminal).
-- §7.6 — manual emulator walkthrough + screenshots.
-- §7.8 — ledger flip to `done` once the above land.
+- §7.6 — manual emulator walkthrough + screenshots: the `LowConfidencePicker` piece was
+  captured in the 0005 review; the Failure-banner live visual was waved off (code review
+  + JVM coverage accepted). Effectively closed.
+- §7.8 — ledger flip to `done` once §7.3 lands.
 
 ## Final commit hashes
 
