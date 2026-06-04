@@ -185,15 +185,33 @@ ficus-lyrata, chlorophytum-comosum, hoya-carnosa) are **not** in the 47-class vo
 route through `LowConfidencePicker` exactly as before (unmapped path unchanged). Closing those is
 the case for a dedicated fine-tuning sprint.
 
-**Per-fixture outcomes — PENDING Phase 3 probe (`pixel6Api34`).** The swap-eval harness
-(`ModelSwapEvaluationTest`) writes `model-swap-eval.csv` once the converted `model.tflite` is
-installed. Fill the per-fixture top-1/top-3/score/route/latency table here from that CSV.
+**Per-fixture outcomes — Phase 3 probe (`pixel6Api34`, 2026-06-05).** Full data:
+`docs/sprints/evidence/PLANTPOTTING-0007/model-swap-eval.csv` / `-summary.md`. Candidate vs AIY:
+**6 high-conf correct vs 1; 8/8 in top-3 vs 2; median 33 ms vs 43 ms.**
 
-**Per-species threshold decisions — PENDING probe; default empty by design.** Thresholds ship
-identical to AIY policy (plain 0.55 / margin_min 0.45 / delta 0.18). `per_species_thresholds`
-stays `{}` until the probe shows an in-vocab species whose correct class falls short of the
-global by a *closeable* gap (the 0006 discipline: never seed to bless a ~10% prediction).
-Record each decision (and the deciding number) here after the probe.
+| Fixture | Candidate top-1 (score) | Route | vs AIY |
+|---|---|---|---|
+| monstera-deliciosa | Monstera 1.0000 | high-conf ✅ | AIY also high-conf (0.8984) |
+| dracaena-trifasciata | Snake plant 1.0000 | high-conf ✅ | AIY low-conf (out-of-vocab) |
+| goeppertia-orbifolia | Calathea 1.0000 | high-conf ✅ (coarse map) | AIY low-conf |
+| phalaenopsis | Orchid 1.0000 | high-conf ✅ (coarse map) | AIY low-conf |
+| zamioculcas-zamiifolia | ZZ Plant 0.9350 | high-conf ✅ | AIY low-conf |
+| crassula-ovata | Jade 0.5825 | high-conf ✅ | AIY low-conf (jade @0.1055) |
+| spathiphyllum-wallisii | Peace lily 0.4468 | low-conf ⚠️ correct top-1 sub-threshold | AIY low-conf |
+| epipremnum-aureum | Pilea 0.9661 (wrong) | low-conf ❌ honest | AIY low-conf |
+
+The two coarse maps (`Orchid`→phalaenopsis, `Calathea`→goeppertia-orbifolia) both fired correctly
+at 1.0000. Pothos is a genuine model weakness (confidently confused with Pilea peperomioides) but
+routes low-confidence — no false-confident KB id.
+
+**Per-species threshold decisions — `per_species_thresholds` stays `{}` (empty by design).**
+Thresholds ship identical to AIY policy (plain 0.55 / margin_min 0.45 / delta 0.18). Deciding
+numbers from the probe:
+- 6 hits clear the global 0.55 outright (4 @ 1.00, ZZ 0.935, jade 0.5825) → no override needed.
+- **peace lily @ 0.4468** is the only correct-top-1-but-low-conf case. **Not seeded**: 0.4468 is a
+  sub-50% prediction with Boston Fern close behind (0.306; margin 0.14 < 0.18). An override ≤0.4468
+  would bless a coin-flip — the 0006 anti-overfit prohibition. Honest low-conf to the picker.
+- **pothos** is confidently *wrong* (Pilea), not a threshold case.
 
 **License report.** Model weights Apache-2.0 (repo `LICENSE`; README's "NONE License" line is an
 unfilled template). Dataset-vs-weights nuance recorded: we bundle the **weights**, not the

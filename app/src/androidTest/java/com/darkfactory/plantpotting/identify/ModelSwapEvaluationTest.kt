@@ -134,12 +134,44 @@ class ModelSwapEvaluationTest {
         assertThat(aiyJade.route).isEqualTo("low-conf")
         assertThat(aiyJade.mappedTop1).isEqualTo("crassula-ovata") // top *mapped* candidate
 
-        // --- Candidate smoke (no accuracy assertion yet — evidence-driven, added in Phase 4) ---
-        // Any non-AIY model that is present must at least run end-to-end and emit ON_DEVICE_MODEL
-        // rows without a failure. Accuracy/route assertions are seeded from this CSV in Phase 4.
+        // --- Candidate smoke: any non-AIY model present runs clean as ON_DEVICE_MODEL ---
         rows.filter { it.modelId != "aiy_plants_v1" }.forEach {
             assertThat(it.failure).isEmpty()
             assertThat(it.source).isEqualTo("ON_DEVICE_MODEL")
+        }
+
+        // --- Evidence-driven candidate assertions (seeded from the 2026-06-05 probe;
+        //     see model-swap-eval.csv / -summary.md). Falsifiable: a regression in the model,
+        //     mapping, preprocessing, or threshold policy breaks these. ---
+        val cand = rows.filter { it.modelId == "house_plant_species_mobilenetv2" }
+        if (cand.isNotEmpty()) {
+            fun row(fixture: String) = cand.single { it.fixtureId == fixture }
+
+            // Preferred form: correct top-1 at high confidence for these 6 covered species.
+            for (f in listOf(
+                "monstera-deliciosa",
+                "dracaena-trifasciata",
+                "goeppertia-orbifolia",
+                "phalaenopsis",
+                "zamioculcas-zamiifolia",
+                "crassula-ovata",
+            )) {
+                assertThat(row(f).route).isEqualTo("high-conf")
+                assertThat(row(f).mappedTop1).isEqualTo(f)
+            }
+
+            // Documented honest fallbacks (reasons in model-swap-eval-summary.md):
+            // peace lily is the correct top-1 (spathiphyllum) but at 0.4468 < 0.55 → low-conf
+            // (NOT seeded — 0006 anti-overfit discipline).
+            assertThat(row("spathiphyllum-wallisii").route).isEqualTo("low-conf")
+            assertThat(row("spathiphyllum-wallisii").mappedTop1).isEqualTo("spathiphyllum-wallisii")
+            // pothos is confidently confused with Pilea (unmapped) → routes low-conf, honest.
+            assertThat(row("epipremnum-aureum").route).isEqualTo("low-conf")
+
+            // The candidate must beat AIY on high-confidence correct identifications.
+            val aiyHighConf = rows.count { it.modelId == "aiy_plants_v1" && it.route == "high-conf" && it.mappedTop1 == it.expectedId }
+            val candHighConf = cand.count { it.route == "high-conf" && it.mappedTop1 == it.expectedId }
+            assertThat(candHighConf).isGreaterThan(aiyHighConf)
         }
     }
 

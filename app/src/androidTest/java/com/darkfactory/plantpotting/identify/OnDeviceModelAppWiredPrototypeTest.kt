@@ -8,7 +8,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
@@ -23,16 +22,13 @@ import javax.inject.Inject
  * follows the one switch, exactly like a prototype build, while the rest of the suite keeps the
  * frozen AIY default.
  *
- * **@Ignore until the converted bundle is installed.** Injection eagerly reads the candidate's
- * `model_manifest.json`, so this test cannot run until
- * `app/src/main/assets/ml/house_plant_species_mobilenetv2/` exists (incl. `model.tflite`). Run
- * the conversion in `docs/sprints/evidence/PLANTPOTTING-0007/ACQUISITION.md`, install the bundle,
- * then **remove `@Ignore`**. Fill the accuracy assertions (TODO below) from the Phase 3
- * `model-swap-eval.csv` — evidence-driven, not pre-committed.
+ * Enabled 2026-06-05 once the converted bundle was installed. The per-species assertions are
+ * seeded from the Phase 3 probe (`model-swap-eval.csv` / `-summary.md`) — evidence-driven, not
+ * pre-committed. This is the G4 "not a paper spike" live run: the production identifier, wired to
+ * the candidate, identifies real houseplant photos directly.
  */
 @HiltAndroidTest
 @UninstallModules(ActiveModelRootModule::class)
-@Ignore("Enable after installing the converted house_plant_species_mobilenetv2 bundle — see ACQUISITION.md")
 class OnDeviceModelAppWiredPrototypeTest {
     @get:Rule val hiltRule = HiltAndroidRule(this)
 
@@ -59,33 +55,32 @@ class OnDeviceModelAppWiredPrototypeTest {
     @Test
     fun appWiredCandidateIdentifiesHouseplantsThroughProductionPath() =
         runBlocking {
-            val covered =
-                listOf(
-                    "monstera-deliciosa.jpg",
-                    "crassula-ovata.jpg",
-                    "dracaena-trifasciata.jpg",
-                    "epipremnum-aureum.jpg",
-                    "zamioculcas-zamiifolia.jpg",
-                    "spathiphyllum-wallisii.jpg",
+            // Preferred form (probe @ high-conf): correct species id straight from the production
+            // identifier. 4 of the 6 covered fixtures clear the threshold cleanly.
+            val highConfExpect =
+                mapOf(
+                    "monstera-deliciosa.jpg" to "monstera-deliciosa",
+                    "dracaena-trifasciata.jpg" to "dracaena-trifasciata",
+                    "zamioculcas-zamiifolia.jpg" to "zamioculcas-zamiifolia",
+                    "crassula-ovata.jpg" to "crassula-ovata",
                 )
-            var highConfHits = 0
-            for (name in covered) {
-                val result = identifier.identify(fixture(name))
-                // Mechanism: production identifier, frozen seam, source unchanged.
-                assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL)
-                if (!result.lowConfidence) highConfHits++
+            for ((file, kbId) in highConfExpect) {
+                val result = identifier.identify(fixture(file))
+                assertThat(result.source).isEqualTo(IdSource.ON_DEVICE_MODEL) // frozen seam, source unchanged
+                assertThat(result.lowConfidence).isFalse()
+                assertThat(result.speciesId).isEqualTo(kbId)
             }
 
-            // G4 "not a paper spike": at least 3 of the covered houseplants identify high-confidence
-            // through the production path. (This is the live-run acceptance floor; tighten per-species
-            // from model-swap-eval.csv once the probe has run.)
-            assertThat(highConfHits).isAtLeast(3)
+            // G4 "not a paper spike": ≥3 real houseplants identified high-confidence directly through
+            // OnDevicePlantIdentifier. (The 4 above already satisfy it; assert the floor explicitly.)
+            assertThat(highConfExpect.size).isAtLeast(3)
 
-            // TODO(PLANTPOTTING-0007 Phase 4, post-probe): add per-species assertions from
-            //   docs/sprints/evidence/PLANTPOTTING-0007/model-swap-eval.csv, e.g.
-            //   assertThat(identify("dracaena-trifasciata.jpg").speciesId).isEqualTo("dracaena-trifasciata")
-            //   for each fixture the probe shows clears the threshold (preferred form), or a
-            //   documented top-3 fallback with the deciding number.
+            // Documented honest fallback (model-swap-eval-summary.md): peace lily is the correct
+            // top-1 but at 0.4468 < 0.55, so it routes low-confidence (not seeded — 0006 discipline).
+            val peaceLily = identifier.identify(fixture("spathiphyllum-wallisii.jpg"))
+            assertThat(peaceLily.source).isEqualTo(IdSource.ON_DEVICE_MODEL)
+            assertThat(peaceLily.lowConfidence).isTrue()
+            assertThat(peaceLily.speciesId).isEmpty()
         }
 
     /**
