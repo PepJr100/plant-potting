@@ -74,10 +74,10 @@ Direct rank-match. Hoya carnosa is the most widely sold Hoya in the West; we acc
 
 ## Coverage notes
 
-- The AIY `plant_class_map.json` contains **34 mappings** for the **32 KB species** (two species — Dracaena trifasciata and Goeppertia orbifolia — have alias entries for their pre-transfer scientific names; 16 dormant rows were added by PLANTPOTTING-0009 — see that section below).
+- The AIY `plant_class_map.json` contains **34 mappings** for the **32 KB species** (two species — Dracaena trifasciata and Goeppertia orbifolia — have alias entries for their pre-transfer scientific names; 16 coverage rows were added by PLANTPOTTING-0009 — 13 dormant + 3 that turn out to be live in AIY's vocabulary, see that section below).
 - Every KB species id appears as a `kbSpeciesId` value at least once. This is enforced by `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`.
-- The real AIY V1 vocabulary (extracted from the upstream `.tflite` as `probability-labels-en.txt`, 2101 scientific names) overlaps our retail-houseplant KB on just **2 of 18 mapping keys**: `Monstera deliciosa` and `Crassula ovata`. The remaining 14 species are not in the model's training set at the species rank, so high-confidence direct hits for them will never fire. This matches the §7.1 risk assessment, and the design's intended safety net is `LowConfidencePicker`'s manual search — every KB species is reachable from there.
-- The dormant 14 mapping entries are intentional editorial intent. They survive a future model variant that adds the species (e.g., a fine-tuned retail-focused checkpoint), and they document that we *would* map those labels if they appeared. `ModelLabelMappingValidationTest.mappingHasAtLeastOneKeyInUpstreamLabels` enforces the minimum-viable invariant (at least one mapping key actually matches the vocabulary, so at least one high-confidence path is reachable).
+- The real AIY V1 vocabulary (extracted from the upstream `.tflite` as `probability-labels-en.txt`, 2101 scientific names) overlaps our retail-houseplant KB on **5 of 34 mapping keys** (was 2 of 18 before PLANTPOTTING-0009): `Monstera deliciosa`, `Crassula ovata`, and the three PLANTPOTTING-0009 additions whose scientificName keys happen to exist in AIY's vocabulary — `Aloe vera`, `Hedera helix`, `Euphorbia pulcherrima`. The remaining species are not in the model's training set at the species rank, so high-confidence direct hits for them will never fire. This matches the §7.1 risk assessment, and the design's intended safety net is `LowConfidencePicker`'s manual search — every KB species is reachable from there.
+- The remaining dormant mapping entries are intentional editorial intent. They survive a future model variant that adds the species (e.g., a fine-tuned retail-focused checkpoint), and they document that we *would* map those labels if they appeared. `ModelLabelMappingValidationTest.mappingHasAtLeastOneKeyInUpstreamLabels` enforces the minimum-viable invariant (at least one mapping key actually matches the vocabulary, so at least one high-confidence path is reachable).
 
 ## When to update this file
 
@@ -274,12 +274,17 @@ now would risk surfacing a wrong-but-confident card on that confusion. It ships 
 bundled with the pothos↔Pilea boundary fix. `HousePlantClassMapValidationTest.pileaIsNotMapped`
 enforces the deferral so it can't be added by accident.
 
-**AIY dormant rows (coverage-invariant maintenance).** `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`
+**AIY coverage rows (coverage-invariant maintenance).** `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`
 asserts every bundled KB species is reachable from the **AIY** map. Adding 16 KB species would red
-it, so 16 **dormant, non-alias** rows (keyed by scientificName) were added to
-`aiy_plants_v1/plant_class_map.json` (now 34 rows / 32 species). Dormant = AIY's vocabulary may
-never emit these labels; the rows exist purely to preserve the cross-model coverage invariant. They
-make the AIY map look more capable than its vocabulary supports — recorded and accepted.
+it, so 16 **non-alias** rows (keyed by scientificName) were added to
+`aiy_plants_v1/plant_class_map.json` (now 34 rows / 32 species). 13 are genuinely **dormant** (AIY's
+vocabulary never emits those labels; the rows exist purely to preserve the cross-model coverage
+invariant and make the AIY map look more capable than its vocabulary supports — recorded and
+accepted). The other **3 turn out to be live**: `Aloe vera`, `Hedera helix` and
+`Euphorbia pulcherrima` exist verbatim in AIY's real 2102-label vocabulary, so AIY can now resolve
+5 KB species (was 2) — a small free win. This is why
+`OnDevicePlantIdentifierFixturesTest.blankGreyFixtureRoutesToLowConfidenceWithEmptyCandidates` now
+surfaces `top_k_candidates` (3) mapped candidates rather than 2 under a flat distribution.
 
 **Known gap — UNPROBED calibration.** The 16 new mappings are **editorial / model-vocabulary
 coverage only**. Unlike PLANTPOTTING-0006/0007's in-vocab probes (Monstera, Crassula, etc.), these
