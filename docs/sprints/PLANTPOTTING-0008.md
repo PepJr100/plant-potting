@@ -26,20 +26,20 @@ fixtures**?*
 **6 out-of-vocab (OOV) KB species** — no class exists in the production model, so fine-tuning would
 add/relabel a head class:
 
-- [ ] `monstera-adansonii` (Swiss-cheese vine; distinct from in-vocab `monstera-deliciosa` — fenestration differs, easy to mislabel)
-- [ ] `philodendron-hederaceum` (heart-leaf philodendron; the canonical pothos lookalike — see boundary problem)
-- [ ] `philodendron-pink-princess` (a **specific cultivar** — pink variegation; generic philodendron imagery does NOT count — highest-risk target)
-- [ ] `ficus-lyrata` (fiddle-leaf fig)
-- [ ] `chlorophytum-comosum` (spider plant)
-- [ ] `hoya-carnosa` (wax plant)
+- [x] `monstera-adansonii` (Swiss-cheese vine; distinct from in-vocab `monstera-deliciosa` — fenestration differs, easy to mislabel) → **GO** (~369 usable)
+- [x] `philodendron-hederaceum` (heart-leaf philodendron; the canonical pothos lookalike — see boundary problem) → **GO** (~467 usable)
+- [x] `philodendron-pink-princess` (a **specific cultivar** — pink variegation; generic philodendron imagery does NOT count — highest-risk target) → **NO-GO** (cultivar-proven ~5–15)
+- [x] `ficus-lyrata` (fiddle-leaf fig) → **GO** (~257 usable, captive-inclusive)
+- [x] `chlorophytum-comosum` (spider plant) → **GO** (~790 usable)
+- [x] `hoya-carnosa` (wax plant) → **GO** (~430 usable)
 
 **1 boundary problem (both classes already in the model, but mutually confused):**
 
-- [ ] `epipremnum-aureum` (pothos) ↔ Pilea — the model has both classes but confidently misclassifies pothos as Pilea. Needs **extra, varied "hard example" imagery of BOTH sides** (including visually-confusable shots), not a new class. Assess as a pair, and assess the **production model's Pilea class specifically** (not generic *Pilea*).
+- [x] `epipremnum-aureum` (pothos) ↔ Pilea — the model has both classes but confidently misclassifies pothos as Pilea. Needs **extra, varied "hard example" imagery of BOTH sides** (including visually-confusable shots), not a new class. Assess as a pair, and assess the **production model's Pilea class specifically** (not generic *Pilea*). → **CONDITIONAL**: pothos abundant (~1470 usable), *Pilea peperomioides* thin (~76 usable, below the 150–300 boundary target).
 
 ## Goals
 
-- [ ] **G1 — Per-species sourcing report + machine-readable counts.** For every target, a per-source table of license-clean image counts, license types, attribution feasibility, taxonomic/synonym/cultivar pitfalls, count-confidence, and disjoint-split feasibility — backed by a diffable `source-counts.csv` and a `query-log.md` of exact queries/dates.
+- [x] **G1 — Per-species sourcing report + machine-readable counts.** For every target, a per-source table of license-clean image counts, license types, attribution feasibility, taxonomic/synonym/cultivar pitfalls, count-confidence, and disjoint-split feasibility — backed by a diffable `source-counts.csv` and a `query-log.md` of exact queries/dates. → `source-counts.csv` (38 rows) + `query-log.md` (exact URLs, 2026-06-05) + `data-availability-report.md`.
 - [ ] **G2 — GO/NO-GO recommendation.** A per-species verdict against the agreed thresholds, plus one overall sprint-level verdict (supporting **partial-GO**), with the deciding numbers shown.
 - [ ] **G3 — Conditional hand-off.** For each GO/CONDITIONAL species, a scoped fine-tuning outline (sourcing/download plan, disjoint-split strategy, transfer-learning on the existing MobileNetV2, float16/INT8 export, reuse of `ModelSwapEvaluationTest` + `ACTIVE_MODEL_ROOT` + fixture/provenance pattern). For each NO-GO species, the paid-dataset / self-shot fallback + rough cost. A partial-GO produces **both**, scoped per species.
 - [x] **G4 — Shutter-on-return UX fix.** The shutter button re-enables when the user navigates back to the camera screen after a capture, with a regression test. The only code change in the sprint. → `CameraScreen` `ON_RESUME` observer resets terminal `Success`; `CameraShutterOnReturnTest` (instrumented) + `CameraViewModelTest.resetFromTerminalSuccessReturnsToIdle` (JVM).
@@ -63,20 +63,20 @@ Each carries a different license/redistribution profile — the report must sepa
 *usable count*. "License-clean / usable" = CC0 / CC-BY / CC-BY-SA / public-domain; **CC-BY-NC and
 CC-BY-ND are recorded but excluded from the usable count** (NC is unusable for a commercial-app model).
 
-- [ ] **iNaturalist** — research-grade observations, per-observation CC license. Record the CC breakdown; check **observation-level vs photo-level** license (they can differ) and filter to media-backed, research-grade, the specific taxon.
-- [ ] **GBIF** — aggregates iNat + herbaria + others; good for taxon-key/synonym cross-checking. Count only **media-bearing** occurrences with a usable media license; **de-dupe against iNat** to avoid double-counting.
-- [ ] **Wikimedia Commons** — CC0 / CC-BY-SA / PD; the source the existing fixtures already use (so provenance-block feasibility is proven). Usually lower volume, higher label quality; map Commons file-license + attribution fields to the fixture provenance pattern.
-- [ ] **Flickr (CC-licensed)** — search by license + species/common name; noisier labels (common-name tagging, mislabels) → flag "needs manual label verification"; verify per-photo attribution fields exist.
-- [ ] **Any other obvious CC/CC0 source** (e.g. Pl@ntNet open data) — count a row **only** when the source has queryable counts, stable per-image URLs, per-image license metadata, and feasible attribution; otherwise list "reference-only, excluded from counts".
+- [x] **iNaturalist** — research-grade observations, per-observation CC license. Record the CC breakdown; check **observation-level vs photo-level** license (they can differ) and filter to media-backed, research-grade, the specific taxon. → **PRIMARY source.** Used `photo_license` (not observation `license`). Key finding: `quality_grade=research`/`verifiable=true` exclude captive houseplants → primary count is **captive-inclusive** photo-license-clean.
+- [x] **GBIF** — aggregates iNat + herbaria + others; good for taxon-key/synonym cross-checking. Count only **media-bearing** occurrences with a usable media license; **de-dupe against iNat** to avoid double-counting. → cross-check only; its `license` is occurrence-level (over-counts); additive over iNat ≈ 0.
+- [x] **Wikimedia Commons** — CC0 / CC-BY-SA / PD; the source the existing fixtures already use (so provenance-block feasibility is proven). Usually lower volume, higher label quality; map Commons file-license + attribution fields to the fixture provenance pattern. → direct category file counts; attribution feasible = Y for every row.
+- [x] **Flickr (CC-licensed)** — search by license + species/common name; noisier labels (common-name tagging, mislabels) → flag "needs manual label verification"; verify per-photo attribution fields exist. → license-filtered UI estimate, low confidence, label-discounted (no API key this spike).
+- [x] **Any other obvious CC/CC0 source** (e.g. Pl@ntNet open data) — count a row **only** when the source has queryable counts, stable per-image URLs, per-image license metadata, and feasible attribution; otherwise list "reference-only, excluded from counts". → Pl@ntNet/others **reference-only, excluded** (no per-image license-filtered count endpoint); the 4 sources above suffice.
 
 ## Phase 0 — Scaffolding & inputs (no networking)
 
-- [ ] Create the evidence dir `docs/sprints/evidence/PLANTPOTTING-0008/` mirroring the 0007 structure, with a `README.md` describing the spike, the no-download rule, the sources used, and the meaning of GO / CONDITIONAL / NO-GO.
-- [ ] Add a local `.gitignore` under `docs/sprints/evidence/PLANTPOTTING-0008/` ignoring accidental media/cache: `*.jpg`, `*.jpeg`, `*.png`, `*.webp`, `downloads/`, `samples/`, `raw/`, and API cache files.
-- [ ] Extract the canonical KB species names + encoded aliases for the 7 targets from `app/src/main/assets/kb/species.json` (read-only) into `species-targets.md` — KB id, accepted scientific name, synonyms, and known lookalikes per target. This is the controlled vocabulary every source query must use. Reconcile synonym handling with `docs/kb/ml-mapping-notes.md`.
-- [ ] Record the **disjoint-split exclusion set** in `species-targets.md`: the 8 fixtures in `app/src/androidTest/assets/identify-fixtures/` and their Wikimedia source URLs (from `LICENSE.txt`), so the report can confirm splits without reusing any fixture image. **`epipremnum-aureum.jpg`'s source URL MUST be excluded from any pothos count** (it overlaps the boundary target).
-- [ ] Write `methodology.md`: the query *template* per source, what "license-clean/usable" means (above), how counts are de-duped across sources, the count-confidence rubric (high/medium/low by metadata quality, taxon precision, duplicate risk), and the threshold definitions (below). (Exact executed URLs + retrieval dates land in `query-log.md` during Phase 1, not here.)
-- [ ] Create empty `source-counts.csv` (header only) and `query-log.md` so Phase 1 has somewhere to land each query.
+- [x] Create the evidence dir `docs/sprints/evidence/PLANTPOTTING-0008/` mirroring the 0007 structure, with a `README.md` describing the spike, the no-download rule, the sources used, and the meaning of GO / CONDITIONAL / NO-GO.
+- [x] Add a local `.gitignore` under `docs/sprints/evidence/PLANTPOTTING-0008/` ignoring accidental media/cache: `*.jpg`, `*.jpeg`, `*.png`, `*.webp`, `downloads/`, `samples/`, `raw/`, and API cache files.
+- [x] Extract the canonical KB species names + encoded aliases for the 7 targets from `app/src/main/assets/kb/species.json` (read-only) into `species-targets.md` — KB id, accepted scientific name, synonyms, and known lookalikes per target. This is the controlled vocabulary every source query must use. Reconcile synonym handling with `docs/kb/ml-mapping-notes.md`.
+- [x] Record the **disjoint-split exclusion set** in `species-targets.md`: the 8 fixtures in `app/src/androidTest/assets/identify-fixtures/` and their Wikimedia source URLs (from `LICENSE.txt`), so the report can confirm splits without reusing any fixture image. **`epipremnum-aureum.jpg`'s source URL MUST be excluded from any pothos count** (it overlaps the boundary target).
+- [x] Write `methodology.md`: the query *template* per source, what "license-clean/usable" means (above), how counts are de-duped across sources, the count-confidence rubric (high/medium/low by metadata quality, taxon precision, duplicate risk), and the threshold definitions (below). (Exact executed URLs + retrieval dates land in `query-log.md` during Phase 1, not here.)
+- [x] Create empty `source-counts.csv` (header only) and `query-log.md` so Phase 1 has somewhere to land each query.
 
 ## Phase 1 — Per-species data assessment (the core research, ASSESS-ONLY)
 
@@ -87,16 +87,16 @@ CC-BY-ND are recorded but excluded from the usable count** (NC is unusable for a
 > `source-counts.csv` + `query-log.md` — keep it per-species (not 32 species×source tasks) for
 > trackability without bloat.
 
-- [ ] **`monstera-adansonii`** — count usable images across iNat (CC breakdown, obs-vs-photo license), GBIF (media-bearing, de-duped), Wikimedia Commons, Flickr-CC; pitfall: vs `monstera-deliciosa` (confirm counts aren't dominated by deliciosa mislabels). Write rows to `source-counts.csv` + queries to `query-log.md`.
-- [ ] **`philodendron-hederaceum`** — same source sweep; pitfall: routinely **cross-tagged with `epipremnum-aureum`** — record how much of each count is likely the other.
-- [ ] **`philodendron-pink-princess`** — same sweep, but **count the pink-variegated cultivar specifically** (`Philodendron erubescens 'Pink Princess'`); generic `Philodendron erubescens` is **excluded** from the recommendation. Record a separate `cultivar-proven` count. (Highest-risk target.)
-- [ ] **`ficus-lyrata`** — same sweep; note indoor/compact vs tree-form imagery.
-- [ ] **`chlorophytum-comosum`** — same sweep; note variegated cultivar variants.
-- [ ] **`hoya-carnosa`** — same sweep; note variegated/compacta forms that may not represent the base class cleanly.
-- [ ] **Pothos/Pilea boundary (special handling).** Assess `epipremnum-aureum` AND the production Pilea class as a pair: count varied **hard-example** imagery for EACH side separately (trailing vines, juvenile leaves, confusable leaf shapes) toward the ~150–300-each target. Exclude true `Pothos`-genus records and generic non-class *Pilea*.
-- [ ] **Per-row license + provenance inventory.** For every `source-counts.csv` row, record license type(s), whether per-image (vs aggregate) license is verifiable, and whether author / source page / original-file-or-observation URL / date / modifications / license / attribution string are API-exposed — i.e. whether a fixture-style provenance block (`identify-fixtures/LICENSE.txt`) can be auto-generated at download time in the future sprint.
-- [ ] **Count-confidence + dedup.** Per species, classify count confidence high/medium/low; estimate cross-source duplicate risk (GBIF mirroring iNat media) and de-dupe by observation/file id; downgrade confidence where per-image license can't be verified.
-- [ ] **Disjoint-split feasibility per species.** Confirm usable-count ≥ floor and that train/val/test splits are achievable **disjoint from the 8 fixtures** (by source observation/file id). Record a one-line yes/no + split sketch (e.g. "210 usable → 150/30/30, fixtures excluded").
+- [x] **`monstera-adansonii`** — count usable images across iNat (CC breakdown, obs-vs-photo license), GBIF (media-bearing, de-duped), Wikimedia Commons, Flickr-CC; pitfall: vs `monstera-deliciosa` (confirm counts aren't dominated by deliciosa mislabels). Write rows to `source-counts.csv` + queries to `query-log.md`. → iNat 295 / Commons 71 / Flickr ~5; GO.
+- [x] **`philodendron-hederaceum`** — same source sweep; pitfall: routinely **cross-tagged with `epipremnum-aureum`** — record how much of each count is likely the other. → iNat 413 / Commons 53; GO (cross-tag risk noted).
+- [x] **`philodendron-pink-princess`** — same sweep, but **count the pink-variegated cultivar specifically** (`Philodendron erubescens 'Pink Princess'`); generic `Philodendron erubescens` is **excluded** from the recommendation. Record a separate `cultivar-proven` count. (Highest-risk target.) → cultivar-proven: Commons **4**, Flickr ~0, iNat cannot isolate (no cultivar taxon). NO-GO.
+- [x] **`ficus-lyrata`** — same sweep; note indoor/compact vs tree-form imagery. → iNat 165 (captive-incl; research-grade only 8) / Commons 50 / Flickr ~43; GO. Filter tree-form vs potted.
+- [x] **`chlorophytum-comosum`** — same sweep; note variegated cultivar variants. → iNat 664 / Commons 53 / Flickr ~78; GO.
+- [x] **`hoya-carnosa`** — same sweep; note variegated/compacta forms that may not represent the base class cleanly. → iNat 246 / Commons 105 / Flickr ~79; GO.
+- [x] **Pothos/Pilea boundary (special handling).** Assess `epipremnum-aureum` AND the production Pilea class as a pair: count varied **hard-example** imagery for EACH side separately (trailing vines, juvenile leaves, confusable leaf shapes) toward the ~150–300-each target. Exclude true `Pothos`-genus records and generic non-class *Pilea*. → pothos ~1470 usable (GO); *Pilea peperomioides* ~76 usable (below boundary target → CONDITIONAL, Pilea side thin).
+- [x] **Per-row license + provenance inventory.** For every `source-counts.csv` row, record license type(s), whether per-image (vs aggregate) license is verifiable, and whether author / source page / original-file-or-observation URL / date / modifications / license / attribution string are API-exposed — i.e. whether a fixture-style provenance block (`identify-fixtures/LICENSE.txt`) can be auto-generated at download time in the future sprint. → recorded per row (license_types, attribution_feasible). iNat & Commons API-expose full provenance ⇒ auto-attribution feasible; GBIF occurrence-license partial; Flickr per-photo attribution exists but labels need verification.
+- [x] **Count-confidence + dedup.** Per species, classify count confidence high/medium/low; estimate cross-source duplicate risk (GBIF mirroring iNat media) and de-dupe by observation/file id; downgrade confidence where per-image license can't be verified. → confidence column populated; GBIF additive ≈ 0 (mirrors iNat); totals = iNat + Commons + label-discounted Flickr.
+- [x] **Disjoint-split feasibility per species.** Confirm usable-count ≥ floor and that train/val/test splits are achievable **disjoint from the 8 fixtures** (by source observation/file id). Record a one-line yes/no + split sketch (e.g. "210 usable → 150/30/30, fixtures excluded"). → recorded in `data-availability-report.md` per species (only `epipremnum-aureum.jpg` overlaps a target; excluded from pothos count).
 
 ## Phase 2 — Report & GO/NO-GO synthesis
 

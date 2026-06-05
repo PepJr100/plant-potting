@@ -1,1 +1,41 @@
 kb_id,scientific_name,source,query_name,usable_count,raw_count,nc_count,license_types,attribution_feasible,cultivar_specific,count_confidence,disjoint_split_achievable,pitfall,retrieval_date
+monstera-adansonii,Monstera adansonii,iNaturalist,captive-incl photo-license CC0/BY/BY-SA,295,4392,1786,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,vs M. deliciosa & rare M. obliqua mislabels (~10-15% discount),2026-06-05
+monstera-adansonii,Monstera adansonii,iNaturalist,research-grade only (sub-note),202,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,research-grade excludes captive houseplants,2026-06-05
+monstera-adansonii,Monstera adansonii,GBIF,StillImage CC0/CC-BY (occurrence-license),2596,,,CC0;CC-BY,partial,n-a,low,Y,occurrence-license not photo-license; mirrors iNat (additive ~0),2026-06-05
+monstera-adansonii,Monstera adansonii,Wikimedia Commons,Category direct files,71,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+4 subcats (more in detail/cultivar subcats),2026-06-05
+monstera-adansonii,Monstera adansonii,Flickr,CC/PD license-filtered,5,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,common-name tagging; needs manual label verification,2026-06-05
+philodendron-hederaceum,Philodendron hederaceum,iNaturalist,captive-incl photo-license CC0/BY/BY-SA,413,6081,1741,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,cross-tagged with Epipremnum aureum (pothos lookalike),2026-06-05
+philodendron-hederaceum,Philodendron hederaceum,iNaturalist,research-grade only (sub-note),281,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,,2026-06-05
+philodendron-hederaceum,Philodendron hederaceum,GBIF,StillImage CC0/CC-BY (occurrence-license),1428,,,CC0;CC-BY,partial,n-a,low,Y,mirrors iNat (additive ~0),2026-06-05
+philodendron-hederaceum,Philodendron hederaceum,Wikimedia Commons,Category direct files,53,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+2 subcats,2026-06-05
+philodendron-hederaceum,Philodendron hederaceum,Flickr,CC/PD license-filtered,2,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,very low; needs label verification,2026-06-05
+philodendron-pink-princess,Philodendron erubescens 'Pink Princess',iNaturalist,no cultivar taxon (folded in P. erubescens 151 usable),0,,,n-a,n-a,N,low,N,iNat has no cultivar rank; cannot isolate the pink-variegated cultivar,2026-06-05
+philodendron-pink-princess,Philodendron erubescens 'Pink Princess',Wikimedia Commons,Category 'Pink Princess' direct files,4,,,CC0;CC-BY;CC-BY-SA;PD,Y,Y,medium,N,cultivar-proven count critically low,2026-06-05
+philodendron-pink-princess,Philodendron erubescens 'Pink Princess',Wikimedia Commons,search '\"Pink Princess\" Philodendron' (loose),11,,,CC0;CC-BY;CC-BY-SA;PD,Y,partial,low,N,loose full-text; includes non-cultivar mentions,2026-06-05
+philodendron-pink-princess,Philodendron erubescens 'Pink Princess',Flickr,CC/PD license-filtered,1,,,CC-BY;CC-BY-SA;CC0;PD,Y,partial,low,N,effectively no cultivar-proven CC results,2026-06-05
+philodendron-pink-princess,Philodendron erubescens (generic - EXCLUDED),iNaturalist,captive-incl photo-license CC0/BY/BY-SA (generic species),151,3052,433,CC0;CC-BY;CC-BY-SA,Y,N,medium,n-a,GENERIC species - excluded from recommendation (not the pink cultivar),2026-06-05
+ficus-lyrata,Ficus lyrata,iNaturalist,captive-incl photo-license CC0/BY/BY-SA,165,7490,293,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,GO depends on captive inclusion (research-grade only=8); filter tree-form vs potted bush,2026-06-05
+ficus-lyrata,Ficus lyrata,iNaturalist,research-grade only (sub-note),8,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,research-grade nearly empty - it is a cultivated houseplant,2026-06-05
+ficus-lyrata,Ficus lyrata,GBIF,StillImage CC0/CC-BY (occurrence-license),290,,,CC0;CC-BY,partial,n-a,low,Y,mirrors iNat (additive ~0),2026-06-05
+ficus-lyrata,Ficus lyrata,Wikimedia Commons,Category direct files,50,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+2 subcats,2026-06-05
+ficus-lyrata,Ficus lyrata,Flickr,CC/PD license-filtered,43,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,needs label verification,2026-06-05
+chlorophytum-comosum,Chlorophytum comosum,iNaturalist,captive-incl photo-license CC0/BY/BY-SA,664,18844,1138,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,variegated vs all-green cultivar split,2026-06-05
+chlorophytum-comosum,Chlorophytum comosum,iNaturalist,research-grade only (sub-note),189,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,,2026-06-05
+chlorophytum-comosum,Chlorophytum comosum,GBIF,StillImage CC0/CC-BY (occurrence-license),882,,,CC0;CC-BY,partial,n-a,low,Y,mirrors iNat (additive ~0),2026-06-05
+chlorophytum-comosum,Chlorophytum comosum,Wikimedia Commons,Category direct files,53,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+6 subcats (cultivars); full-text totalhits noisy (77304 - discarded),2026-06-05
+chlorophytum-comosum,Chlorophytum comosum,Flickr,CC/PD license-filtered,78,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,needs label verification,2026-06-05
+hoya-carnosa,Hoya carnosa,iNaturalist,captive-incl photo-license CC0/BY/BY-SA,246,6050,1388,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,cultivar forms (compacta/variegata/Krimson) may not represent base class,2026-06-05
+hoya-carnosa,Hoya carnosa,iNaturalist,research-grade only (sub-note),138,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,,2026-06-05
+hoya-carnosa,Hoya carnosa,GBIF,StillImage CC0/CC-BY (occurrence-license),377,,,CC0;CC-BY,partial,n-a,low,Y,mirrors iNat (additive ~0),2026-06-05
+hoya-carnosa,Hoya carnosa,Wikimedia Commons,Category direct files,105,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+3 subcats,2026-06-05
+hoya-carnosa,Hoya carnosa,Flickr,CC/PD license-filtered,79,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,needs label verification,2026-06-05
+epipremnum-aureum,Epipremnum aureum (pothos - boundary),iNaturalist,captive-incl photo-license CC0/BY/BY-SA,1178,36841,6716,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,EXCLUDE fixture epipremnum-aureum.jpg URL + true Pothos-genus records,2026-06-05
+epipremnum-aureum,Epipremnum aureum (pothos - boundary),iNaturalist,research-grade only (sub-note),755,,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,,2026-06-05
+epipremnum-aureum,Epipremnum aureum (pothos - boundary),GBIF,StillImage CC0/CC-BY (occurrence-license),965,,,CC0;CC-BY,partial,n-a,low,Y,mirrors iNat (additive ~0),2026-06-05
+epipremnum-aureum,Epipremnum aureum (pothos - boundary),Wikimedia Commons,Category direct files,134,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,+8 subcats; exclude Golden_Pothos_(Money_Plant).jpg (fixture),2026-06-05
+epipremnum-aureum,Epipremnum aureum (pothos - boundary),Flickr,CC/PD license-filtered,160,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,needs label verification,2026-06-05
+pilea-peperomioides,Pilea peperomioides (boundary pair),iNaturalist,captive-incl photo-license CC0/BY/BY-SA,33,3301,3268,CC0;CC-BY;CC-BY-SA,Y,n-a,medium,Y,license is the killer not existence (3301 raw all-grade; 1.0% usable),2026-06-05
+pilea-peperomioides,Pilea peperomioides (boundary pair),iNaturalist,research-grade/verifiable only (sub-note),0,5,,CC0;CC-BY;CC-BY-SA,Y,n-a,high,Y,almost never observed non-captive (taxon id 125439; 3337 lifetime obs),2026-06-05
+pilea-peperomioides,Pilea peperomioides (boundary pair),GBIF,StillImage CC0/CC-BY (occurrence-license),25,,,CC0;CC-BY,partial,n-a,low,Y,confirms scarcity; mirrors iNat,2026-06-05
+pilea-peperomioides,Pilea peperomioides (boundary pair),Wikimedia Commons,Category direct files,34,,,CC0;CC-BY;CC-BY-SA;PD,Y,n-a,high,Y,exclude generic genus Pilea (P. cadierei etc.),2026-06-05
+pilea-peperomioides,Pilea peperomioides (boundary pair),Flickr,CC/PD license-filtered,17,,,CC-BY;CC-BY-SA;CC0;PD,Y,n-a,low,Y,needs label verification,2026-06-05
