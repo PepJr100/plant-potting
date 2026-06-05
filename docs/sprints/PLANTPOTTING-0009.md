@@ -267,9 +267,9 @@ this gate confirms them.
       synthetic in-memory KB. No golden edits required.)
 
 ### Phase 7 — Docs & evidence
-- [ ] Update `docs/kb/ml-mapping-notes.md`: the 16 new mappings, the coarse/genus rows, the Pilea
+- [x] Update `docs/kb/ml-mapping-notes.md`: the 16 new mappings, the coarse/genus rows, the Pilea
       deferral + rationale, and the unprobed-calibration known gap.
-- [ ] Write `docs/sprints/evidence/PLANTPOTTING-0009/` note (matches the 0007 convention): final species
+- [x] Write `docs/sprints/evidence/PLANTPOTTING-0009/` note (matches the 0007 convention): final species
       count, final mapped-class count, new-archetype count, commands run, and an explicit record that the
       16 new mappings are editorial/model-vocabulary coverage only — **not** calibrated with real-photo
       probes.

@@ -74,7 +74,7 @@ Direct rank-match. Hoya carnosa is the most widely sold Hoya in the West; we acc
 
 ## Coverage notes
 
-- The current `plant_class_map.json` contains **18 mappings** for the **16 KB species** (two species — Dracaena trifasciata and Goeppertia orbifolia — have alias entries for their pre-transfer scientific names).
+- The AIY `plant_class_map.json` contains **34 mappings** for the **32 KB species** (two species — Dracaena trifasciata and Goeppertia orbifolia — have alias entries for their pre-transfer scientific names; 16 dormant rows were added by PLANTPOTTING-0009 — see that section below).
 - Every KB species id appears as a `kbSpeciesId` value at least once. This is enforced by `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`.
 - The real AIY V1 vocabulary (extracted from the upstream `.tflite` as `probability-labels-en.txt`, 2101 scientific names) overlaps our retail-houseplant KB on just **2 of 18 mapping keys**: `Monstera deliciosa` and `Crassula ovata`. The remaining 14 species are not in the model's training set at the species rank, so high-confidence direct hits for them will never fire. This matches the §7.1 risk assessment, and the design's intended safety net is `LowConfidencePicker`'s manual search — every KB species is reachable from there.
 - The dormant 14 mapping entries are intentional editorial intent. They survive a future model variant that adds the species (e.g., a fine-tuned retail-focused checkpoint), and they document that we *would* map those labels if they appeared. `ModelLabelMappingValidationTest.mappingHasAtLeastOneKeyInUpstreamLabels` enforces the minimum-viable invariant (at least one mapping key actually matches the vocabulary, so at least one high-confidence path is reachable).
@@ -216,3 +216,74 @@ numbers from the probe:
 **License report.** Model weights Apache-2.0 (repo `LICENSE`; README's "NONE License" line is an
 unfilled template). Dataset-vs-weights nuance recorded: we bundle the **weights**, not the
 community-collected training images. See `LICENSE-house-plant-species.txt`.
+
+### PLANTPOTTING-0009 — text-only KB-expansion over the model-covered delta (10 → 26)
+
+Pure content/config sprint: **no ML, no fine-tune, no imagery, no real-photo probing.** The
+production `house_plant_species_mobilenetv2` emits 47 classes; PLANTPOTTING-0007 mapped 10. This
+sprint additively maps **16 more delta species** so the house-plant `plant_class_map.json` now
+covers **26 of 47** model classes. Runtime lookup is **exact-match on the verbatim label string**
+(including any parenthetical), so every key below was copied byte-for-byte from
+`house_plant_species_mobilenetv2/labels.csv` and is CI-guarded by
+`HousePlantClassMapValidationTest.everyMappingKeyIsVerbatimLabelLine`.
+
+| # | Exact model label | KB id | Map kind | Toxicity flag |
+|---|---|---|---|---|
+| 1 | `Chinese evergreen (Aglaonema)` | `aglaonema` | coarse/genus (`alias`) | mild toxic (calcium oxalate) |
+| 2 | `Elephant Ear (Alocasia spp.)` | `alocasia` | coarse/genus (`alias`) | toxic (calcium oxalate) |
+| 3 | `Anthurium (Anthurium andraeanum)` | `anthurium-andraeanum` | exact | mild toxic (calcium oxalate) |
+| 4 | `Dumb Cane (Dieffenbachia spp.)` | `dieffenbachia` | coarse/genus (`alias`) | **toxic** (raphides + enzymes) |
+| 5 | `Aloe Vera` | `aloe-vera` | exact | — |
+| 6 | `Kalanchoe` | `kalanchoe` | coarse/genus (`alias`) | toxic to pets (cardiac glycosides) |
+| 7 | `Prayer Plant (Maranta leuconeura)` | `maranta-leuconeura` | exact | non-toxic |
+| 8 | `Boston Fern (Nephrolepis exaltata)` | `nephrolepis-exaltata` | exact | non-toxic |
+| 9 | `Money Tree (Pachira aquatica)` | `pachira-aquatica` | exact | non-toxic |
+| 10 | `Areca Palm (Dypsis lutescens)` | `dypsis-lutescens` | exact | non-toxic |
+| 11 | `Dracaena` | `dracaena` | coarse/genus (`alias`) | mild toxic to pets (saponins) |
+| 12 | `Tradescantia` | `tradescantia` | coarse/genus (`alias`) | mild irritant (sap) |
+| 13 | `English Ivy (Hedera helix)` | `hedera-helix` | exact | **toxic** (saponins, pets & humans) |
+| 14 | `Schefflera` | `schefflera` | coarse/genus (`alias`) | toxic (calcium oxalate) |
+| 15 | `Poinsettia (Euphorbia pulcherrima)` | `euphorbia-pulcherrima` | exact | irritant/latex |
+| 16 | `Venus Flytrap` | `dionaea-muscipula` | exact (monospecific) | non-toxic, special-case care |
+
+**Coarse/genus rows.** Seven bare or `spp.` model classes (Aglaonema, Alocasia, Dieffenbachia,
+Kalanchoe, Dracaena, Tradescantia, Schefflera) map a broad model class onto the KB's representative
+species, tagged `alias: true` with a `_note`, following the established `Orchid`→phalaenopsis /
+`Calathea`→goeppertia precedent. Existing confidence gating in the seam handles weak hits; coarse
+sub-species substrate divergence within those genera is not modelled (recorded gap).
+
+**`Dracaena` is genus-level and coarse, and deliberately split from the snake plant.** The bare
+model class `Dracaena` maps to a **new** `dracaena` KB id covering the standard tree-form
+marginata/fragrans care envelope (`standard-houseplant`). This is **distinct from**
+`dracaena-trifasciata` (snake plant, `succulent-gritty`), which stays mapped via
+`Snake plant (Sanseviera)`. Both the class-map `_note` and `HousePlantClassMapValidationTest`
+guard this distinction.
+
+**New archetype — `carnivorous-peat-sand`.** Venus Flytrap is the only one of the 16 needing a new
+archetype: nutrient-poor 50/50 sphagnum-peat / lime-free silica-sand, **zero fertiliser**, **zero
+lime/dolomite**, **distilled/rain water only**, with a winter-dormancy note. No existing archetype
+is botanically valid (`succulent-gritty` is mineral/fertilised; `acidic-ericaceous` carries an
+acidic amendment + bark). Boston Fern reuses `moisture-retentive` and Areca Palm reuses
+`standard-houseplant` — dedicated `fern-*`/`palm-*` archetypes were considered and rejected as
+redundant for this sprint.
+
+**Pilea deferral (deliberate, CI-enforced).** `Chinese Money Plant (Pilea peperomioides)` is in
+`labels.csv` but is **intentionally left unmapped** this sprint. PLANTPOTTING-0007's probe showed
+the model confidently confuses **pothos with Pilea** (Pothos top-1 = Pilea @ 0.9661). Mapping Pilea
+now would risk surfacing a wrong-but-confident card on that confusion. It ships in a later sprint
+bundled with the pothos↔Pilea boundary fix. `HousePlantClassMapValidationTest.pileaIsNotMapped`
+enforces the deferral so it can't be added by accident.
+
+**AIY dormant rows (coverage-invariant maintenance).** `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`
+asserts every bundled KB species is reachable from the **AIY** map. Adding 16 KB species would red
+it, so 16 **dormant, non-alias** rows (keyed by scientificName) were added to
+`aiy_plants_v1/plant_class_map.json` (now 34 rows / 32 species). Dormant = AIY's vocabulary may
+never emit these labels; the rows exist purely to preserve the cross-model coverage invariant. They
+make the AIY map look more capable than its vocabulary supports — recorded and accepted.
+
+**Known gap — UNPROBED calibration.** The 16 new mappings are **editorial / model-vocabulary
+coverage only**. Unlike PLANTPOTTING-0006/0007's in-vocab probes (Monstera, Crassula, etc.), these
+classes have **not** been calibrated against real first-party photos — per-class confidence
+behaviour is assumed-from-routing, not measured. A coarse class could in principle fire a
+confident-but-marginal card; the coarse `alias` routing + existing gating is the mitigation. This
+gap is closed only when imagery/probing work is greenlit.
