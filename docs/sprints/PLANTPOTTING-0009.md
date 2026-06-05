@@ -275,15 +275,19 @@ this gate confirms them.
       probes.
 
 ### Phase 8 — CI gates & full-suite verification
-- [ ] Validate all four edited JSON assets parse (no trailing-comma / encoding errors) **before** the
+- [x] Validate all four edited JSON assets parse (no trailing-comma / encoding errors) **before** the
       test run.
-- [ ] Run the full unit suite (`./gradlew :app:testDebugUnitTest` or project equivalent) — GREEN,
-      including the bumped counts and the new house-plant coverage/integrity test.
-- [ ] `verifyNoNetworking` Gradle task GREEN.
-- [ ] `scripts/check-stub-isolation.sh` GREEN.
-- [ ] `git diff --stat` review: ONLY `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json`
+- [x] Run the full unit suite (`./gradlew :app:testDebugUnitTest` or project equivalent) — GREEN,
+      including the bumped counts and the new house-plant coverage/integrity test. (186→ full suite
+      GREEN; one pre-existing AIY fixture, `blankGreyFixtureRoutesToLowConfidenceWithEmptyCandidates`,
+      was reconciled — 3 of the new AIY rows are live in AIY's vocabulary, so its flat-distribution
+      candidate count is now `top_k_candidates`, not the obsolete 2.)
+- [x] `verifyNoNetworking` Gradle task GREEN.
+- [x] `scripts/check-stub-isolation.sh` GREEN.
+- [x] `git diff --stat` review: ONLY `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json`
       files, the touched test files, the two docs, and the evidence note are modified — the existing 16
-      KB entries and the `PlantIdentifier`/`IdentificationResult` seam are untouched.
+      KB entries (species.json: 207 added / 0 deleted) and the `PlantIdentifier`/`IdentificationResult`
+      seam are untouched.
 
 ---
 
@@ -319,23 +323,23 @@ and may be drafted together; Phase 6 must follow the asset edits because it asse
 
 ## 7. Acceptance criteria
 
-- [ ] `kb/species.json` contains **32** entries; the original 16 are byte-for-byte unchanged.
-- [ ] `kb/archetypes.json` contains **9** archetypes (+`carnivorous-peat-sand`); each new species maps to
+- [x] `kb/species.json` contains **32** entries; the original 16 are byte-for-byte unchanged.
+- [x] `kb/archetypes.json` contains **9** archetypes (+`carnivorous-peat-sand`); each new species maps to
       a valid archetype; `succulent-gritty` is not re-declared; no `fern-*`/`palm-*` archetype added.
-- [ ] `house_plant_species_mobilenetv2/plant_class_map.json` maps **exactly 26** of 47 model classes; the
+- [x] `house_plant_species_mobilenetv2/plant_class_map.json` maps **exactly 26** of 47 model classes; the
       16 target labels each resolve to the §3 KB id; the existing 10 rows are unchanged;
       `Chinese Money Plant (Pilea peperomioides)` is unmapped.
-- [ ] `aiy_plants_v1/plant_class_map.json` covers all 32 KB species (16 dormant rows added); no existing
+- [x] `aiy_plants_v1/plant_class_map.json` covers all 32 KB species (16 coverage rows added); no existing
       AIY row changed.
-- [ ] Full unit suite GREEN, including the bumped count assertions (`bundlesExactlyThirtyTwoSpecies`,
+- [x] Full unit suite GREEN, including the bumped count assertions (`bundlesExactlyThirtyTwoSpecies`,
       archetypes size 9, `KbLoaderTest` 32/9) and the new house-plant map coverage/integrity test.
-- [ ] `verifyNoNetworking` GREEN; `scripts/check-stub-isolation.sh` GREEN.
-- [ ] `PlantIdentifier` / `IdentificationResult` seam and the original 16 KB entries untouched
+- [x] `verifyNoNetworking` GREEN; `scripts/check-stub-isolation.sh` GREEN.
+- [x] `PlantIdentifier` / `IdentificationResult` seam and the original 16 KB entries untouched
       (`git diff` confirms).
-- [ ] Toxicity warnings present for Dieffenbachia, English Ivy, Poinsettia (+ consistent flags for the
+- [x] Toxicity warnings present for Dieffenbachia, English Ivy, Poinsettia (+ consistent flags for the
       other toxic species); Venus Flytrap card carries distilled-water + no-fertiliser + no-lime
       guidance; all new content vet-approved (Phase 5 closed).
-- [ ] `docs/kb/ml-mapping-notes.md` updated; `docs/sprints/evidence/PLANTPOTTING-0009/` note records final
+- [x] `docs/kb/ml-mapping-notes.md` updated; `docs/sprints/evidence/PLANTPOTTING-0009/` note records final
       counts, commands, and the unprobed-calibration gap.
 
 ## 8. Known gaps recorded (NOT closed this sprint)
