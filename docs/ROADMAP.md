@@ -38,6 +38,17 @@ no-self-shot rule). See `feedback/PLANTPOTTING-0008/feedback.md`.
 
 ---
 
+**The text-only KB-expansion shipped and is reviewed clean.** PLANTPOTTING-0009 closed the cheap slice
+of the model/KB delta with zero ML: `species.json` **16 → 32**, the active house-plant
+`plant_class_map.json` **10 → 26 of 47** model classes, **+1 archetype** (`carnivorous-peat-sand`, for
+Venus Flytrap). Pilea stays deliberately unmapped (CI-enforced) for the upcoming pothos↔Pilea
+boundary-fix sprint. Free side effect: 3 new species (`Aloe vera`, `Hedera helix`, `Euphorbia
+pulcherrima`) are in AIY's vocabulary, so the AIY baseline now resolves **5 of 32** (was 2). Review
+verdict **clean — no bugs, no UX issues** (`feedback/PLANTPOTTING-0009/feedback.md`): all gates GREEN,
+toxicity/care content vetted accurate, on-device spot-check via a v0.3.0 debug build. **Known gap (not
+closed):** the 16 new mappings are editorial/model-vocabulary coverage only — **unprobed**, not
+calibrated against real photos.
+
 **The houseplant model swap shipped — V1 is open.** The AIY Plants V1/3 model (wild-flora-tuned,
 2 of 16 KB species in-vocab) has been replaced as the production default by
 **`house_plant_species_mobilenetv2`** (MobileNetV2, 47 house-plant classes, Apache-2.0, converted
@@ -87,7 +98,7 @@ the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in l
 
 | Layer | Status | Notes |
 | --- | --- | --- |
-| KB (species.json, archetypes.json, plant_class_map.json) | ✓ shipped | 16 species. KB locked; the active model's `plant_class_map.json` now resolves **10 of 16** (8 exact + 2 coarse). |
+| KB (species.json, archetypes.json, plant_class_map.json) | ✓ expanded (0009) | **32 species, 9 archetypes** (+`carnivorous-peat-sand`). The active model's `plant_class_map.json` now resolves **26 of 47** model classes (was 10). Pilea deliberately unmapped (CI-enforced). New mappings unprobed (editorial coverage). |
 | Model bundle (active / baseline) | ✓ swapped (0007) | **Active default: `house_plant_species_mobilenetv2`** (MobileNetV2, 47 classes, Apache-2.0, float16, 10.42 MiB). AIY V1/3 retained as the bundled regression anchor. One `ACTIVE_MODEL_ROOT` switch selects between them. |
 | Identifier (interface + on-device impl + stub) | ✓ shipped | `OnDevicePlantIdentifier` is production. Seam **unchanged** through the 0007 swap (candidate `[1,47]` FLOAT32 fits existing mapper + preprocessor). |
 | Confidence calibration | ✓ probe-backed (post-swap) | Mechanism shipped (`perSpeciesThresholds` in manifest, reader, mapper). Re-probed against the new model over 8 fixtures: 6 hits clear the global 0.55 outright. `per_species_thresholds` stays **empty by design** — peace lily @ 0.4468 not seeded (sub-50%), pothos confidently wrong (not a threshold case). Routing honesty preserved (0006 discipline). |
@@ -107,10 +118,10 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 
 | Axis | State | Notes |
 | --- | --- | --- |
-| KB species | 16 | `species.json`; locked. |
-| In-vocab (active model) | **10 of 16** | Up from 2/16 (AIY). 8 exact (epipremnum-aureum, spathiphyllum-wallisii, ficus-elastica, dracaena-trifasciata, zamioculcas-zamiifolia, saintpaulia-ionantha, crassula-ovata, monstera-deliciosa) + 2 coarse-genus (phalaenopsis→Orchid, goeppertia→Calathea). |
-| Out-of-vocab | 6 of 16 | monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess, ficus-lyrata, chlorophytum-comosum, hoya-carnosa — route to `LowConfidencePicker` as before. 0008 confirmed CC fine-tune data exists for 5 of 6 (pink-princess NO-GO); fine-tune **deferred** behind the cheaper text-only KB-expansion (PLANTPOTTING-0009). |
-| Model/KB delta | **37 of 47 model classes unmapped** | The active model recognizes 47 species but only 10 have a KB entry — 37 model-recognized houseplants return a prediction with no care card. Closing the popular slice is text-only (next sprint). |
+| KB species | **32** | `species.json`; +16 added by 0009 (append-only; original 16 untouched). |
+| Mapped (active model) | **26 of 47** | Up from 10 (and 2 under AIY). 0009 added 16 delta-species rows (mix of exact + coarse/genus). New rows are **unprobed** — editorial coverage, not real-photo calibrated. |
+| Unmapped model classes | 21 of 47 | Includes **Pilea** (deliberately deferred, CI-enforced) pending the pothos↔Pilea boundary fix. A further text-only expansion over the remaining popular slice is still cheap/available. |
+| KB species OOV in active model | 6 | monstera-adansonii, both Philodendrons, ficus-lyrata, chlorophytum-comosum, hoya-carnosa — route to `LowConfidencePicker`. 0008 confirmed CC fine-tune data for 5 of 6 (pink-princess NO-GO); fine-tune **deferred**. |
 | Probe results (8 fixtures) | 6 high-conf correct | monstera 1.0000, snake 1.0000, calathea 1.0000, orchid 1.0000, ZZ 0.9350, jade 0.5825. Weak: peace lily 0.4468 (correct, sub-threshold); pothos confidently confused with Pilea. |
 | Routing | threshold-gated | Top-1 score vs per-class threshold (`perSpeciesThresholds`) falling back to the 0.55 global → `ResultScreen` (high-conf) or `LowConfidencePicker` (low-conf / out-of-vocab). |
 | Latency | 33 ms median | Down from AIY's 43 ms despite the larger, more capable model. |
@@ -132,20 +143,22 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 
 ## Known gaps
 
-**Open this window — 37-class KB/model coverage delta (text-only to close) + the deferred OOV
-fine-tune.** Two distinct gaps, re-prioritized by the 0008 review:
+**Open this window — unprobed calibration of the new mappings + the Pilea boundary + the deferred OOV
+fine-tune.** Re-prioritized after the 0009 ship/review:
 
-1. **The model recognizes 37 species the KB can't describe.** The active model has **47 classes but
-   only 10 map to the KB** — so 37 model-recognized species (Aloe Vera, Aglaonema, Alocasia,
-   Anthurium, Dieffenbachia, Boston Fern, Monstera-money-tree, palms, Pilea, etc.) return a prediction
-   with **no care card to show**. **Why it matters:** these are common houseplants; the recognition
-   already works, only the KB entry is missing. **Closing it is text-only** — additive `species.json` /
-   `archetypes.json` / `plant_class_map.json` rows, **no training, no self-shot imagery.** This is the
-   cheapest large coverage win on the board and is the **next sprint** (KB-expansion over the popular
-   delta, ~17 species incl. user-owned Poinsettia + Venus Flytrap → 10→~27 mapped). **Sharp edge:**
-   adding a **Pilea** KB entry turns today's silent pothos→Pilea misread into a *confidently wrong* care
-   card — ship the boundary fix or strict pothos/Pilea confidence gating alongside the Pilea entry.
-2. **6 KB species remain out-of-vocab + pothos→Pilea confusion (training-bound, now DEFERRED).** The
+1. **The 16 new mappings are unprobed (editorial coverage, not calibrated).** 0009 closed the cheap
+   slice of the delta — coverage **10 → 26 of 47** — but the new rows' per-class confidence behaviour is
+   assumed-from-routing, **not measured against real photos** (unlike the 0006/0007 in-vocab probes for
+   Monstera and Crassula). **Why it matters:** a coarse/genus row could fire a confident-but-marginal
+   card. **Closing it needs imagery/probing** — out of scope until imagery work is greenlit. Coarse rows
+   route through existing confidence gating in the meantime. **21 model classes remain unmapped**; a
+   further text-only expansion over the remaining popular slice is still cheap and available.
+2. **Pilea deferred + pothos→Pilea confusion (boundary-fix sprint, the likely next move).** `Chinese
+   Money Plant (Pilea peperomioides)` is deliberately left unmapped (CI-enforced) because the model
+   confidently confuses **pothos with Pilea** (pothos top-1 = Pilea @ 0.9661). Adding a Pilea KB entry
+   without a boundary fix turns today's silent misread into a *confidently wrong* care card — so the
+   Pilea entry must ship **paired with** the boundary fix or strict pothos/Pilea confidence gating.
+3. **6 KB species remain out-of-vocab + pothos→Pilea confusion (training-bound, now DEFERRED).** The
    0008 spike answered the data question: **PARTIAL-GO** — 5 OOV species (chlorophytum, hederaceum,
    hoya, adansonii, ficus-lyrata) have sufficient CC imagery to fine-tune; pothos/Pilea boundary is
    CONDITIONAL (Pilea side thin at ~76); pink-princess is **NO-GO** (cultivar-proven ~5–15). The
@@ -180,33 +193,31 @@ Accepted as-is (recorded, **not** an open gap):
 
 ### Active horizon (detailed)
 
-#### Next: PLANTPOTTING-0009 — KB-expansion over the model-covered delta (text-only, no ML)
-- **Intent:** the active model already recognizes **47 species but only 10 map to the KB** — 37
-  model-recognized houseplants currently return a prediction with **no care card.** Closing the popular
-  slice of that delta is **pure KB work** (text rows, no training, no self-shot imagery), the cheapest
-  large coverage win available. This was the explicit re-direction from the 0008 review, chosen over the
-  deferred fine-tune.
-- **Entry conditions:** PLANTPOTTING-0008 merged to `origin/main` (`status: done`) and its review PR
-  merged. KB unlocks for **additive** entries this sprint (existing 16 untouched).
+#### Shipped: PLANTPOTTING-0009 — KB-expansion over the model-covered delta (text-only, no ML) — *done, reviewed clean*
+- Closed the cheap slice of the delta with zero ML: `species.json` **16 → 32**, house-plant
+  `plant_class_map.json` **10 → 26 of 47**, **+1 archetype** (`carnivorous-peat-sand`). Review verdict
+  clean (no bugs/UX issues); all gates GREEN; content vetted; on-device spot-check via a v0.3.0 debug
+  build. Pilea left unmapped (CI-enforced). The 16 new mappings are **unprobed** (editorial coverage).
+
+#### Next: pothos↔Pilea boundary fix + Pilea KB entry (the deferred pairing)
+- **Intent:** add the `Chinese Money Plant (Pilea peperomioides)` KB entry — but **only** alongside a
+  fix for the model's confident pothos→Pilea confusion (pothos top-1 = Pilea @ 0.9661). Mapping Pilea
+  without the fix turns today's *silent* misread into a *confidently wrong* care card.
+- **Entry conditions:** PLANTPOTTING-0009 merged to `origin/main` (`status: done`) and its review PR
+  merged. KB stays open for additive entries.
 - **Scope hints (to be firmed up in planning):**
-  1. **Add KB entries for the ~17 target delta species** — Aloe Vera, Pilea peperomioides, Aglaonema,
-     Alocasia, Anthurium, Dieffenbachia, Maranta, Boston Fern, Pachira (Money Tree), Areca Palm, generic
-     Dracaena, Tradescantia, English Ivy, Schefflera, Kalanchoe + user-owned **Poinsettia** and **Venus
-     Flytrap**. Each = `species.json` + `archetypes.json` + a `plant_class_map.json` row mapping the
-     model class → new KB id. Target ~10 → ~27 mapped.
-  2. **Boundary safety for Pilea.** Adding a Pilea KB entry turns the silent pothos→Pilea misread into a
-     confidently-wrong care card — pair the Pilea entry with strict pothos/Pilea confidence gating (or a
-     boundary fix) so a wrong-but-confident result can't surface.
-  3. **Verify care content + routing.** Care data per new species vetted in planning; confidence
-     calibration for these previously-unprobed classes considered; `verifyNoNetworking` +
-     `check-stub-isolation.sh` stay GREEN; seam frozen.
-- **Milestone contribution:** delivers the bulk of **V1 — broad species coverage** directly (recognition
-  already works; this makes it *useful*), at zero ML cost.
+  1. **Boundary safety first.** Strict pothos/Pilea confidence gating (or a discriminating fix) so a
+     wrong-but-confident result can't surface, *then* the Pilea KB entry + class-map row (drops the
+     CI-enforced Pilea-absence guard).
+  2. **Optionally** continue the text-only expansion over the remaining **21 unmapped** model classes
+     (still cheap, no ML, no self-shot).
+  3. Consider whether the **unprobed-calibration** gap (the 16 new 0009 mappings) warrants an
+     imagery/probing sprint before further coverage — likely separate, imagery-gated.
 - **Notes:**
   - **No self-shot / first-party imagery** anywhere (hard user constraint) and **no model training** —
-    this is KB text only, behind the frozen `PlantIdentifier` seam.
-  - The 0008 fine-tune outline (5 GO OOV classes on CC data) is **deferred behind this sprint**, not
-    cancelled; pink-princess + Pilea-balance retraining are out under the no-self-shot rule.
+    behind the frozen `PlantIdentifier` seam.
+  - The 0008 fine-tune outline (5 GO OOV classes on CC data) remains **deferred**, not cancelled;
+    pink-princess + Pilea-balance retraining are out under the no-self-shot rule.
 
 ### Milestone ladder (skeleton — sprints become detailed as they approach)
 
@@ -225,10 +236,12 @@ for the bundled species set.
 #### V1 — Broad species coverage *(active — entered at PLANTPOTTING-0007)*
 - **Exit criteria:** most common houseplants identify directly (model swap, supplemental
   classifier, or expanded vocab) so the low-confidence path is the exception, not the rule.
-- **Progress:** the 0007 swap moved coverage 2/16 → **10/16** and made the production model
+- **Progress:** the 0007 swap moved coverage 2/16 → 10/16 and made the production model
   houseplant-tuned. The 0008 spike confirmed CC fine-tune data exists for 5 of 6 OOV species
-  (PARTIAL-GO). **Review then found the bigger, cheaper lever:** the model recognizes 37 species the KB
-  can't describe — a text-only KB-expansion closes most of the milestone with no ML.
+  (PARTIAL-GO). **0009 then took the bigger, cheaper lever:** a text-only KB-expansion moved mapped
+  coverage **10 → 26 of 47** model classes with no ML. **21 classes remain unmapped** (incl. the
+  deferred Pilea); new mappings are still unprobed. The milestone's exit condition (low-confidence path
+  is the exception) is substantially advanced; calibration of the new coverage is the open piece.
 - **Skeleton sprints:** ~~model-selection spike (PLANTPOTTING-0007 ✓)~~; ~~training-data availability
   spike (PLANTPOTTING-0008 ✓ — PARTIAL-GO)~~; **KB-expansion over the model-covered delta
   (PLANTPOTTING-0009, next — ~17 species, text-only)**; *deferred* → fine-tune sprint for the 5 GO OOV
