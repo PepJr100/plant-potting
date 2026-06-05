@@ -169,6 +169,35 @@ class CameraViewModelTest {
             assertThat(vm.state.value).isNotInstanceOf(CameraUiState.Failure::class.java)
         }
 
+    @Test
+    fun resetFromTerminalSuccessReturnsToIdle() =
+        runTest {
+            // PLANTPOTTING-0008 Phase 3 — the JVM contract the shutter-on-return
+            // fix relies on: a view model left in terminal Success (a capture
+            // whose result screen the user backed out of) must return to Idle
+            // when reset() is invoked from CameraScreen's ON_RESUME observer, so
+            // the shutter re-enables. The screen-level wiring is covered by the
+            // instrumented CameraShutterOnReturnTest; this pins the VM transition.
+            val fake =
+                FakePlantIdentifier(
+                    result =
+                        IdentificationResult(
+                            speciesId = "monstera-deliciosa",
+                            displayName = "Swiss cheese plant",
+                            source = IdSource.STUB_DETERMINISTIC,
+                        ),
+                )
+            val vm = CameraViewModel(fake)
+            vm.onCaptureReady(byteArrayOf(1, 2, 3))
+            // Under UnconfinedTestDispatcher the launched coroutine runs inline,
+            // so the terminal state is Success.
+            assertThat(vm.state.value).isInstanceOf(CameraUiState.Success::class.java)
+
+            vm.reset()
+
+            assertThat(vm.state.value).isInstanceOf(CameraUiState.Idle::class.java)
+        }
+
     private class FakePlantIdentifier(
         private val result: IdentificationResult,
     ) : PlantIdentifier {
