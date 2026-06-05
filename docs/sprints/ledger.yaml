@@ -55,6 +55,7 @@ sprints:
     updated: "2026-06-05T12:10:30+00:00"
   - id: PLANTPOTTING-0010
     title: "App-experience sprint: UI/UX refresh + add-this-plant wireframe + KB expansion"
-    status: planned
+    status: in-progress
+    executor: opus (claude-opus-4-8)
     created: "2026-06-05T20:47:09+00:00"
-    updated: "2026-06-05T21:02:07+00:00"
+    updated: "2026-06-05T22:40:24+00:00"
