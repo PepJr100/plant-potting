@@ -141,51 +141,51 @@ representative species. Existing confidence gating in the seam handles weak hits
 ## 4. Phases & task list
 
 ### Phase 0 — Preflight & guardrails (do first; cheapest defence against the label-truncation bug)
-- [ ] Read `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json` files, and
+- [x] Read `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json` files, and
       `house_plant_species_mobilenetv2/labels.csv`; capture the **before-counts** (16 species, 8
       archetypes, 10 mapped house-plant rows).
-- [ ] **Verify all 16 target labels appear in `labels.csv` byte-exactly** (full parenthetical form per
+- [x] **Verify all 16 target labels appear in `labels.csv` byte-exactly** (full parenthetical form per
       §3). Copy the matched strings directly from the file — do not retype them.
-- [ ] Confirm `Chinese Money Plant (Pilea peperomioides)` is present in `labels.csv` and currently
+- [x] Confirm `Chinese Money Plant (Pilea peperomioides)` is present in `labels.csv` and currently
       **unmapped**, and will remain unmapped after this sprint.
-- [ ] Identify the hard count assertions that will break: `KbContentSpeciesTest.bundlesExactlySixteenSpecies`
+- [x] Identify the hard count assertions that will break: `KbContentSpeciesTest.bundlesExactlySixteenSpecies`
       (→32), `KbContentArchetypesTest.bundlesExactlyEightArchetypes` (→9), and **`KbLoaderTest`**
       (species size 16→32, archetypes size 8→9).
-- [ ] Confirm `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies` is AIY-scoped
+- [x] Confirm `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies` is AIY-scoped
       (`dir = "ml/aiy_plants_v1"`, asserts `kbIds − mappingIds == ∅`) — it will red without Phase 3.
 
 ### Phase 1 — New archetype (do before species; Phase 2 references it)
-- [ ] Add `carnivorous-peat-sand` to `kb/archetypes.json` with `id`, `displayName`
+- [x] Add `carnivorous-peat-sand` to `kb/archetypes.json` with `id`, `displayName`
       ("Carnivorous Bog (Peat/Sand)"), `shortDescription`, `recipe` (≈50% sphagnum peat moss / 50%
       horticultural silica sand or perlite; **zero** fertiliser, **zero** lime/dolomite),
       `rationaleTemplate` noting nutrient-poor substrate + distilled/rain-water mandate, and `citations[]`
       (drafter-sourced general horticulture, vet-flagged).
-- [ ] Verify the new archetype's `recipe` proportion percentages sum to 100 (matches every existing
+- [x] Verify the new archetype's `recipe` proportion percentages sum to 100 (matches every existing
       archetype's convention).
-- [ ] Do **not** re-declare `succulent-gritty`; do **not** add `fern-*` or `palm-*` archetypes.
+- [x] Do **not** re-declare `succulent-gritty`; do **not** add `fern-*` or `palm-*` archetypes.
 
 ### Phase 2 — `species.json` entries (append-only at the END of the array; one checkbox per species)
 Each entry follows the existing schema: `id`, `scientificName`, `commonNames[]`, `aliases[]`,
 `mapping{kind:"single", archetypeId}` (see §3 blend note), `speciesRationale` (drafter-sourced
 horticulture, vet-flagged), `citations[]` (≥1, non-empty). Grouped by care lane for legibility:
 
-- [ ] `aglaonema` (Aglaonema) → `aroid-chunky`
-- [ ] `alocasia` (Alocasia) → `aroid-chunky`
-- [ ] `anthurium-andraeanum` (Anthurium andraeanum) → `aroid-chunky`
-- [ ] `dieffenbachia` (Dieffenbachia) → `aroid-chunky` — toxic flag in rationale
-- [ ] `aloe-vera` (Aloe vera) → `succulent-gritty`
-- [ ] `kalanchoe` (Kalanchoe) → `succulent-gritty`
-- [ ] `maranta-leuconeura` (Maranta leuconeura) → `moisture-retentive`
-- [ ] `nephrolepis-exaltata` (Nephrolepis exaltata) → `moisture-retentive`
-- [ ] `pachira-aquatica` (Pachira aquatica) → `standard-houseplant`
-- [ ] `dypsis-lutescens` (Dypsis lutescens) → `standard-houseplant`
-- [ ] `dracaena` (Dracaena marginata/fragrans) → `standard-houseplant` (distinct from `dracaena-trifasciata`)
-- [ ] `tradescantia` (Tradescantia) → `standard-houseplant`
-- [ ] `hedera-helix` (Hedera helix) → `standard-houseplant` — toxic flag in rationale
-- [ ] `schefflera` (Schefflera) → `standard-houseplant` — toxic flag in rationale
-- [ ] `euphorbia-pulcherrima` (Euphorbia pulcherrima) → `standard-houseplant` — irritant/latex flag
-- [ ] `dionaea-muscipula` (Dionaea muscipula) → `carnivorous-peat-sand` — special-case care
-- [ ] Confirm no new `id` collides with an existing id and no `scientificName`/`aliases` collides with an
+- [x] `aglaonema` (Aglaonema) → `aroid-chunky`
+- [x] `alocasia` (Alocasia) → `aroid-chunky`
+- [x] `anthurium-andraeanum` (Anthurium andraeanum) → `aroid-chunky`
+- [x] `dieffenbachia` (Dieffenbachia) → `aroid-chunky` — toxic flag in rationale
+- [x] `aloe-vera` (Aloe vera) → `succulent-gritty`
+- [x] `kalanchoe` (Kalanchoe) → `succulent-gritty`
+- [x] `maranta-leuconeura` (Maranta leuconeura) → `moisture-retentive`
+- [x] `nephrolepis-exaltata` (Nephrolepis exaltata) → `moisture-retentive`
+- [x] `pachira-aquatica` (Pachira aquatica) → `standard-houseplant`
+- [x] `dypsis-lutescens` (Dypsis lutescens) → `standard-houseplant`
+- [x] `dracaena` (Dracaena marginata/fragrans) → `standard-houseplant` (distinct from `dracaena-trifasciata`)
+- [x] `tradescantia` (Tradescantia) → `standard-houseplant`
+- [x] `hedera-helix` (Hedera helix) → `standard-houseplant` — toxic flag in rationale
+- [x] `schefflera` (Schefflera) → `standard-houseplant` — toxic flag in rationale
+- [x] `euphorbia-pulcherrima` (Euphorbia pulcherrima) → `standard-houseplant` — irritant/latex flag
+- [x] `dionaea-muscipula` (Dionaea muscipula) → `carnivorous-peat-sand` — special-case care
+- [x] Confirm no new `id` collides with an existing id and no `scientificName`/`aliases` collides with an
       existing normalised alias (guards `speciesIdsAreUnique` / `normalisedAliasesAreUnique`). Keep
       aliases minimal — watch `Money Tree` vs existing `crassula-ovata`'s "Money plant" common name, and
       `Dracaena` vs existing `dracaena-trifasciata`.

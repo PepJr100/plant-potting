@@ -210,5 +210,212 @@
       "Claude-report:Pillar A — cultivar granularity",
       "Brief §3.2"
     ]
+  },
+  {
+    "id": "aglaonema",
+    "scientificName": "Aglaonema",
+    "commonNames": ["Chinese evergreen"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Aglaonema is a terrestrial-to-hemi-epiphytic aroid (Araceae) that shares the chunky-aroid substrate envelope with Monstera and Philodendron: its roots want high air-filled porosity and resent the compaction of a peat-perlite mix. Modelled at genus rank — retail 'Chinese evergreen' spans many hybrids with effectively identical substrate needs. Mildly toxic: the foliage carries insoluble calcium-oxalate crystals (raphides) that irritate mouth and throat if chewed, so keep clippings away from pets and children.",
+    "citations": [
+      "Drafter-sourced horticulture (Araceae chunky-aroid substrate; calcium-oxalate toxicity)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "alocasia",
+    "scientificName": "Alocasia (spp.)",
+    "commonNames": ["Elephant ear", "Alocasia"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Alocasia (elephant ear) is a tuberous tropical aroid that grows in loose, fast-draining forest-floor litter; the chunky bark-led aroid mix matches its preference for moisture with abundant air around the rhizome and rejects the waterlogging that rots its tuber. Modelled at genus rank across the many commercial hybrids. Toxic: high in insoluble calcium oxalate — ingestion causes intense oral and gastrointestinal irritation in pets and humans, so site it out of reach and handle sap with care.",
+    "citations": [
+      "Drafter-sourced horticulture (Alocasia tuber/aroid substrate; calcium-oxalate toxicity)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "anthurium-andraeanum",
+    "scientificName": "Anthurium andraeanum",
+    "commonNames": ["Flamingo flower", "Painter's palette"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Anthurium andraeanum (flamingo flower) is an epiphytic/hemi-epiphytic aroid whose thick aerial-leaning roots demand the open, bark-dominant structure of the chunky aroid mix; in a dense mix it suffers root rot. Mildly toxic: like other aroids it contains insoluble calcium-oxalate raphides that irritate the mouth if chewed — keep away from pets and children.",
+    "citations": [
+      "Drafter-sourced horticulture (Anthurium epiphytic aroid substrate; calcium-oxalate toxicity)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "dieffenbachia",
+    "scientificName": "Dieffenbachia (spp.)",
+    "commonNames": ["Dumb cane", "Dieffenbachia"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Dieffenbachia (dumb cane) is a terrestrial aroid that thrives in the loose, airy, bark-led substrate of the chunky aroid archetype; its fleshy stem base rots in a compacted, water-retentive mix. Modelled at genus rank across common cultivars. Toxic — the common name 'dumb cane' names the hazard: the sap is laden with insoluble calcium-oxalate raphides plus proteolytic enzymes that, if chewed, cause painful swelling of the mouth, tongue and throat and temporary loss of speech. Keep strictly away from pets and children; wear gloves when pruning and wash hands afterwards.",
+    "citations": [
+      "Drafter-sourced horticulture (Dieffenbachia aroid substrate)",
+      "Drafter-sourced toxicity reference (insoluble calcium oxalate; oral swelling, 'dumb cane' effect)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "aloe-vera",
+    "scientificName": "Aloe vera",
+    "commonNames": ["Aloe"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Aloe vera is a leaf-succulent (Asphodelaceae) that stores water in thick gel-filled leaves and evolved in arid, mineral, free-draining ground. The gritty mineral-led mix is essential: in moisture-retentive media the stem base and roots rot quickly. Water only when the substrate has dried fully through.",
+    "citations": [
+      "Drafter-sourced horticulture (Aloe leaf-succulent gritty-mineral substrate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "kalanchoe",
+    "scientificName": "Kalanchoe",
+    "commonNames": ["Flaming Katy", "Widow's-thrill"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Kalanchoe is a Crassulaceae leaf-succulent with CAM metabolism and water-storing leaves; it needs the fast-drying gritty mineral mix that protects succulents from basal rot, and flowers best kept on the dry side. Modelled at genus rank. Toxic to pets: the genus contains bufadienolide cardiac glycosides that can cause vomiting and, rarely, heart-rhythm disturbance in cats and dogs if eaten — keep out of their reach.",
+    "citations": [
+      "Drafter-sourced horticulture (Kalanchoe Crassulaceae gritty-mineral substrate)",
+      "Drafter-sourced toxicity reference (bufadienolide cardiac glycosides)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "maranta-leuconeura",
+    "scientificName": "Maranta leuconeura",
+    "commonNames": ["Prayer plant"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Maranta leuconeura (prayer plant) is a shallow-rooted tropical terrestrial that punishes substrate dry-back with crisping leaf edges; the coir-led moisture-retentive mix with sphagnum holds the even, steady moisture it requires without becoming waterlogged. Non-toxic to cats and dogs, a safe choice for pet households.",
+    "citations": [
+      "Drafter-sourced horticulture (Maranta dry-back-intolerant terrestrial; moisture-retentive substrate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "nephrolepis-exaltata",
+    "scientificName": "Nephrolepis exaltata",
+    "commonNames": ["Boston fern", "Sword fern"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Nephrolepis exaltata (Boston fern) is a moisture-loving terrestrial fern with fine fibrous roots that desiccate rapidly; the coir-and-sphagnum moisture-retentive mix buffers the constant dampness it needs. A dedicated fern archetype was considered and rejected as redundant — the moisture-retentive substrate envelope already covers it. Non-toxic to pets and humans.",
+    "citations": [
+      "Drafter-sourced horticulture (Nephrolepis moisture-loving fern; moisture-retentive substrate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "pachira-aquatica",
+    "scientificName": "Pachira aquatica",
+    "commonNames": ["Money tree", "Guiana chestnut"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Pachira aquatica (money tree) is a wetland-margin tree that, indoors, does best in a free-draining standard coir-perlite-bark mix that stays evenly moist but never sodden — despite its swampy origins, container culture rots its roots if the mix holds water. Non-toxic to pets and people. The 'money tree' trade name is shared with the unrelated jade plant (Crassula ovata), so the binomial is the reliable key.",
+    "citations": [
+      "Drafter-sourced horticulture (Pachira standard terrestrial substrate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "dypsis-lutescens",
+    "scientificName": "Dypsis lutescens",
+    "commonNames": ["Areca palm", "Golden cane palm", "Butterfly palm"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Dypsis lutescens (areca / golden cane palm) is a clumping palm with fine, brittle roots that want a free-draining yet moisture-holding medium; the standard coir-perlite-bark mix covers its peat-based, well-aerated substrate envelope for indoor culture. A dedicated palm archetype was considered and rejected as redundant for this sprint. Non-toxic to pets and humans.",
+    "citations": [
+      "Drafter-sourced horticulture (Dypsis palm standard substrate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table",
+      "Brief §4.4"
+    ]
+  },
+  {
+    "id": "dracaena",
+    "scientificName": "Dracaena (marginata / fragrans)",
+    "commonNames": ["Dragon tree", "Corn plant", "Dracaena"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "This entry covers the standard tree-form Dracaena species (notably D. marginata and D. fragrans) grown for foliage — distinct from the succulent snake plant Dracaena trifasciata, which keeps its own gritty-mineral mapping. These dracaenas are fibrous-rooted terrestrials suited to the standard coir-perlite-bark mix; they are sensitive to fluoride and salt build-up, so a free-draining mix that flushes easily helps. Modelled at genus rank. Mildly toxic to cats and dogs (saponins) — ingestion can cause vomiting and drooling; keep away from pets.",
+    "citations": [
+      "Drafter-sourced horticulture (tree-form Dracaena standard substrate; fluoride sensitivity)",
+      "Drafter-sourced toxicity reference (saponins, pets)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "tradescantia",
+    "scientificName": "Tradescantia",
+    "commonNames": ["Spiderwort", "Inch plant", "Wandering dude"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Tradescantia (spiderwort / inch plant) is a fast-growing trailing terrestrial that roots readily and tolerates a broad moisture range; the standard coir-perlite-bark mix suits its vigorous fibrous roots. Modelled at genus rank. Mild irritant: the sap can cause contact dermatitis on sensitive skin and is mildly irritating to pets if chewed — handle cuttings with light care.",
+    "citations": [
+      "Drafter-sourced horticulture (Tradescantia standard terrestrial substrate)",
+      "Drafter-sourced toxicity reference (sap contact dermatitis)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "hedera-helix",
+    "scientificName": "Hedera helix",
+    "commonNames": ["English ivy", "Common ivy"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Hedera helix (English ivy) is a woody evergreen climber that, indoors, thrives in a free-draining standard coir-perlite-bark mix kept lightly moist. Toxic to both pets and humans: leaves and berries contain triterpenoid saponins (hederagenin) that cause gastrointestinal upset if eaten, and the sap is a known contact-dermatitis allergen — wear gloves when pruning and keep it away from pets and children.",
+    "citations": [
+      "Drafter-sourced horticulture (Hedera climber standard substrate)",
+      "Drafter-sourced toxicity reference (triterpenoid saponins; contact dermatitis)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "schefflera",
+    "scientificName": "Schefflera",
+    "commonNames": ["Umbrella tree", "Umbrella plant", "Dwarf umbrella tree"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Schefflera (umbrella tree) is a woody tropical that grows vigorously in a standard well-draining coir-perlite-bark mix kept evenly moist. Modelled at genus rank (S. arboricola and S. actinophylla). Toxic: the foliage contains insoluble calcium-oxalate crystals that irritate the mouth and gut of pets and humans if chewed — keep out of reach of cats, dogs and children.",
+    "citations": [
+      "Drafter-sourced horticulture (Schefflera standard substrate)",
+      "Drafter-sourced toxicity reference (insoluble calcium oxalate)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "euphorbia-pulcherrima",
+    "scientificName": "Euphorbia pulcherrima",
+    "commonNames": ["Poinsettia", "Christmas star"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Euphorbia pulcherrima (poinsettia) is grown as a short-lived flowering houseplant; a free-draining standard coir-perlite-bark mix kept lightly moist (never waterlogged) is correct — its roots rot fast in sodden media. Irritant/latex: like all Euphorbia it exudes a milky latex sap that irritates skin and eyes and causes mild mouth and stomach upset if eaten. Its toxicity is widely overstated, but the latex is a genuine irritant, so wash hands after handling and keep cuttings from pets and children.",
+    "citations": [
+      "Drafter-sourced horticulture (poinsettia well-draining standard substrate)",
+      "Drafter-sourced toxicity reference (Euphorbia latex irritant; toxicity overstated)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
+  },
+  {
+    "id": "dionaea-muscipula",
+    "scientificName": "Dionaea muscipula",
+    "commonNames": ["Venus flytrap"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "carnivorous-peat-sand" },
+    "speciesRationale": "Dionaea muscipula (Venus flytrap) is a temperate carnivorous bog plant and the sole species needing the carnivorous-peat-sand archetype: a nutrient-poor 50/50 sphagnum-peat and lime-free silica-sand mix. Its care is unlike any other houseplant — water ONLY with distilled, reverse-osmosis or rainwater (tap-water minerals are lethal over time), give it NO fertiliser (it feeds by trapping insects) and NO lime or dolomite, keep the medium permanently damp in bright direct light, and respect its winter dormancy (a cool rest of several weeks). Non-toxic, but avoid triggering the traps for amusement — each trap closes only a limited number of times.",
+    "citations": [
+      "Drafter-sourced horticulture (carnivorous bog mix; distilled-water/no-fertiliser/no-lime mandate; dormancy)",
+      "PLANTPOTTING-0009 §3 — care-lane mapping table"
+    ]
   }
 ]

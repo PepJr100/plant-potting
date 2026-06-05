@@ -49,6 +49,7 @@ sprints:
     updated: "2026-06-05T02:14:52+00:00"
   - id: PLANTPOTTING-0009
     title: "Text-only KB-expansion: +16 delta species (10->26 mapped), Pilea deferred"
-    status: planned
+    status: in-progress
+    executor: opus (claude-opus-4-8)
     created: "2026-06-05T10:55:38+00:00"
-    updated: "2026-06-05T11:12:31+00:00"
+    updated: "2026-06-05T11:49:42+00:00"
