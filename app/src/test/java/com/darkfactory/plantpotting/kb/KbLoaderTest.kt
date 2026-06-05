@@ -13,14 +13,14 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [34])
 class KbLoaderTest {
     @Test
-    fun loadsBundledKbWithNineArchetypesAndThirtyTwoSpecies() =
+    fun loadsBundledKbWithNineArchetypesAndFortyFourSpecies() =
         runBlocking {
-            // PLANTPOTTING-0009: 9 archetypes (+carnivorous-peat-sand), 32 species (16 + 16 delta).
+            // PLANTPOTTING-0010: 9 archetypes (unchanged), 44 species (32 + 12 popular-slice delta).
             val context = ApplicationProvider.getApplicationContext<Context>()
             val loader = KbLoader(assets = context.assets)
             val kb = loader.load()
             assertThat(kb.archetypes).hasSize(9)
-            assertThat(kb.species).hasSize(32)
+            assertThat(kb.species).hasSize(44)
         }
 
     @Test

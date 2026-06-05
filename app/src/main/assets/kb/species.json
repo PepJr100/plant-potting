@@ -417,5 +417,161 @@
       "Drafter-sourced horticulture (carnivorous bog mix; distilled-water/no-fertiliser/no-lime mandate; dormancy)",
       "PLANTPOTTING-0009 §3 — care-lane mapping table"
     ]
+  },
+  {
+    "id": "chamaedorea-elegans",
+    "scientificName": "Chamaedorea elegans",
+    "commonNames": ["Parlor palm", "Neanthe bella palm"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Chamaedorea elegans (parlor palm) is a small, shade-tolerant understorey palm with fine fibrous roots that want a free-draining yet moisture-holding medium; the standard coir-perlite-bark mix kept lightly moist matches its substrate envelope, and a dedicated palm archetype was rejected as redundant (it shares the lane with the areca palm). Non-toxic to cats and dogs — one of the safest choices for pet households.",
+    "citations": [
+      "Drafter-sourced horticulture (Chamaedorea understorey palm; standard substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: parlor palm non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "strelitzia-reginae",
+    "scientificName": "Strelitzia reginae",
+    "commonNames": ["Bird of paradise", "Crane flower"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Strelitzia reginae (bird of paradise) is a large, vigorous terrestrial with thick fleshy roots that need a rich but free-draining medium; the standard coir-perlite-bark mix kept evenly moist in the growing season suits it, while sharp drainage protects the roots from rot. Mildly toxic to pets: the foliage and especially the seeds contain tannins and a toxic compound that cause drooling, vomiting and lethargy if eaten — keep fruit and seeds away from cats and dogs.",
+    "citations": [
+      "Drafter-sourced horticulture (Strelitzia rich free-draining standard substrate)",
+      "Drafter-sourced toxicity reference (mild pet toxicity; seeds)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "aspidistra-elatior",
+    "scientificName": "Aspidistra elatior",
+    "commonNames": ["Cast iron plant"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Aspidistra elatior (cast iron plant) earns its name as a near-indestructible low-light terrestrial; its rhizomatous roots tolerate a broad moisture range and do well in a standard coir-perlite-bark mix that drains freely yet holds some moisture. It dislikes being waterlogged or repotted often. Non-toxic to cats and dogs — a safe, forgiving choice for pet households and beginners.",
+    "citations": [
+      "Drafter-sourced horticulture (Aspidistra tolerant rhizomatous terrestrial; standard substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: cast iron plant non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "asplenium-nidus",
+    "scientificName": "Asplenium nidus",
+    "commonNames": ["Bird's nest fern"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Asplenium nidus (bird's nest fern) is an epiphytic fern that, indoors, wants a loose, organic, evenly-damp medium that never fully dries; the coir-led moisture-retentive mix with sphagnum buffers the steady moisture its fine roots need while the bark and perlite keep enough air around the crown to prevent rot. Non-toxic to cats and dogs.",
+    "citations": [
+      "Drafter-sourced horticulture (Asplenium epiphytic fern; moisture-retentive substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: bird's nest fern non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "asparagus-setaceus",
+    "scientificName": "Asparagus setaceus",
+    "commonNames": ["Asparagus fern", "Lace fern"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Asparagus setaceus (asparagus fern) is not a true fern but an Asparagaceae with tuberous, water-storing roots; it thrives in a free-draining standard coir-perlite-bark mix kept lightly moist and resents both sodden media and prolonged drought. Toxic: the small red berries contain sapogenins that cause vomiting and diarrhoea if eaten by pets or children, and repeated skin contact with the foliage can cause dermatitis — site it out of reach and handle with light care.",
+    "citations": [
+      "Drafter-sourced horticulture (Asparagus setaceus tuberous-rooted; standard substrate)",
+      "Drafter-sourced toxicity reference (sapogenin berries; contact dermatitis)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "begonia",
+    "scientificName": "Begonia (spp.)",
+    "commonNames": ["Begonia"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Begonia is modelled at genus rank across the many commercial fibrous-, rhizomatous- and tuberous-rooted types sold as houseplants; they share a preference for a light, free-draining standard coir-perlite-bark mix kept lightly moist but never wet, which protects their shallow roots and crowns from the rot they are prone to. Modelled coarsely — rex/tuberous types want a touch more airiness, a recorded sub-genus gap. Toxic to pets: begonias contain soluble calcium oxalates, most concentrated in the underground parts, that cause oral irritation, drooling and vomiting if chewed by cats and dogs.",
+    "citations": [
+      "Drafter-sourced horticulture (Begonia light free-draining standard substrate; rot-prone crowns)",
+      "Drafter-sourced toxicity reference (soluble calcium oxalates, pets; tubers most toxic)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "hypoestes-phyllostachya",
+    "scientificName": "Hypoestes phyllostachya",
+    "commonNames": ["Polka dot plant", "Freckle face"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Hypoestes phyllostachya (polka dot plant) is a small tropical terrestrial that wilts quickly when the substrate dries and crisps in low humidity; the coir-led moisture-retentive mix with sphagnum holds the steady, even moisture it needs, while the perlite fraction keeps it from turning sodden. Non-toxic to cats and dogs — a safe, colourful pick for pet households.",
+    "citations": [
+      "Drafter-sourced horticulture (Hypoestes dry-back-intolerant tropical; moisture-retentive substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: polka dot plant non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "beaucarnea-recurvata",
+    "scientificName": "Beaucarnea recurvata",
+    "commonNames": ["Ponytail palm", "Elephant's foot"],
+    "aliases": ["Nolina recurvata"],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Beaucarnea recurvata (ponytail palm) is not a palm but a caudiciform Asparagaceae that stores water in its swollen basal stem and evolved in semi-arid Mexico; the gritty mineral-led succulent mix is essential because its caudex and roots rot in moisture-retentive media, and it should be watered only when the substrate has dried fully. Non-toxic to cats and dogs.",
+    "citations": [
+      "Drafter-sourced horticulture (Beaucarnea caudex water-storage; gritty-mineral substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: ponytail palm non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "cycas-revoluta",
+    "scientificName": "Cycas revoluta",
+    "commonNames": ["Sago palm", "King sago"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Cycas revoluta (sago palm) is a cycad — not a true palm — with a water-storing trunk and coralloid roots adapted to lean, fast-draining ground; the gritty mineral-led succulent mix prevents the root and crown rot it suffers in heavy, wet media, and it should dry well between waterings. SEVERELY TOXIC: every part, and especially the seeds, contains cycasin, which causes vomiting, liver failure and death in dogs even in small amounts — it is one of the most dangerous houseplants for pets and children. Keep strictly out of reach and wash hands after handling.",
+    "citations": [
+      "Drafter-sourced horticulture (Cycas cycad lean gritty substrate; rot-prone)",
+      "Drafter-sourced toxicity reference (cycasin; severe hepatotoxicity in dogs; seeds most toxic)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "yucca",
+    "scientificName": "Yucca (spp.)",
+    "commonNames": ["Yucca", "Spineless yucca"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "succulent-gritty" },
+    "speciesRationale": "Yucca is modelled at genus rank across the cane-form species sold indoors (notably Y. gigantea / elephantipes); these are drought-adapted woody monocots that store water and demand the fast-drying gritty mineral mix to keep their thick roots and cane bases from rotting in wet media. Mildly toxic to pets: the leaves contain steroidal saponins that cause vomiting and drooling in cats and dogs if chewed; the leaf tips can also be sharp.",
+    "citations": [
+      "Drafter-sourced horticulture (Yucca drought-adapted; gritty-mineral substrate)",
+      "Drafter-sourced toxicity reference (steroidal saponins, pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "ctenanthe",
+    "scientificName": "Ctenanthe (spp.)",
+    "commonNames": ["Ctenanthe", "Never never plant"],
+    "aliases": [],
+    "mapping": { "kind": "single", "archetypeId": "moisture-retentive" },
+    "speciesRationale": "Ctenanthe is a Marantaceae prayer-plant relative modelled at genus rank; like Maranta and Goeppertia it is a shallow-rooted tropical terrestrial that punishes substrate dry-back with crisping, curling leaf edges, so the coir-led moisture-retentive mix with sphagnum holds the steady even moisture it needs while staying aerated. Non-toxic to cats and dogs.",
+    "citations": [
+      "Drafter-sourced horticulture (Ctenanthe Marantaceae dry-back-intolerant; moisture-retentive substrate)",
+      "Drafter-sourced toxicity reference (ASPCA: Ctenanthe/prayer-plant relatives non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
+  },
+  {
+    "id": "schlumbergera-bridgesii",
+    "scientificName": "Schlumbergera bridgesii",
+    "commonNames": ["Christmas cactus", "Holiday cactus"],
+    "aliases": ["Schlumbergera x buckleyi"],
+    "mapping": { "kind": "single", "archetypeId": "aroid-chunky" },
+    "speciesRationale": "Schlumbergera bridgesii (Christmas cactus) is an epiphytic forest cactus, not a desert one: in the wild it grows in pockets of leaf litter on tree branches and wants a chunky, airy, moderately organic medium that holds some moisture but drains fast. The bark-led aroid-chunky mix (bark, coir, perlite, sphagnum, charcoal) is a good coarse fit for that epiphytic root habit — far closer than a gritty desert-cactus mix. Coarse mapping recorded: it sits in the chunky-airy lane rather than a dedicated epiphytic-cactus archetype. Non-toxic to cats and dogs (mild stomach upset at most if eaten).",
+    "citations": [
+      "Drafter-sourced horticulture (Schlumbergera epiphytic forest cactus; chunky airy organic medium)",
+      "Drafter-sourced toxicity reference (ASPCA: Christmas cactus non-toxic to pets)",
+      "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
+    ]
   }
 ]

@@ -56,6 +56,23 @@ class HousePlantClassMapValidationTest {
             "Venus Flytrap" to "dionaea-muscipula",
         )
 
+    /** The 12 PLANTPOTTING-0010 delta labels → expected KB id (verbatim from the plan §Phase 2). */
+    private val newLabel2010ToKbId =
+        mapOf(
+            "Parlor Palm (Chamaedorea elegans)" to "chamaedorea-elegans",
+            "Bird of Paradise (Strelitzia reginae)" to "strelitzia-reginae",
+            "Cast Iron Plant (Aspidistra elatior)" to "aspidistra-elatior",
+            "Birds Nest Fern (Asplenium nidus)" to "asplenium-nidus",
+            "Asparagus Fern (Asparagus setaceus)" to "asparagus-setaceus",
+            "Begonia (Begonia spp.)" to "begonia",
+            "Polka Dot Plant (Hypoestes phyllostachya)" to "hypoestes-phyllostachya",
+            "Ponytail Palm (Beaucarnea recurvata)" to "beaucarnea-recurvata",
+            "Sago Palm (Cycas revoluta)" to "cycas-revoluta",
+            "Yucca" to "yucca",
+            "Ctenanthe" to "ctenanthe",
+            "Christmas Cactus (Schlumbergera bridgesii)" to "schlumbergera-bridgesii",
+        )
+
     /** The 10 pre-existing mapped rows → KB id (positive regression guard). */
     private val existingLabelToKbId =
         mapOf(
@@ -120,15 +137,15 @@ class HousePlantClassMapValidationTest {
     }
 
     @Test
-    fun mapsExactlyTwentySixClasses() {
-        // 10 existing + 16 new — guards against both accidental extras and silent drops.
-        assertThat(mappingRows()).hasSize(26)
+    fun mapsExactlyThirtyEightClasses() {
+        // 10 (0007) + 16 (0009) + 12 (0010) — guards against both accidental extras and silent drops.
+        assertThat(mappingRows()).hasSize(38)
     }
 
     @Test
     fun eachNewLabelResolvesToExpectedKbId() {
         val rows = mappingRows()
-        for ((label, expectedId) in newLabelToKbId) {
+        for ((label, expectedId) in newLabelToKbId + newLabel2010ToKbId) {
             val row = rows[label]
             assertWithMessage("new label '$label' present").that(row).isNotNull()
             assertWithMessage("new label '$label' kbSpeciesId")

@@ -28,9 +28,62 @@ class KbContentSpeciesTest {
     private val archetypeIds: Set<String> by lazy { archetypes.map { it.id }.toSet() }
 
     @Test
-    fun bundlesExactlyThirtyTwoSpecies() {
-        // PLANTPOTTING-0009: 16 original + 16 delta species = 32.
-        assertThat(species).hasSize(32)
+    fun bundlesExactlyFortyFourSpecies() {
+        // PLANTPOTTING-0010: 32 (0009) + 12 popular-slice delta species = 44.
+        assertThat(species).hasSize(44)
+    }
+
+    /** PLANTPOTTING-0010 delta species → expected archetype id. */
+    private val delta2010ToArchetype =
+        mapOf(
+            "chamaedorea-elegans" to "standard-houseplant",
+            "strelitzia-reginae" to "standard-houseplant",
+            "aspidistra-elatior" to "standard-houseplant",
+            "asplenium-nidus" to "moisture-retentive",
+            "asparagus-setaceus" to "standard-houseplant",
+            "begonia" to "standard-houseplant",
+            "hypoestes-phyllostachya" to "moisture-retentive",
+            "beaucarnea-recurvata" to "succulent-gritty",
+            "cycas-revoluta" to "succulent-gritty",
+            "yucca" to "succulent-gritty",
+            "ctenanthe" to "moisture-retentive",
+            "schlumbergera-bridgesii" to "aroid-chunky",
+        )
+
+    @Test
+    fun delta2010SpeciesArePresentMappedAndHaveContent() {
+        val byId = species.associateBy { it.id }
+        for ((id, expectedArchetype) in delta2010ToArchetype) {
+            val s = byId[id]
+            assertWithMessage("delta-2010 species '$id' present").that(s).isNotNull()
+            val mapping = s!!.mapping
+            assertWithMessage("delta-2010 species '$id' is Single-mapped")
+                .that(mapping)
+                .isInstanceOf(ArchetypeMapping.Single::class.java)
+            assertWithMessage("delta-2010 species '$id' archetypeId")
+                .that((mapping as ArchetypeMapping.Single).archetypeId)
+                .isEqualTo(expectedArchetype)
+            // common name + citation content present (matches existing per-field guards).
+            assertWithMessage("delta-2010 species '$id' has a common name")
+                .that(s.commonNames)
+                .isNotEmpty()
+            assertWithMessage("delta-2010 species '$id' has a citation")
+                .that(s.citations)
+                .isNotEmpty()
+        }
+    }
+
+    @Test
+    fun delta2010SpeciesRationaleAddressesToxicityOrSafety() {
+        // Every popular-slice species vets toxicity in its rationale (toxic flag or pet-safe note).
+        val byId = species.associateBy { it.id }
+        val safetyTerms = listOf("toxic", "non-toxic", "irritant", "pet", "safe", "cycasin", "saponin", "oxalate")
+        for (id in delta2010ToArchetype.keys) {
+            val rationale = byId[id]!!.speciesRationale.lowercase()
+            assertWithMessage("delta-2010 species '$id' rationale addresses toxicity/safety")
+                .that(safetyTerms.any { rationale.contains(it) })
+                .isTrue()
+        }
     }
 
     @Test

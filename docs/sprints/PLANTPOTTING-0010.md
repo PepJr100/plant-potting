@@ -33,7 +33,7 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
 - [ ] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
 - [ ] Bundled, **license-clean (CC0/PD)** reference imagery on plant detail / recipe views, within an explicit
       APK-size budget, with a checked-in attribution manifest.
-- [ ] A bounded **text-only KB expansion** over remaining popular unmapped model classes; Pilea stays unmapped.
+- [x] A bounded **text-only KB expansion** over remaining popular unmapped model classes; Pilea stays unmapped.
 - [ ] App version bumped (`versionCode 3→4`, `versionName 0.3.0→0.4.0`); a debug APK + theme screenshots
       delivered for review.
 - [ ] `verifyNoNetworking` and `scripts/check-stub-isolation.sh` stay GREEN throughout.
@@ -145,18 +145,18 @@ is currently invisible (it collapses into the low-confidence verdict).
       timestamps, empty-store cold read.
 
 ### Phase 2 — Pillar C: text-only KB expansion (independent, lowest-risk — land early)
-- [ ] Diff `house_plant_species_mobilenetv2/labels.csv` against `plant_class_map.json`; list the remaining 21
+- [x] Diff `house_plant_species_mobilenetv2/labels.csv` against `plant_class_map.json`; list the remaining 21
       unmapped classes and pick the popular slice (exclude Pilea; **keep at least one high-confidence unmapped
       class unmapped** so Phase 5's Add-this-plant has a real fixture to exercise).
-- [ ] Append new species rows to `app/src/main/assets/kb/species.json` (append-only; reuse existing archetypes
+- [x] Append new species rows to `app/src/main/assets/kb/species.json` (append-only; reuse existing archetypes
       where possible); add archetype rows to `archetypes.json` only if no existing archetype fits.
-- [ ] Add verbatim-label rows to `plant_class_map.json` (mark coarse/genus rows `alias:true` + `_note`, per the
+- [x] Add verbatim-label rows to `plant_class_map.json` (mark coarse/genus rows `alias:true` + `_note`, per the
       0009 convention).
-- [ ] Update count assertions: `HousePlantClassMapValidationTest` (mapped count — keep Pilea-absence +
+- [x] Update count assertions: `HousePlantClassMapValidationTest` (mapped count — keep Pilea-absence +
       existing-row regression guards), `KbContentSpeciesTest` / `KbLoaderTest` (species & archetype counts).
-- [ ] Add content tests (toxicity, common name, citation, sum-to-100 recipe) matching existing `KbContentSpeciesTest`
+- [x] Add content tests (toxicity, common name, citation, sum-to-100 recipe) matching existing `KbContentSpeciesTest`
       style; vet content for each new species.
-- [ ] Record the slice + citations in `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0010`; document the new
+- [x] Record the slice + citations in `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0010`; document the new
       mappings as **editorial / model-vocabulary coverage, not calibrated** behaviour.
 
 ### Phase 3 — Pillar A polish on existing screens (independent of persistence)

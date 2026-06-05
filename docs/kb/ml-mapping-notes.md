@@ -292,3 +292,60 @@ classes have **not** been calibrated against real first-party photos — per-cla
 behaviour is assumed-from-routing, not measured. A coarse class could in principle fire a
 confident-but-marginal card; the coarse `alias` routing + existing gating is the mitigation. This
 gap is closed only when imagery/probing work is greenlit.
+
+### PLANTPOTTING-0010 — text-only popular-slice KB-expansion (26 → 38)
+
+Pure content/config (same discipline as 0009): **no ML, no fine-tune, no imagery, no real-photo
+probing.** Adds **12 more popular-slice species** so the house-plant `plant_class_map.json` now
+covers **38 of 47** model classes. Every key below was copied byte-for-byte from
+`house_plant_species_mobilenetv2/labels.csv` (CI-guarded by
+`HousePlantClassMapValidationTest.everyMappingKeyIsVerbatimLabelLine` /
+`.mapsExactlyThirtyEightClasses`).
+
+| # | Exact model label | KB id | Map kind | Archetype | Toxicity flag |
+|---|---|---|---|---|---|
+| 1 | `Parlor Palm (Chamaedorea elegans)` | `chamaedorea-elegans` | exact | standard-houseplant | non-toxic (pet-safe) |
+| 2 | `Bird of Paradise (Strelitzia reginae)` | `strelitzia-reginae` | exact | standard-houseplant | mild toxic to pets (seeds) |
+| 3 | `Cast Iron Plant (Aspidistra elatior)` | `aspidistra-elatior` | exact | standard-houseplant | non-toxic (pet-safe) |
+| 4 | `Birds Nest Fern (Asplenium nidus)` | `asplenium-nidus` | exact | moisture-retentive | non-toxic (pet-safe) |
+| 5 | `Asparagus Fern (Asparagus setaceus)` | `asparagus-setaceus` | exact | standard-houseplant | toxic (sapogenin berries; dermatitis) |
+| 6 | `Begonia (Begonia spp.)` | `begonia` | coarse/genus (`alias`) | standard-houseplant | toxic to pets (soluble oxalates) |
+| 7 | `Polka Dot Plant (Hypoestes phyllostachya)` | `hypoestes-phyllostachya` | exact | moisture-retentive | non-toxic (pet-safe) |
+| 8 | `Ponytail Palm (Beaucarnea recurvata)` | `beaucarnea-recurvata` | exact | succulent-gritty | non-toxic (pet-safe) |
+| 9 | `Sago Palm (Cycas revoluta)` | `cycas-revoluta` | exact | succulent-gritty | **SEVERELY toxic** (cycasin; fatal to dogs) |
+| 10 | `Yucca` | `yucca` | coarse/genus (`alias`) | succulent-gritty | mild toxic to pets (saponins) |
+| 11 | `Ctenanthe` | `ctenanthe` | coarse/genus (`alias`) | moisture-retentive | non-toxic (pet-safe) |
+| 12 | `Christmas Cactus (Schlumbergera bridgesii)` | `schlumbergera-bridgesii` | exact label / **coarse care-lane** | aroid-chunky | non-toxic (pet-safe) |
+
+**Coarse/genus rows.** Three bare/`spp.` model classes (Begonia, Yucca, Ctenanthe) map a broad
+class onto a representative KB species, tagged `alias: true` with a `_note`, following the 0007/0009
+`Orchid`→phalaenopsis precedent. Confidence gating in the seam handles weak hits; sub-species
+substrate divergence within those genera is not modelled (recorded gap).
+
+**Christmas Cactus — exact label, deliberately coarse archetype.** `Schlumbergera bridgesii` is a
+species-rank label, so it is **not** an `alias` row — but its mapping to `aroid-chunky` is a
+*care-lane* approximation: Schlumbergera is an epiphytic forest cactus (leaf-litter on branches),
+so the bark-led chunky-airy mix is far closer than a gritty desert-cactus mix. There is no
+dedicated epiphytic-cactus archetype this sprint; the `_note` records the coarse fit.
+
+**Deliberate non-mappings preserved.** `Chinese Money Plant (Pilea peperomioides)` stays **unmapped**
+(CI-enforced by `pileaIsNotMapped`; the pothos↔Pilea boundary fix is still deferred) and serves as
+the live confident-but-unmapped fixture for PLANTPOTTING-0010's "Add this plant" routing.
+`Rattlesnake Plant (Calathea lancifolia)` stays unmapped (different species from goeppertia-orbifolia).
+`Iron Cross begonia (Begonia masoniana)` is left unmapped (rex-type, distinct moisture preference)
+rather than folded into the coarse `begonia` row. Seasonal flowering bulbs/outdoor classes
+(Chrysanthemum, Daffodils, Hyacinth, Lilium, Lily of the valley, Tulip) are intentionally **out of
+scope** — they are not potting-mix houseplants and mapping them to a generic mix would be
+editorially weak. 9 model classes remain unmapped of 47.
+
+**AIY coverage rows (coverage-invariant maintenance).** As in 0009,
+`ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies` requires every bundled KB
+species be reachable from the **AIY** map, so 12 **non-alias** dormant rows (keyed by scientificName)
+were added to `aiy_plants_v1/plant_class_map.json`. None of the 12 are expected to be live in AIY's
+2102-label vocabulary; they exist purely to preserve the cross-model coverage invariant (recorded
+and accepted).
+
+**Known gap — UNPROBED calibration (unchanged from 0009).** All 12 new mappings are **editorial /
+model-vocabulary coverage only** — NOT calibrated against real first-party photos. Per-class
+confidence behaviour is assumed-from-routing, not measured; the coarse `alias`/care-lane routing +
+existing confidence gating is the mitigation. Closed only when imagery/probing is greenlit.
