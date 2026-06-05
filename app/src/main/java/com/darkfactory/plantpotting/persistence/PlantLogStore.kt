@@ -16,6 +16,9 @@ interface PlantLogStore {
     /** Add-this-plant request totals, one row per model class. */
     val addPlantRequests: Flow<List<AddPlantRequest>>
 
+    /** PLANTPOTTING-0010 D5 — persisted debug theme-candidate name (defaults to "LEAF"). */
+    val themeCandidate: Flow<String>
+
     /**
      * Append a user-saved plant to **My Plants** (most-recent first), evicting the oldest beyond
      * the N-cap. User-initiated only — never auto-append on every scan.
@@ -32,6 +35,9 @@ interface PlantLogStore {
      * the row at count 1) and refresh its `lastRequestedEpochMs`.
      */
     suspend fun recordAddPlantRequest(modelClassLabel: String)
+
+    /** PLANTPOTTING-0010 D5 — persist the selected debug theme candidate. */
+    suspend fun setThemeCandidate(name: String)
 
     /** One-shot read of the full document (used by restart round-trip tests). */
     suspend fun snapshot(): PlantLogDocument

@@ -16,6 +16,9 @@ import kotlinx.serialization.Serializable
 data class PlantLogDocument(
     val identifiedPlants: List<IdentifiedPlant> = emptyList(),
     val addPlantRequests: List<AddPlantRequest> = emptyList(),
+    // PLANTPOTTING-0010 D5 — debug-only theme-candidate selection, persisted in the same DataStore
+    // ("one local store"). Defaults to the production "LEAF" scheme. Release builds never write it.
+    val themeCandidate: String = "LEAF",
 )
 
 /**

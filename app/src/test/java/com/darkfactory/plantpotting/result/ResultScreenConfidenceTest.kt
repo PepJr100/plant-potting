@@ -65,6 +65,16 @@ class ResultScreenConfidenceTest {
         composeRule.onNodeWithTag(ResultScreenTags.CONFIDENCE_BAR).assertDoesNotExist()
     }
 
+    @Test
+    fun referenceImageRendersForSpeciesWithoutBundledPhoto() {
+        // PLANTPOTTING-0010 Phase 6 — missing-image metadata must not crash rendering: the placeholder
+        // shows for a species with no bundled CC0/PD photo (ficus-lyrata).
+        composeRule.setContent {
+            ResultScreen(viewModel = vm(confidencePct = 50), onSeePottingMix = {})
+        }
+        composeRule.onNodeWithTag(ResultScreenTags.REFERENCE_IMAGE).assertIsDisplayed()
+    }
+
     private fun fixtureKb(): KnowledgeBase {
         val arch =
             Archetype(

@@ -23,6 +23,9 @@ class DataStorePlantLogStore(
     override val addPlantRequests: Flow<List<AddPlantRequest>> =
         dataStore.data.map { it.addPlantRequests }
 
+    override val themeCandidate: Flow<String> =
+        dataStore.data.map { it.themeCandidate }
+
     override suspend fun saveIdentifiedPlant(
         speciesId: String,
         displayName: String,
@@ -68,6 +71,10 @@ class DataStorePlantLogStore(
                 }
             doc.copy(addPlantRequests = updated)
         }
+    }
+
+    override suspend fun setThemeCandidate(name: String) {
+        dataStore.updateData { it.copy(themeCandidate = name) }
     }
 
     override suspend fun snapshot(): PlantLogDocument = dataStore.data.first()

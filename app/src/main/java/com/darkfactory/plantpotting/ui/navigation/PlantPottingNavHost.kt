@@ -14,6 +14,7 @@ import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
+import com.darkfactory.plantpotting.ui.theme.DebugThemeSwitcherScreen
 import com.darkfactory.plantpotting.result.AddThisPlantScreen
 import com.darkfactory.plantpotting.result.ArchetypePickerScreen
 import com.darkfactory.plantpotting.result.LowConfidencePickerScreen
@@ -53,6 +54,7 @@ fun PlantPottingNavHost() {
             CameraScreen(
                 viewModel = hiltViewModel(),
                 onOpenMyPlants = { navController.navigate(Routes.MY_PLANTS) },
+                onOpenThemeSwitcher = { navController.navigate(Routes.THEME_SWITCHER) },
                 onNavigate = { command ->
                     when (command) {
                         is NavCommand.Success ->
@@ -182,6 +184,9 @@ fun PlantPottingNavHost() {
                     navController.navigate(Routes.lowConfidencePicker(emptyList()))
                 },
             )
+        }
+        composable(Routes.THEME_SWITCHER) {
+            DebugThemeSwitcherScreen(viewModel = hiltViewModel())
         }
         composable(Routes.ARCHETYPE_PICKER) {
             ArchetypePickerScreen(

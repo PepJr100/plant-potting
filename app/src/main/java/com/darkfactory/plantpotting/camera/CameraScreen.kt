@@ -11,6 +11,7 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import com.darkfactory.plantpotting.BuildConfig
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,6 +65,10 @@ fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigate: (NavCommand) -> Unit,
     onOpenMyPlants: () -> Unit = {},
+    onOpenThemeSwitcher: () -> Unit = {},
+    // PLANTPOTTING-0010 D5 — debug-only affordances (theme switcher) are excluded from release.
+    // Parameterised (defaulting to BuildConfig.DEBUG) so the exclusion is deterministically testable.
+    showDebugAffordances: Boolean = BuildConfig.DEBUG,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -234,6 +239,20 @@ fun CameraScreen(
             )
         }
 
+        // PLANTPOTTING-0010 D5 — debug-only theme switcher entry; excluded from release builds.
+        if (showDebugAffordances) {
+            TextButton(
+                onClick = onOpenThemeSwitcher,
+                modifier =
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                        .testTag(CameraScreenTags.THEME_SWITCHER_ENTRY),
+            ) {
+                Text(text = "Theme", color = Color.White)
+            }
+        }
+
         val shutterLabel = stringResource(id = R.string.camera_shutter_label)
         val shutterEnabled =
             (state is CameraUiState.Idle || state is CameraUiState.Failure) &&
@@ -271,6 +290,9 @@ object CameraScreenTags {
 
     /** PLANTPOTTING-0010 Phase 4 — opens the My Plants folder. */
     const val MY_PLANTS_ENTRY = "camera.myPlantsEntry"
+
+    /** PLANTPOTTING-0010 D5 — debug-only theme-switcher entry (excluded from release). */
+    const val THEME_SWITCHER_ENTRY = "camera.themeSwitcherEntry"
 
     /** Back-compat tag preserved on the banner body text (was top-center Text pre-0005). */
     const val ERROR = "camera.error"

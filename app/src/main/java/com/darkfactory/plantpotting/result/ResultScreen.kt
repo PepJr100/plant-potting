@@ -1,6 +1,7 @@
 package com.darkfactory.plantpotting.result
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -18,8 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
@@ -49,6 +54,20 @@ fun ResultScreen(
             return@Column
         }
 
+        // PLANTPOTTING-0010 Phase 6 — license-clean reference image (or authored placeholder) for the
+        // click-through plant. The placeholder is tinted with the theme primary; a real CC0/PD WebP
+        // (when bundled) renders untinted.
+        val hasRealImage = PlantImageResolver.hasRealImage(state.speciesId)
+        Image(
+            painter = painterResource(id = PlantImageResolver.drawableFor(state.speciesId)),
+            contentDescription = stringResource(id = R.string.result_reference_image_description),
+            colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+            modifier =
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .size(120.dp)
+                    .testTag(ResultScreenTags.REFERENCE_IMAGE),
+        )
         Text(
             text = state.scientificName,
             style = MaterialTheme.typography.headlineMedium.copy(fontStyle = FontStyle.Italic),
@@ -151,4 +170,7 @@ object ResultScreenTags {
     // PLANTPOTTING-0010 Phase 4 — Save to My Plants.
     const val SAVE_TO_MY_PLANTS = "result.saveToMyPlants"
     const val SAVED_INDICATOR = "result.saved"
+
+    // PLANTPOTTING-0010 Phase 6 — reference image (real CC0/PD photo or authored placeholder).
+    const val REFERENCE_IMAGE = "result.referenceImage"
 }

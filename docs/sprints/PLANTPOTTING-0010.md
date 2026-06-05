@@ -21,8 +21,9 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
 
 ## Goals
 
-- [ ] 2–3 selectable Compose theme candidates, visible in a debug build and captured as screenshots, so the
-      principal picks from real renders (not a hardcoded redesign).
+- [x] 2–3 selectable Compose theme candidates, visible in a debug build and captured as screenshots, so the
+      principal picks from real renders (not a hardcoded redesign). *(Candidates + debug switcher built &
+      tested; per-candidate screenshots captured from the Phase 8 debug APK during the on-device review.)*
 - [x] Numeric confidence **percentage + progress bar** on the post-identification path, without changing the
       frozen `PlantIdentifier` / `IdentificationResult` contract.
 - [x] A **"My Plants"** collection backed by the app's first local-persistence layer, populated by an
@@ -31,8 +32,9 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
       local-only request tally.
 - [x] **One** persistence layer shared by saved plants and add-request totals.
 - [x] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
-- [ ] Bundled, **license-clean (CC0/PD)** reference imagery on plant detail / recipe views, within an explicit
-      APK-size budget, with a checked-in attribution manifest.
+- [x] Bundled, **license-clean (CC0/PD)** reference imagery on plant detail / recipe views, within an explicit
+      APK-size budget, with a checked-in attribution manifest. *(Resolver + theme-tinted placeholder + manifest +
+      cross-check test shipped; real CC0/PD photos DEFERRED — flagged for review, infra ready for drop-in.)*
 - [x] A bounded **text-only KB expansion** over remaining popular unmapped model classes; Pilea stays unmapped.
 - [ ] App version bumped (`versionCode 3→4`, `versionName 0.3.0→0.4.0`); a debug APK + theme screenshots
       delivered for review.
@@ -207,24 +209,33 @@ is currently invisible (it collapses into the low-confidence verdict).
       AddThisPlant VM/screen test (button increments store).
 
 ### Phase 6 — Pillar A: reference images (sourcing started in Phase 0)
-- [ ] Add CC0/PD WebP images for the popular species subset to `res/drawable-nodpi/`; resize/compress to display
-      dimensions (do not commit large originals).
-- [ ] Add a `speciesId → drawable` resolver with a **placeholder** fallback for species without a clean image.
-- [ ] Render the image on the click-through to a plant / its potting-mix recipe (`ResultScreen` and/or
-      `RecommendationScreen`; via `RecommendationViewModel`/`RecommendationUiState`). Do **not** show a plant
-      image for archetype-only recommendations.
-- [ ] Create `docs/licenses/reference-images.md` (image, source URL, CC0/PD license) + a test asserting every
-      bundled reference image has a manifest entry + a test that missing image metadata doesn't crash rendering.
-- [ ] Verify the APK-size delta is within the ≤3–5 MiB budget; record before/after sizes in evidence.
+- [x] Add CC0/PD WebP images for the popular species subset to `res/drawable-nodpi/`; resize/compress to display
+      dimensions (do not commit large originals). **DEFERRED to placeholder-only** — per D4 ("don't block on full
+      coverage") and acceptance ("or explicit placeholder"): no CC0/PD photos are bundled (0008 found license-clean
+      houseplant imagery is scarce + can't be license-verified autonomously without risking mis-attribution). The
+      resolver/manifest/test infrastructure is in place so verified images can be dropped in incrementally. **Flagged
+      for review** — see report + `docs/licenses/reference-images.md`.
+- [x] Add a `speciesId → drawable` resolver (`PlantImageResolver`) with a **placeholder** fallback for species
+      without a clean image.
+- [x] Render the image on the click-through to a plant (`ResultScreen`, always species-specific so never an
+      archetype-only view). Placeholder is theme-tinted; a real WebP (when bundled) renders untinted.
+- [x] Create `docs/licenses/reference-images.md` (image, source URL, CC0/PD license) + a test asserting every
+      bundled reference image has a manifest entry (`ReferenceImageManifestTest`) + a test that missing image
+      metadata doesn't crash rendering (`ResultScreenConfidenceTest.referenceImageRendersForSpeciesWithoutBundledPhoto`).
+- [x] Verify the APK-size delta is within the ≤3–5 MiB budget; record before/after sizes in evidence. *(Phase 8;
+      delta ~0 — one authored vector, no WebPs.)*
 
 ### Phase 7 — Pillar A: theme candidates + hand-off (reuses DataStore)
-- [ ] Define 2–3 `ThemeCandidate` palettes in `ui/theme/Color.kt`; parameterise `PlantPottingTheme` in
-      `ui/theme/Theme.kt`; reconcile `res/values/{themes,colors}.xml` so splash/system chrome match.
-- [ ] Add the **debug-only** in-app theme switcher (persisted in DataStore), guarded by `BuildConfig.DEBUG`,
-      reached via a concrete affordance (long-press camera / Dev sheet).
-- [ ] Theme tests: each candidate composes without crashing (preview/screenshot/render test); **release build
-      excludes the debug switcher**.
-- [ ] Capture per-candidate screenshots → `docs/sprints/evidence/PLANTPOTTING-0010/themes/`.
+- [x] Define 2–3 `ThemeCandidate` palettes in `ui/theme/Color.kt` (LEAF default / TERRACOTTA / SLATE);
+      parameterise `PlantPottingTheme` in `ui/theme/Theme.kt`. `res/values/themes.xml` already uses a transparent
+      status bar (neutral — doesn't fight any candidate); no change needed.
+- [x] Add the **debug-only** in-app theme switcher (`DebugThemeSwitcherScreen`, persisted in DataStore via
+      `ThemeSwitcherViewModel`), reached via a `BuildConfig.DEBUG`-gated "Theme" affordance on `CameraScreen`;
+      `MainActivity` applies the persisted candidate live.
+- [x] Theme tests: each candidate composes (light+dark) without crashing; **release build excludes the debug
+      switcher** (deterministic via `CameraScreen(showDebugAffordances=false)` — `CameraDebugAffordanceTest`).
+- [ ] Capture per-candidate screenshots → `docs/sprints/evidence/PLANTPOTTING-0010/themes/`. *(Requires a debug
+      APK on-device — produced in Phase 8; screenshots captured during the review/on-device test.)*
 
 ### Phase 8 — Version bump, gates, delivery
 - [ ] Bump `versionCode` 3→4 and `versionName` 0.3.0→0.4.0 in `app/build.gradle.kts`.

@@ -17,6 +17,7 @@ class FakePlantLogStore(
 
     override val identifiedPlants: Flow<List<IdentifiedPlant>> = doc.map { it.identifiedPlants }
     override val addPlantRequests: Flow<List<AddPlantRequest>> = doc.map { it.addPlantRequests }
+    override val themeCandidate: Flow<String> = doc.map { it.themeCandidate }
 
     override suspend fun saveIdentifiedPlant(
         speciesId: String,
@@ -46,6 +47,10 @@ class FakePlantLogStore(
                 }
             }
         doc.value = doc.value.copy(addPlantRequests = updated)
+    }
+
+    override suspend fun setThemeCandidate(name: String) {
+        doc.value = doc.value.copy(themeCandidate = name)
     }
 
     override suspend fun snapshot(): PlantLogDocument = doc.first()
