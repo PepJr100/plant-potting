@@ -1,5 +1,5 @@
 ---
-through_sid: PLANTPOTTING-0007
+through_sid: PLANTPOTTING-0008
 ---
 
 # Feature ideas — async funnel
@@ -13,7 +13,7 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-- small UX issue, taking picture then going back from results screen causes the "take picture" button to grey out. 
+_(none open — last raw idea folded into PLANTPOTTING-0008)_
 
 ## developed idea
 
@@ -22,6 +22,14 @@ _(none yet — raw ideas that have been fleshed out into a paragraph go here)_
 ## idea decisions
 
 ### accepted and added to roadmap or sprint
+
+- **PLANTPOTTING-0008 (folded-in UX bug) = shutter button greys out after back-nav from results.**
+  Raw idea *"taking picture then going back from results screen causes the 'take picture' button to
+  grey out"* pulled into PLANTPOTTING-0008 (the training-data availability spike) as the sprint's one
+  code change. Root-caused during planning: the back-stack `CameraViewModel` is left at
+  `CameraUiState.Success` after a capture, and the shutter enables only on `Idle`/`Failure`
+  (`CameraScreen.kt:191`) — fix resets to `Idle` on return via the existing `viewModel.reset()`.
+  _Accepted 2026-06-05 (`/sprint-planner`): folded into `docs/sprints/PLANTPOTTING-0008.md` Phase 3._
 
 - **PLANTPOTTING-0007 = houseplant model swap (V1 entry).** Raw idea *"the plant ML is too
   limited on houseplants — this needs to get MUCH better sooner"* folded directly into the
