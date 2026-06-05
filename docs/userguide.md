@@ -52,8 +52,11 @@ bottom of the camera screen with a **Try again** action. Tap it to retry.
 
 ## Known limitations
 
-- Only a couple of the 16 knowledge-base species are in the model's vocabulary verbatim,
-  so the **low-confidence picker is common** — that's expected today, not a bug. Widening
-  direct coverage is tracked as the **V1** milestone in [`docs/ROADMAP.md`](ROADMAP.md).
+- The active model now maps **26 of its 47** classes to knowledge-base care cards (widened
+  from 10 by PLANTPOTTING-0009, which added 16 species), but plants outside that vocabulary —
+  and uncertain matches — still route to the **low-confidence picker**, so the picker remains
+  common. That's expected today, not a bug. The newly-mapped species are editorial coverage and
+  have **not** yet been calibrated against real photos. Coverage progress is tracked as the
+  **V1** milestone in [`docs/ROADMAP.md`](ROADMAP.md).
 - Identification is best-effort on-device ML, not a botanical authority. The potting-mix
   recommendation is guidance, not a guarantee.

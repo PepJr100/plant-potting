@@ -1,7 +1,7 @@
 {
   "version": 1,
   "modelLabelsAsset": "ml/house_plant_species_mobilenetv2/labels.csv",
-  "_comment": "PLANTPOTTING-0007 — maps the House Plant Species (47-class) MobileNetV2 model labels to KB speciesIds. Labels are the model's exact output-index order (see labels.csv). 8 exact + 2 coarse = 10 of 16 KB species covered (vs AIY's 2/16). Coarse rows (alias:true with a _note) map a broader model class onto the KB's single representative species; routing honesty still applies (a coarse high-confidence hit maps, a weak one routes low-confidence). 'Rattlesnake Plant (Calathea lancifolia)' is deliberately NOT mapped to goeppertia-orbifolia — it is a different Calathea species. See docs/kb/ml-mapping-notes.md.",
+  "_comment": "PLANTPOTTING-0007 + PLANTPOTTING-0009 — maps the House Plant Species (47-class) MobileNetV2 model labels to KB speciesIds. Labels are the model's exact output-index order (see labels.csv); runtime lookup is EXACT-MATCH on the verbatim label string (including any parenthetical). PLANTPOTTING-0009 added 16 delta species: coverage is now 26 of 47 model classes (was 10). Coarse rows (alias:true with a _note) map a broader model class onto the KB's single representative species; routing honesty still applies (a coarse high-confidence hit maps, a weak one routes low-confidence). The 16 new mappings are editorial/model-vocabulary coverage only — NOT calibrated with real-photo probes (known gap). 'Rattlesnake Plant (Calathea lancifolia)' is deliberately NOT mapped to goeppertia-orbifolia (different Calathea species). 'Chinese Money Plant (Pilea peperomioides)' is deliberately LEFT UNMAPPED this sprint — it ships in a later sprint bundled with the pothos<->Pilea boundary fix so a wrong-but-confident card cannot surface. See docs/kb/ml-mapping-notes.md.",
   "mapping": {
     "Monstera Deliciosa (Monstera deliciosa)": { "kbSpeciesId": "monstera-deliciosa" },
     "Pothos (Ivy arum)":                        { "kbSpeciesId": "epipremnum-aureum", "alias": true, "_note": "Pothos common-name == Epipremnum aureum" },
@@ -12,6 +12,22 @@
     "Jade plant (Crassula ovata)":              { "kbSpeciesId": "crassula-ovata" },
     "African Violet (Saintpaulia ionantha)":    { "kbSpeciesId": "saintpaulia-ionantha" },
     "Orchid":                                   { "kbSpeciesId": "phalaenopsis", "alias": true, "_note": "COARSE: model class 'Orchid' is broader than the KB's Phalaenopsis; mapped because Phalaenopsis is the KB's only (and the most common houseplant) orchid. Flagged in ml-mapping-notes." },
-    "Calathea":                                 { "kbSpeciesId": "goeppertia-orbifolia", "alias": true, "_note": "COARSE/genus: Goeppertia orbifolia was formerly Calathea orbifolia; the model's generic 'Calathea' class is mapped to the KB's only Calathea/Goeppertia. The separate 'Rattlesnake Plant (Calathea lancifolia)' class is intentionally left unmapped (different species)." }
+    "Calathea":                                 { "kbSpeciesId": "goeppertia-orbifolia", "alias": true, "_note": "COARSE/genus: Goeppertia orbifolia was formerly Calathea orbifolia; the model's generic 'Calathea' class is mapped to the KB's only Calathea/Goeppertia. The separate 'Rattlesnake Plant (Calathea lancifolia)' class is intentionally left unmapped (different species)." },
+    "Chinese evergreen (Aglaonema)":            { "kbSpeciesId": "aglaonema", "alias": true, "_note": "COARSE/genus: model class 'Chinese evergreen (Aglaonema)' mapped to the KB's representative Aglaonema entry (PLANTPOTTING-0009)." },
+    "Elephant Ear (Alocasia spp.)":             { "kbSpeciesId": "alocasia", "alias": true, "_note": "COARSE/genus: model class 'Elephant Ear (Alocasia spp.)' mapped to the KB's representative Alocasia entry (PLANTPOTTING-0009)." },
+    "Anthurium (Anthurium andraeanum)":         { "kbSpeciesId": "anthurium-andraeanum" },
+    "Dumb Cane (Dieffenbachia spp.)":           { "kbSpeciesId": "dieffenbachia", "alias": true, "_note": "COARSE/genus: model class 'Dumb Cane (Dieffenbachia spp.)' mapped to the KB's representative Dieffenbachia entry (PLANTPOTTING-0009)." },
+    "Aloe Vera":                                { "kbSpeciesId": "aloe-vera" },
+    "Kalanchoe":                                { "kbSpeciesId": "kalanchoe", "alias": true, "_note": "COARSE/genus: bare model class 'Kalanchoe' mapped to the KB's representative Kalanchoe entry (PLANTPOTTING-0009)." },
+    "Prayer Plant (Maranta leuconeura)":        { "kbSpeciesId": "maranta-leuconeura" },
+    "Boston Fern (Nephrolepis exaltata)":       { "kbSpeciesId": "nephrolepis-exaltata" },
+    "Money Tree (Pachira aquatica)":            { "kbSpeciesId": "pachira-aquatica" },
+    "Areca Palm (Dypsis lutescens)":            { "kbSpeciesId": "dypsis-lutescens" },
+    "Dracaena":                                 { "kbSpeciesId": "dracaena", "alias": true, "_note": "COARSE/genus: bare model class 'Dracaena' mapped to the KB's tree-form Dracaena (marginata/fragrans) entry. The succulent snake plant stays separately mapped to 'dracaena-trifasciata' via 'Snake plant (Sanseviera)' (PLANTPOTTING-0009)." },
+    "Tradescantia":                             { "kbSpeciesId": "tradescantia", "alias": true, "_note": "COARSE/genus: bare model class 'Tradescantia' mapped to the KB's representative Tradescantia entry (PLANTPOTTING-0009)." },
+    "English Ivy (Hedera helix)":               { "kbSpeciesId": "hedera-helix" },
+    "Schefflera":                               { "kbSpeciesId": "schefflera", "alias": true, "_note": "COARSE/genus: bare model class 'Schefflera' mapped to the KB's representative Schefflera entry (PLANTPOTTING-0009)." },
+    "Poinsettia (Euphorbia pulcherrima)":       { "kbSpeciesId": "euphorbia-pulcherrima" },
+    "Venus Flytrap":                            { "kbSpeciesId": "dionaea-muscipula" }
   }
 }

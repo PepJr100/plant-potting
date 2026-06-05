@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-05
-through_sid: PLANTPOTTING-0008
+through_sid: PLANTPOTTING-0009
 ---
 
 # ROADMAP
@@ -11,7 +11,7 @@ in [`docs/sprints/`](sprints/); this file is the current view.
 > Maintained by the `/roadmap` skill (INIT / REFRESH / BUMP). The frontmatter above is
 > parsed by routing — `last_updated` and `through_sid` drive when a REFRESH is due.
 
-## Current state (post-PLANTPOTTING-0008)
+## Current state (post-PLANTPOTTING-0009)
 
 **The fine-tune data spike landed PARTIAL-GO — but review re-pointed V1 at a cheaper win.**
 PLANTPOTTING-0008 was an assess-only desk spike (no training): it counted license-clean CC imagery for
@@ -69,8 +69,18 @@ whether a fine-tuning sprint is even viable.
 > all JVM + `pixel6Api34` gates re-run GREEN. Confirmed intentional in review. To revert: point the
 > `buildConfigField` default back to AIY.
 
-_Derived stats: ~9,100 Kotlin LOC (app/src, incl. tests); 40 unit + 16 instrumentation test
-files; acceptance checkboxes 455/505 ticked (~90%) across `docs/sprints/*.md` (the open boxes are
+> **Ship note (2026-06-05) — PLANTPOTTING-0009 shipped the KB-expansion described above as "the next
+> sprint".** Text-only, zero ML: `species.json` **16 → 32**, the house-plant `plant_class_map.json`
+> **10 → 26 of 47** model classes, **+1 archetype** (`carnivorous-peat-sand`, for Venus Flytrap). Pilea
+> stays deliberately unmapped (CI-enforced) for a later pothos↔Pilea boundary-fix sprint. A free side
+> effect: 3 of the new species (`Aloe vera`, `Hedera helix`, `Euphorbia pulcherrima`) exist in AIY's
+> vocabulary, so the AIY baseline now resolves **5 of 32** (was 2). **Known gap (not closed):** the 16
+> new mappings are editorial/model-vocabulary coverage only — **unprobed**, not calibrated against real
+> photos. Full narrative reconciliation (Layer Status, Species/Model Coverage, Known Gaps, Proposed
+> Path) is deferred to the next `/roadmap refresh`.
+
+_Derived stats: ~9,478 Kotlin LOC (app/src, incl. tests); 41 unit + 11 instrumentation test
+files; acceptance checkboxes 623/673 ticked (~93%) across `docs/sprints/*.md` (the open boxes are
 the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in lieu of)._
 
 ## Layer status
@@ -118,6 +128,7 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 | PLANTPOTTING-0006 | Second in-vocab calibration probe (`crassula-ovata`) + two UX fixes | done | V0.1 multi-species sweep complete — *Crassula ovata* (jade) probes @ 0.1055 (low-conf), honest-fallback assertion in CI; `perSpeciesThresholds` stays empty by design (override not warranted). Two UX fixes: subtitle de-jargoned; `(0%)` chips drop the suffix, stay selectable. **Review surfaced the model-swap milestone — AIY V1/3 recognises wild flora, not houseplants.** |
 | PLANTPOTTING-0007 | Houseplant model swap (V1 entry) — survey, eval harness, running prototype | done | **Model swapped: `house_plant_species_mobilenetv2` (MobileNetV2, Apache-2.0) replaces AIY as the production default.** Coverage 2/16 → **10/16**; top-1 high-conf 1 → 6; latency 43 → 33 ms. Single `ACTIVE_MODEL_ROOT` switch; seam unchanged; live `pixel6Api34` + real-device prototype. AIY kept as regression anchor. Survey rejected PlantNet/PlantCLEF/iNat/ViT candidates (non-existent or not bundle-fit). Known residue: 6 OOV species + pothos→Pilea confusion → next is a data-availability spike. |
 | PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + shutter-on-return UX fix | done | **Assess-only CC-imagery spike → PARTIAL-GO.** 5 OOV species GO (CC counts ~257–790), pothos/Pilea boundary CONDITIONAL (pothos ~1470 / Pilea ~76), pink-princess NO-GO (cultivar-proven ~5–15). Only 1.0–6.8% of iNat houseplant imagery is license-clean. Text-only deliverables (report + GO/NO-GO matrix + fine-tune outline + CSV/query-log); no images/model/KB committed. Plus a shutter-on-return UX fix (`ON_RESUME` reset of terminal `Success`). **Review re-pointed V1:** the no-self-shot constraint kills the pink-princess + Pilea-balance fallbacks; the model's 47-class / 10-mapped delta makes a **text-only KB-expansion the next sprint**, fine-tune deferred. |
+| PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done (opus) | **Pure content/config, zero ML.** `species.json` **16 → 32**; house-plant `plant_class_map.json` **10 → 26 of 47** classes; **+1 archetype** (`carnivorous-peat-sand`, Venus Flytrap). New `HousePlantClassMapValidationTest` (verbatim-key guard, 26-count, Pilea-absence, existing-10 regression); count asserts bumped (32/9). Pilea left unmapped (CI-enforced) for the boundary-fix sprint. Free win: AIY now resolves 5 of 32 (Aloe vera / Hedera helix / Euphorbia pulcherrima are in its vocab). **Known gap:** the 16 new mappings are unprobed (editorial coverage, not real-photo calibrated). Full suite + `verifyNoNetworking` + stub-isolation GREEN. |
 
 ## Known gaps
 

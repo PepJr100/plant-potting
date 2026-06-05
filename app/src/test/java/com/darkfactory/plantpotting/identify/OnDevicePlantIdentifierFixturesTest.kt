@@ -138,12 +138,16 @@ class OnDevicePlantIdentifierFixturesTest {
             val result = identifier.identify(blankGreyJpeg())
             assertThat(result.lowConfidence).isTrue()
             assertThat(result.speciesId).isEmpty()
-            // The mapping covers 18 keys but only 2 (Monstera deliciosa, Crassula
-            // ovata) overlap the real upstream vocabulary, so the up-to-3 mapped
-            // candidates list maxes out at 2. The fixture proves the pipeline reaches
-            // the low-confidence emission path on a clearly uncertain distribution
-            // and surfaces the mapped candidates that do resolve.
-            assertThat(identifier.mostRecentCandidates).hasSize(2)
+            // PLANTPOTTING-0009: the AIY map now covers 34 keys, of which **five** overlap
+            // the real upstream 2102-label vocabulary — Monstera deliciosa, Crassula ovata
+            // (the original two) plus Aloe vera, Hedera helix and Euphorbia pulcherrima
+            // (added this sprint; their scientificName keys happen to exist in AIY's vocab,
+            // so they are live, not dormant). The up-to-3 mapped-candidate list therefore
+            // caps at `top_k_candidates = 3`. The fixture proves the pipeline reaches the
+            // low-confidence emission path on a clearly uncertain distribution and surfaces
+            // the mapped candidates that resolve.
+            val topK = ModelManifestReader(context.assets).read().thresholds.topKCandidates
+            assertThat(identifier.mostRecentCandidates).hasSize(topK)
         }
 
     @Test

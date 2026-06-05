@@ -19,6 +19,22 @@
     "Goeppertia orbifolia":    { "kbSpeciesId": "goeppertia-orbifolia" },
     "Crassula ovata":          { "kbSpeciesId": "crassula-ovata" },
     "Saintpaulia ionantha":    { "kbSpeciesId": "saintpaulia-ionantha" },
-    "Hoya carnosa":            { "kbSpeciesId": "hoya-carnosa" }
+    "Hoya carnosa":            { "kbSpeciesId": "hoya-carnosa" },
+    "Aglaonema":               { "kbSpeciesId": "aglaonema", "_note": "PLANTPOTTING-0009 dormant: AIY's vocabulary may never emit this; row exists to keep the cross-model coverage invariant (every bundled KB species reachable from the AIY map)." },
+    "Alocasia (spp.)":         { "kbSpeciesId": "alocasia", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Anthurium andraeanum":    { "kbSpeciesId": "anthurium-andraeanum", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Dieffenbachia (spp.)":    { "kbSpeciesId": "dieffenbachia", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Aloe vera":               { "kbSpeciesId": "aloe-vera", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Kalanchoe":               { "kbSpeciesId": "kalanchoe", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Maranta leuconeura":      { "kbSpeciesId": "maranta-leuconeura", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Nephrolepis exaltata":    { "kbSpeciesId": "nephrolepis-exaltata", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Pachira aquatica":        { "kbSpeciesId": "pachira-aquatica", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Dypsis lutescens":        { "kbSpeciesId": "dypsis-lutescens", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Dracaena (marginata / fragrans)": { "kbSpeciesId": "dracaena", "_note": "PLANTPOTTING-0009 dormant coverage row; tree-form Dracaena, distinct from the snake plant 'dracaena-trifasciata'." },
+    "Tradescantia":            { "kbSpeciesId": "tradescantia", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Hedera helix":            { "kbSpeciesId": "hedera-helix", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Schefflera":              { "kbSpeciesId": "schefflera", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Euphorbia pulcherrima":   { "kbSpeciesId": "euphorbia-pulcherrima", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Dionaea muscipula":       { "kbSpeciesId": "dionaea-muscipula", "_note": "PLANTPOTTING-0009 dormant coverage row." }
   }
 }

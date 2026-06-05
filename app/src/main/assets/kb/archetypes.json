@@ -126,5 +126,19 @@
       "Brief §4.3",
       "docs/sprints/PLANTPOTTING-0001.md §4.1"
     ]
+  },
+  {
+    "id": "carnivorous-peat-sand",
+    "displayName": "Carnivorous Bog (Peat/Sand)",
+    "shortDescription": "Nutrient-poor peat/sand mix for temperate carnivores; zero fertiliser, zero lime, distilled/rain water only.",
+    "recipe": [
+      { "ingredient": "Sphagnum peat moss", "proportionPct": 50, "notes": "Acidic, nutrient-poor organic base; the bog-soil analogue carnivores evolved in." },
+      { "ingredient": "Horticultural silica sand or perlite", "proportionPct": 50, "notes": "Inert drainage; must be lime-free (silica sand, not builder's/beach sand)." }
+    ],
+    "rationaleTemplate": "A nutrient-poor peat/sand bog mix suits {species}: carnivorous plants evolved in mineral-starved acidic bogs and trap insects precisely because the substrate cannot feed them — so the mix carries NO fertiliser and NO lime/dolomite, and only distilled, reverse-osmosis, or rainwater is safe (tap-water minerals accumulate to toxic levels). A 50/50 sphagnum peat and lime-free silica sand blend reproduces that low-fertility, free-draining-yet-damp bog substrate.",
+    "citations": [
+      "Drafter-sourced general horticulture (carnivorous plant cultivation; peat/sand bog mix, distilled-water mandate)",
+      "Brief §4.4"
+    ]
   }
 ]

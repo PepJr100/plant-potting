@@ -39,9 +39,9 @@ recommendation drawn from a bundled knowledge base.
 
 <p align="center"><img src="docs/images/result-screen.png" alt="ResultScreen showing a Monstera deliciosa identification and potting-mix recipe" width="320"></p>
 
-## Current state (post PLANTPOTTING-0005, 2026-06-04)
+## Current state (post PLANTPOTTING-0009, 2026-06-05)
 
-Five sprints landed on `main`:
+Nine sprints landed on `main`:
 
 | Sprint | Title | Status |
 | --- | --- | --- |
@@ -50,14 +50,19 @@ Five sprints landed on `main`:
 | PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | done |
 | PLANTPOTTING-0004 | Fix sprint for 0003 review bugs (UINT8 dtype + testTagsAsResourceId bridge) | done |
 | PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | done (calibration mechanism + real-photo probe + integration-flow all landed — see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
+| PLANTPOTTING-0006 | Second in-vocab calibration probe (crassula-ovata) + two UX fixes | done |
+| PLANTPOTTING-0007 | Houseplant model swap (V1 entry) — survey, eval harness, running prototype | done |
+| PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + camera-button UX fix | done |
+| PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done |
 
 What you can do today:
 
 - **Identify a plant on-device.** Camera capture → JPEG → House Plant Species
   MobileNetV2 TensorFlow Lite model (~10.9 MB, float16, 47 houseplant classes,
   bundled in `app/src/main/assets/ml/house_plant_species_mobilenetv2/` —
-  PLANTPOTTING-0007). It covers **10 of the 16** KB species (vs the AIY Plants
-  V1/3 baseline's 2 — which stays bundled in `app/src/main/assets/ml/aiy_plants_v1/`
+  PLANTPOTTING-0007). It maps **26 of its 47** model classes to KB care cards
+  (up from 10 — PLANTPOTTING-0009 added 16 delta species; Pilea deferred), vs the
+  AIY Plants V1/3 baseline's 5 — which stays bundled in `app/src/main/assets/ml/aiy_plants_v1/`
   as the regression anchor; the active model is selected by the
   `ACTIVE_MODEL_ROOT` `BuildConfig` switch). Inference runs entirely on-device;
   the network policy is enforced at build time by `verifyNoNetworking`.
@@ -101,8 +106,8 @@ PlantIdentifier (interface)
    RecommendationScreen (KB-driven archetype + recipe)
 ```
 
-KB: `app/src/main/assets/kb/species.json` (16 species) and `archetypes.json`
-(potting-mix recipes). Validated at app start.
+KB: `app/src/main/assets/kb/species.json` (32 species) and `archetypes.json`
+(9 potting-mix archetypes). Validated at app start.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for layer status and the gap inventory.
 

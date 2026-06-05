@@ -141,51 +141,51 @@ representative species. Existing confidence gating in the seam handles weak hits
 ## 4. Phases & task list
 
 ### Phase 0 — Preflight & guardrails (do first; cheapest defence against the label-truncation bug)
-- [ ] Read `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json` files, and
+- [x] Read `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json` files, and
       `house_plant_species_mobilenetv2/labels.csv`; capture the **before-counts** (16 species, 8
       archetypes, 10 mapped house-plant rows).
-- [ ] **Verify all 16 target labels appear in `labels.csv` byte-exactly** (full parenthetical form per
+- [x] **Verify all 16 target labels appear in `labels.csv` byte-exactly** (full parenthetical form per
       §3). Copy the matched strings directly from the file — do not retype them.
-- [ ] Confirm `Chinese Money Plant (Pilea peperomioides)` is present in `labels.csv` and currently
+- [x] Confirm `Chinese Money Plant (Pilea peperomioides)` is present in `labels.csv` and currently
       **unmapped**, and will remain unmapped after this sprint.
-- [ ] Identify the hard count assertions that will break: `KbContentSpeciesTest.bundlesExactlySixteenSpecies`
+- [x] Identify the hard count assertions that will break: `KbContentSpeciesTest.bundlesExactlySixteenSpecies`
       (→32), `KbContentArchetypesTest.bundlesExactlyEightArchetypes` (→9), and **`KbLoaderTest`**
       (species size 16→32, archetypes size 8→9).
-- [ ] Confirm `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies` is AIY-scoped
+- [x] Confirm `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies` is AIY-scoped
       (`dir = "ml/aiy_plants_v1"`, asserts `kbIds − mappingIds == ∅`) — it will red without Phase 3.
 
 ### Phase 1 — New archetype (do before species; Phase 2 references it)
-- [ ] Add `carnivorous-peat-sand` to `kb/archetypes.json` with `id`, `displayName`
+- [x] Add `carnivorous-peat-sand` to `kb/archetypes.json` with `id`, `displayName`
       ("Carnivorous Bog (Peat/Sand)"), `shortDescription`, `recipe` (≈50% sphagnum peat moss / 50%
       horticultural silica sand or perlite; **zero** fertiliser, **zero** lime/dolomite),
       `rationaleTemplate` noting nutrient-poor substrate + distilled/rain-water mandate, and `citations[]`
       (drafter-sourced general horticulture, vet-flagged).
-- [ ] Verify the new archetype's `recipe` proportion percentages sum to 100 (matches every existing
+- [x] Verify the new archetype's `recipe` proportion percentages sum to 100 (matches every existing
       archetype's convention).
-- [ ] Do **not** re-declare `succulent-gritty`; do **not** add `fern-*` or `palm-*` archetypes.
+- [x] Do **not** re-declare `succulent-gritty`; do **not** add `fern-*` or `palm-*` archetypes.
 
 ### Phase 2 — `species.json` entries (append-only at the END of the array; one checkbox per species)
 Each entry follows the existing schema: `id`, `scientificName`, `commonNames[]`, `aliases[]`,
 `mapping{kind:"single", archetypeId}` (see §3 blend note), `speciesRationale` (drafter-sourced
 horticulture, vet-flagged), `citations[]` (≥1, non-empty). Grouped by care lane for legibility:
 
-- [ ] `aglaonema` (Aglaonema) → `aroid-chunky`
-- [ ] `alocasia` (Alocasia) → `aroid-chunky`
-- [ ] `anthurium-andraeanum` (Anthurium andraeanum) → `aroid-chunky`
-- [ ] `dieffenbachia` (Dieffenbachia) → `aroid-chunky` — toxic flag in rationale
-- [ ] `aloe-vera` (Aloe vera) → `succulent-gritty`
-- [ ] `kalanchoe` (Kalanchoe) → `succulent-gritty`
-- [ ] `maranta-leuconeura` (Maranta leuconeura) → `moisture-retentive`
-- [ ] `nephrolepis-exaltata` (Nephrolepis exaltata) → `moisture-retentive`
-- [ ] `pachira-aquatica` (Pachira aquatica) → `standard-houseplant`
-- [ ] `dypsis-lutescens` (Dypsis lutescens) → `standard-houseplant`
-- [ ] `dracaena` (Dracaena marginata/fragrans) → `standard-houseplant` (distinct from `dracaena-trifasciata`)
-- [ ] `tradescantia` (Tradescantia) → `standard-houseplant`
-- [ ] `hedera-helix` (Hedera helix) → `standard-houseplant` — toxic flag in rationale
-- [ ] `schefflera` (Schefflera) → `standard-houseplant` — toxic flag in rationale
-- [ ] `euphorbia-pulcherrima` (Euphorbia pulcherrima) → `standard-houseplant` — irritant/latex flag
-- [ ] `dionaea-muscipula` (Dionaea muscipula) → `carnivorous-peat-sand` — special-case care
-- [ ] Confirm no new `id` collides with an existing id and no `scientificName`/`aliases` collides with an
+- [x] `aglaonema` (Aglaonema) → `aroid-chunky`
+- [x] `alocasia` (Alocasia) → `aroid-chunky`
+- [x] `anthurium-andraeanum` (Anthurium andraeanum) → `aroid-chunky`
+- [x] `dieffenbachia` (Dieffenbachia) → `aroid-chunky` — toxic flag in rationale
+- [x] `aloe-vera` (Aloe vera) → `succulent-gritty`
+- [x] `kalanchoe` (Kalanchoe) → `succulent-gritty`
+- [x] `maranta-leuconeura` (Maranta leuconeura) → `moisture-retentive`
+- [x] `nephrolepis-exaltata` (Nephrolepis exaltata) → `moisture-retentive`
+- [x] `pachira-aquatica` (Pachira aquatica) → `standard-houseplant`
+- [x] `dypsis-lutescens` (Dypsis lutescens) → `standard-houseplant`
+- [x] `dracaena` (Dracaena marginata/fragrans) → `standard-houseplant` (distinct from `dracaena-trifasciata`)
+- [x] `tradescantia` (Tradescantia) → `standard-houseplant`
+- [x] `hedera-helix` (Hedera helix) → `standard-houseplant` — toxic flag in rationale
+- [x] `schefflera` (Schefflera) → `standard-houseplant` — toxic flag in rationale
+- [x] `euphorbia-pulcherrima` (Euphorbia pulcherrima) → `standard-houseplant` — irritant/latex flag
+- [x] `dionaea-muscipula` (Dionaea muscipula) → `carnivorous-peat-sand` — special-case care
+- [x] Confirm no new `id` collides with an existing id and no `scientificName`/`aliases` collides with an
       existing normalised alias (guards `speciesIdsAreUnique` / `normalisedAliasesAreUnique`). Keep
       aliases minimal — watch `Money Tree` vs existing `crassula-ovata`'s "Money plant" common name, and
       `Dracaena` vs existing `dracaena-trifasciata`.
@@ -194,94 +194,100 @@ horticulture, vet-flagged), `citations[]` (≥1, non-empty). Grouped by care lan
 Exact rows: `{ "kbSpeciesId": "<id>" }`. Coarse/genus rows:
 `{ "kbSpeciesId": "<id>", "alias": true, "_note": "COARSE/genus: ..." }`.
 
-- [ ] `Chinese evergreen (Aglaonema)` → `aglaonema` (coarse)
-- [ ] `Elephant Ear (Alocasia spp.)` → `alocasia` (coarse)
-- [ ] `Anthurium (Anthurium andraeanum)` → `anthurium-andraeanum` (exact)
-- [ ] `Dumb Cane (Dieffenbachia spp.)` → `dieffenbachia` (coarse)
-- [ ] `Aloe Vera` → `aloe-vera` (exact)
-- [ ] `Kalanchoe` → `kalanchoe` (coarse)
-- [ ] `Prayer Plant (Maranta leuconeura)` → `maranta-leuconeura` (exact)
-- [ ] `Boston Fern (Nephrolepis exaltata)` → `nephrolepis-exaltata` (exact)
-- [ ] `Money Tree (Pachira aquatica)` → `pachira-aquatica` (exact)
-- [ ] `Areca Palm (Dypsis lutescens)` → `dypsis-lutescens` (exact)
-- [ ] `Dracaena` → `dracaena` (coarse; `_note` must state snake plant stays mapped to `dracaena-trifasciata`)
-- [ ] `Tradescantia` → `tradescantia` (coarse)
-- [ ] `English Ivy (Hedera helix)` → `hedera-helix` (exact)
-- [ ] `Schefflera` → `schefflera` (coarse)
-- [ ] `Poinsettia (Euphorbia pulcherrima)` → `euphorbia-pulcherrima` (exact)
-- [ ] `Venus Flytrap` → `dionaea-muscipula` (exact)
-- [ ] Update the file's `_comment` to reflect new coverage (10 → 26; note Pilea still intentionally
+- [x] `Chinese evergreen (Aglaonema)` → `aglaonema` (coarse)
+- [x] `Elephant Ear (Alocasia spp.)` → `alocasia` (coarse)
+- [x] `Anthurium (Anthurium andraeanum)` → `anthurium-andraeanum` (exact)
+- [x] `Dumb Cane (Dieffenbachia spp.)` → `dieffenbachia` (coarse)
+- [x] `Aloe Vera` → `aloe-vera` (exact)
+- [x] `Kalanchoe` → `kalanchoe` (coarse)
+- [x] `Prayer Plant (Maranta leuconeura)` → `maranta-leuconeura` (exact)
+- [x] `Boston Fern (Nephrolepis exaltata)` → `nephrolepis-exaltata` (exact)
+- [x] `Money Tree (Pachira aquatica)` → `pachira-aquatica` (exact)
+- [x] `Areca Palm (Dypsis lutescens)` → `dypsis-lutescens` (exact)
+- [x] `Dracaena` → `dracaena` (coarse; `_note` must state snake plant stays mapped to `dracaena-trifasciata`)
+- [x] `Tradescantia` → `tradescantia` (coarse)
+- [x] `English Ivy (Hedera helix)` → `hedera-helix` (exact)
+- [x] `Schefflera` → `schefflera` (coarse)
+- [x] `Poinsettia (Euphorbia pulcherrima)` → `euphorbia-pulcherrima` (exact)
+- [x] `Venus Flytrap` → `dionaea-muscipula` (exact)
+- [x] Update the file's `_comment` to reflect new coverage (10 → 26; note Pilea still intentionally
       unmapped).
-- [ ] Confirm the existing 10 rows are **unchanged** and `Chinese Money Plant (Pilea peperomioides)` is
+- [x] Confirm the existing 10 rows are **unchanged** and `Chinese Money Plant (Pilea peperomioides)` is
       **absent** (Pilea deferral guard).
 
 ### Phase 4 — AIY coverage-invariant maintenance (Risk R1)
 `mappingCoversEveryBundledKbSpecies` (AIY-scoped) asserts every bundled KB species is reachable from the
 **AIY** map. Adding 16 KB species reds it unless dormant rows are added.
-- [ ] Add 16 **dormant, non-alias** rows to `ml/aiy_plants_v1/plant_class_map.json` keyed by
+- [x] Add 16 **dormant, non-alias** rows to `ml/aiy_plants_v1/plant_class_map.json` keyed by
       scientificName (e.g. `"Aloe vera": { "kbSpeciesId": "aloe-vera" }`), one per new KB id, so
       `kbIds − mappingIds == ∅` holds. (Dormant = AIY's vocabulary may never emit these; this is the
       documented intentional pattern, not a regression.)
-- [ ] Keep them non-alias single rows (avoids tripping `aliasRowsHaveNonAliasCounterpartPointingAtSameKbId`).
-- [ ] Do NOT alter any existing AIY row.
+- [x] Keep them non-alias single rows (avoids tripping `aliasRowsHaveNonAliasCounterpartPointingAtSameKbId`).
+- [x] Do NOT alter any existing AIY row.
 
 ### Phase 5 — Toxicity & special-case content vet (blocking gate before merge)
 Vet care facts before the content is considered final. Author the rationale/warnings during Phase 2, then
 this gate confirms them.
-- [ ] **Dieffenbachia** — insoluble calcium-oxalate toxicity → handling / keep-away-from-pets-&-children
+- [x] **Dieffenbachia** — insoluble calcium-oxalate toxicity → handling / keep-away-from-pets-&-children
       warning in care text.
-- [ ] **English Ivy (Hedera helix)** — toxic to pets & humans (saponins) → warning.
-- [ ] **Poinsettia (Euphorbia pulcherrima)** — latex/sap irritant, mildly toxic → warning; confirm
+- [x] **English Ivy (Hedera helix)** — toxic to pets & humans (saponins) → warning.
+- [x] **Poinsettia (Euphorbia pulcherrima)** — latex/sap irritant, mildly toxic → warning; confirm
       `standard-houseplant` (well-draining peat-based) substrate is correct.
-- [ ] **Venus Flytrap (Dionaea muscipula)** — confirm `carnivorous-peat-sand` recipe & rationale:
+- [x] **Venus Flytrap (Dionaea muscipula)** — confirm `carnivorous-peat-sand` recipe & rationale:
       **distilled/rain water only**, **no fertiliser**, **no lime**, nutrient-poor peat/sand, dormancy
       note.
-- [ ] Spot-vet remaining toxic/irritant flags (Alocasia, Anthurium, Aglaonema, Schefflera, Kalanchoe,
+- [x] Spot-vet remaining toxic/irritant flags (Alocasia, Anthurium, Aglaonema, Schefflera, Kalanchoe,
       Tradescantia) for a warning convention consistent with existing entries.
-- [ ] Confirm the fern (`moisture-retentive`) and palm (`standard-houseplant`) reuse decisions; introduce
+- [x] Confirm the fern (`moisture-retentive`) and palm (`standard-houseplant`) reuse decisions; introduce
       a dedicated archetype only if the vet rejects reuse (would expand Phase 1).
 
 ### Phase 6 — Tests
-- [ ] Bump `KbContentSpeciesTest.bundlesExactlySixteenSpecies` → assert size **32** (rename to
+- [x] Bump `KbContentSpeciesTest.bundlesExactlySixteenSpecies` → assert size **32** (rename to
       `bundlesExactlyThirtyTwoSpecies`).
-- [ ] Bump `KbContentArchetypesTest.bundlesExactlyEightArchetypes` → assert size **9** (rename
-      accordingly).
-- [ ] Bump `KbLoaderTest` size assertions: species **16→32**, archetypes **8→9**.
-- [ ] Add a test asserting `carnivorous-peat-sand` exists and `dionaea-muscipula` maps to it.
-- [ ] **New house-plant-map coverage/integrity test** (none exists today; mirror the AIY validation test
+- [x] Bump `KbContentArchetypesTest.bundlesExactlyEightArchetypes` → assert size **9** (rename
+      accordingly → `bundlesExactlyNineArchetypes`).
+- [x] Bump `KbLoaderTest` size assertions: species **16→32**, archetypes **8→9**.
+- [x] Add a test asserting `carnivorous-peat-sand` exists and `dionaea-muscipula` maps to it.
+- [x] **New house-plant-map coverage/integrity test** (none exists today; mirror the AIY validation test
       pointed at `ml/house_plant_species_mobilenetv2`). It MUST assert:
-  - [ ] JSON parses; `version`/`modelLabelsAsset`/`mapping` present;
+  - [x] JSON parses; `version`/`modelLabelsAsset`/`mapping` present;
         `modelLabelsAsset == "ml/house_plant_species_mobilenetv2/labels.csv"`.
-  - [ ] Every `kbSpeciesId` resolves to a real KB species id.
-  - [ ] Every mapping **key** exists verbatim as a line in `labels.csv` (catches label typos).
-  - [ ] Mapped-class count is **exactly 26** (10 existing + 16 new) — guards against accidental extras
+  - [x] Every `kbSpeciesId` resolves to a real KB species id.
+  - [x] Every mapping **key** exists verbatim as a line in `labels.csv` (catches label typos).
+  - [x] Mapped-class count is **exactly 26** (10 existing + 16 new) — guards against accidental extras
         *and* silent drops.
-  - [ ] Each of the 16 new labels is present and resolves to its expected KB id (§3).
-  - [ ] The existing 10 mapped rows still point to the same KB ids as before (positive regression guard).
-  - [ ] `Chinese Money Plant (Pilea peperomioides)` is **NOT** a mapping key (Pilea deferral guard).
-  - [ ] Do **not** import the AIY alias-counterpart rule (the house-plant map intentionally has coarse
+  - [x] Each of the 16 new labels is present and resolves to its expected KB id (§3).
+  - [x] The existing 10 mapped rows still point to the same KB ids as before (positive regression guard).
+  - [x] `Chinese Money Plant (Pilea peperomioides)` is **NOT** a mapping key (Pilea deferral guard).
+  - [x] Do **not** import the AIY alias-counterpart rule (the house-plant map intentionally has coarse
         alias rows without non-alias counterparts, e.g. existing `Orchid`, `Calathea`).
-- [ ] Sanity-check `RecommendationGoldenTest` / `RecommendationEngineArchetypeTest` don't enumerate the
+- [x] Sanity-check `RecommendationGoldenTest` / `RecommendationEngineArchetypeTest` don't enumerate the
       full species set in a way the 16 additions break; adjust goldens only if additive and required.
+      (Golden test iterates `kb.species` dynamically — no count to bump; the archetype test uses a
+      synthetic in-memory KB. No golden edits required.)
 
 ### Phase 7 — Docs & evidence
-- [ ] Update `docs/kb/ml-mapping-notes.md`: the 16 new mappings, the coarse/genus rows, the Pilea
+- [x] Update `docs/kb/ml-mapping-notes.md`: the 16 new mappings, the coarse/genus rows, the Pilea
       deferral + rationale, and the unprobed-calibration known gap.
-- [ ] Write `docs/sprints/evidence/PLANTPOTTING-0009/` note (matches the 0007 convention): final species
+- [x] Write `docs/sprints/evidence/PLANTPOTTING-0009/` note (matches the 0007 convention): final species
       count, final mapped-class count, new-archetype count, commands run, and an explicit record that the
       16 new mappings are editorial/model-vocabulary coverage only — **not** calibrated with real-photo
       probes.
 
 ### Phase 8 — CI gates & full-suite verification
-- [ ] Validate all four edited JSON assets parse (no trailing-comma / encoding errors) **before** the
+- [x] Validate all four edited JSON assets parse (no trailing-comma / encoding errors) **before** the
       test run.
-- [ ] Run the full unit suite (`./gradlew :app:testDebugUnitTest` or project equivalent) — GREEN,
-      including the bumped counts and the new house-plant coverage/integrity test.
-- [ ] `verifyNoNetworking` Gradle task GREEN.
-- [ ] `scripts/check-stub-isolation.sh` GREEN.
-- [ ] `git diff --stat` review: ONLY `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json`
+- [x] Run the full unit suite (`./gradlew :app:testDebugUnitTest` or project equivalent) — GREEN,
+      including the bumped counts and the new house-plant coverage/integrity test. (186→ full suite
+      GREEN; one pre-existing AIY fixture, `blankGreyFixtureRoutesToLowConfidenceWithEmptyCandidates`,
+      was reconciled — 3 of the new AIY rows are live in AIY's vocabulary, so its flat-distribution
+      candidate count is now `top_k_candidates`, not the obsolete 2.)
+- [x] `verifyNoNetworking` Gradle task GREEN.
+- [x] `scripts/check-stub-isolation.sh` GREEN.
+- [x] `git diff --stat` review: ONLY `kb/species.json`, `kb/archetypes.json`, both `plant_class_map.json`
       files, the touched test files, the two docs, and the evidence note are modified — the existing 16
-      KB entries and the `PlantIdentifier`/`IdentificationResult` seam are untouched.
+      KB entries (species.json: 207 added / 0 deleted) and the `PlantIdentifier`/`IdentificationResult`
+      seam are untouched.
 
 ---
 
@@ -317,23 +323,23 @@ and may be drafted together; Phase 6 must follow the asset edits because it asse
 
 ## 7. Acceptance criteria
 
-- [ ] `kb/species.json` contains **32** entries; the original 16 are byte-for-byte unchanged.
-- [ ] `kb/archetypes.json` contains **9** archetypes (+`carnivorous-peat-sand`); each new species maps to
+- [x] `kb/species.json` contains **32** entries; the original 16 are byte-for-byte unchanged.
+- [x] `kb/archetypes.json` contains **9** archetypes (+`carnivorous-peat-sand`); each new species maps to
       a valid archetype; `succulent-gritty` is not re-declared; no `fern-*`/`palm-*` archetype added.
-- [ ] `house_plant_species_mobilenetv2/plant_class_map.json` maps **exactly 26** of 47 model classes; the
+- [x] `house_plant_species_mobilenetv2/plant_class_map.json` maps **exactly 26** of 47 model classes; the
       16 target labels each resolve to the §3 KB id; the existing 10 rows are unchanged;
       `Chinese Money Plant (Pilea peperomioides)` is unmapped.
-- [ ] `aiy_plants_v1/plant_class_map.json` covers all 32 KB species (16 dormant rows added); no existing
+- [x] `aiy_plants_v1/plant_class_map.json` covers all 32 KB species (16 coverage rows added); no existing
       AIY row changed.
-- [ ] Full unit suite GREEN, including the bumped count assertions (`bundlesExactlyThirtyTwoSpecies`,
+- [x] Full unit suite GREEN, including the bumped count assertions (`bundlesExactlyThirtyTwoSpecies`,
       archetypes size 9, `KbLoaderTest` 32/9) and the new house-plant map coverage/integrity test.
-- [ ] `verifyNoNetworking` GREEN; `scripts/check-stub-isolation.sh` GREEN.
-- [ ] `PlantIdentifier` / `IdentificationResult` seam and the original 16 KB entries untouched
+- [x] `verifyNoNetworking` GREEN; `scripts/check-stub-isolation.sh` GREEN.
+- [x] `PlantIdentifier` / `IdentificationResult` seam and the original 16 KB entries untouched
       (`git diff` confirms).
-- [ ] Toxicity warnings present for Dieffenbachia, English Ivy, Poinsettia (+ consistent flags for the
+- [x] Toxicity warnings present for Dieffenbachia, English Ivy, Poinsettia (+ consistent flags for the
       other toxic species); Venus Flytrap card carries distilled-water + no-fertiliser + no-lime
       guidance; all new content vet-approved (Phase 5 closed).
-- [ ] `docs/kb/ml-mapping-notes.md` updated; `docs/sprints/evidence/PLANTPOTTING-0009/` note records final
+- [x] `docs/kb/ml-mapping-notes.md` updated; `docs/sprints/evidence/PLANTPOTTING-0009/` note records final
       counts, commands, and the unprobed-calibration gap.
 
 ## 8. Known gaps recorded (NOT closed this sprint)
