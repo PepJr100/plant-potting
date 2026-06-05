@@ -194,51 +194,51 @@ horticulture, vet-flagged), `citations[]` (≥1, non-empty). Grouped by care lan
 Exact rows: `{ "kbSpeciesId": "<id>" }`. Coarse/genus rows:
 `{ "kbSpeciesId": "<id>", "alias": true, "_note": "COARSE/genus: ..." }`.
 
-- [ ] `Chinese evergreen (Aglaonema)` → `aglaonema` (coarse)
-- [ ] `Elephant Ear (Alocasia spp.)` → `alocasia` (coarse)
-- [ ] `Anthurium (Anthurium andraeanum)` → `anthurium-andraeanum` (exact)
-- [ ] `Dumb Cane (Dieffenbachia spp.)` → `dieffenbachia` (coarse)
-- [ ] `Aloe Vera` → `aloe-vera` (exact)
-- [ ] `Kalanchoe` → `kalanchoe` (coarse)
-- [ ] `Prayer Plant (Maranta leuconeura)` → `maranta-leuconeura` (exact)
-- [ ] `Boston Fern (Nephrolepis exaltata)` → `nephrolepis-exaltata` (exact)
-- [ ] `Money Tree (Pachira aquatica)` → `pachira-aquatica` (exact)
-- [ ] `Areca Palm (Dypsis lutescens)` → `dypsis-lutescens` (exact)
-- [ ] `Dracaena` → `dracaena` (coarse; `_note` must state snake plant stays mapped to `dracaena-trifasciata`)
-- [ ] `Tradescantia` → `tradescantia` (coarse)
-- [ ] `English Ivy (Hedera helix)` → `hedera-helix` (exact)
-- [ ] `Schefflera` → `schefflera` (coarse)
-- [ ] `Poinsettia (Euphorbia pulcherrima)` → `euphorbia-pulcherrima` (exact)
-- [ ] `Venus Flytrap` → `dionaea-muscipula` (exact)
-- [ ] Update the file's `_comment` to reflect new coverage (10 → 26; note Pilea still intentionally
+- [x] `Chinese evergreen (Aglaonema)` → `aglaonema` (coarse)
+- [x] `Elephant Ear (Alocasia spp.)` → `alocasia` (coarse)
+- [x] `Anthurium (Anthurium andraeanum)` → `anthurium-andraeanum` (exact)
+- [x] `Dumb Cane (Dieffenbachia spp.)` → `dieffenbachia` (coarse)
+- [x] `Aloe Vera` → `aloe-vera` (exact)
+- [x] `Kalanchoe` → `kalanchoe` (coarse)
+- [x] `Prayer Plant (Maranta leuconeura)` → `maranta-leuconeura` (exact)
+- [x] `Boston Fern (Nephrolepis exaltata)` → `nephrolepis-exaltata` (exact)
+- [x] `Money Tree (Pachira aquatica)` → `pachira-aquatica` (exact)
+- [x] `Areca Palm (Dypsis lutescens)` → `dypsis-lutescens` (exact)
+- [x] `Dracaena` → `dracaena` (coarse; `_note` must state snake plant stays mapped to `dracaena-trifasciata`)
+- [x] `Tradescantia` → `tradescantia` (coarse)
+- [x] `English Ivy (Hedera helix)` → `hedera-helix` (exact)
+- [x] `Schefflera` → `schefflera` (coarse)
+- [x] `Poinsettia (Euphorbia pulcherrima)` → `euphorbia-pulcherrima` (exact)
+- [x] `Venus Flytrap` → `dionaea-muscipula` (exact)
+- [x] Update the file's `_comment` to reflect new coverage (10 → 26; note Pilea still intentionally
       unmapped).
-- [ ] Confirm the existing 10 rows are **unchanged** and `Chinese Money Plant (Pilea peperomioides)` is
+- [x] Confirm the existing 10 rows are **unchanged** and `Chinese Money Plant (Pilea peperomioides)` is
       **absent** (Pilea deferral guard).
 
 ### Phase 4 — AIY coverage-invariant maintenance (Risk R1)
 `mappingCoversEveryBundledKbSpecies` (AIY-scoped) asserts every bundled KB species is reachable from the
 **AIY** map. Adding 16 KB species reds it unless dormant rows are added.
-- [ ] Add 16 **dormant, non-alias** rows to `ml/aiy_plants_v1/plant_class_map.json` keyed by
+- [x] Add 16 **dormant, non-alias** rows to `ml/aiy_plants_v1/plant_class_map.json` keyed by
       scientificName (e.g. `"Aloe vera": { "kbSpeciesId": "aloe-vera" }`), one per new KB id, so
       `kbIds − mappingIds == ∅` holds. (Dormant = AIY's vocabulary may never emit these; this is the
       documented intentional pattern, not a regression.)
-- [ ] Keep them non-alias single rows (avoids tripping `aliasRowsHaveNonAliasCounterpartPointingAtSameKbId`).
-- [ ] Do NOT alter any existing AIY row.
+- [x] Keep them non-alias single rows (avoids tripping `aliasRowsHaveNonAliasCounterpartPointingAtSameKbId`).
+- [x] Do NOT alter any existing AIY row.
 
 ### Phase 5 — Toxicity & special-case content vet (blocking gate before merge)
 Vet care facts before the content is considered final. Author the rationale/warnings during Phase 2, then
 this gate confirms them.
-- [ ] **Dieffenbachia** — insoluble calcium-oxalate toxicity → handling / keep-away-from-pets-&-children
+- [x] **Dieffenbachia** — insoluble calcium-oxalate toxicity → handling / keep-away-from-pets-&-children
       warning in care text.
-- [ ] **English Ivy (Hedera helix)** — toxic to pets & humans (saponins) → warning.
-- [ ] **Poinsettia (Euphorbia pulcherrima)** — latex/sap irritant, mildly toxic → warning; confirm
+- [x] **English Ivy (Hedera helix)** — toxic to pets & humans (saponins) → warning.
+- [x] **Poinsettia (Euphorbia pulcherrima)** — latex/sap irritant, mildly toxic → warning; confirm
       `standard-houseplant` (well-draining peat-based) substrate is correct.
-- [ ] **Venus Flytrap (Dionaea muscipula)** — confirm `carnivorous-peat-sand` recipe & rationale:
+- [x] **Venus Flytrap (Dionaea muscipula)** — confirm `carnivorous-peat-sand` recipe & rationale:
       **distilled/rain water only**, **no fertiliser**, **no lime**, nutrient-poor peat/sand, dormancy
       note.
-- [ ] Spot-vet remaining toxic/irritant flags (Alocasia, Anthurium, Aglaonema, Schefflera, Kalanchoe,
+- [x] Spot-vet remaining toxic/irritant flags (Alocasia, Anthurium, Aglaonema, Schefflera, Kalanchoe,
       Tradescantia) for a warning convention consistent with existing entries.
-- [ ] Confirm the fern (`moisture-retentive`) and palm (`standard-houseplant`) reuse decisions; introduce
+- [x] Confirm the fern (`moisture-retentive`) and palm (`standard-houseplant`) reuse decisions; introduce
       a dedicated archetype only if the vet rejects reuse (would expand Phase 1).
 
 ### Phase 6 — Tests
