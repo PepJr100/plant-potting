@@ -56,15 +56,40 @@ class LowConfidencePickerScreenTest {
         composeRule.onNodeWithText("Fiddle-leaf fig (18%)").assertIsDisplayed()
     }
 
+    // -- PLANTPOTTING-0010 A4 — search containment -----------------------------
+
     @Test
-    fun rendersAllSpeciesInManualList() {
+    fun speciesListIsCollapsedByDefaultShowingThePrompt() {
         val v = vm("")
         composeRule.setContent {
             LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
         }
+        // Contained: the full list is NOT always-visible; a tap-prompt stands in for it.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH_PROMPT).assertIsDisplayed()
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SPECIES_LIST).assertDoesNotExist()
+    }
+
+    @Test
+    fun typingRevealsSpeciesListContainedWithinSearch() {
+        val v = vm("")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).performTextInput("Monstera")
         composeRule.onNodeWithTag(LowConfidencePickerTags.SPECIES_LIST).assertIsDisplayed()
-        // Sample three of the fixture species names — the LazyColumn may only have
-        // composed the first viewport, but Robolectric typically realizes most.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH_PROMPT).assertDoesNotExist()
+        composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
+    }
+
+    @Test
+    fun focusingSearchRevealsTheFullSpeciesList() {
+        val v = vm("")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        // Engaging the search (focus via click) reveals the full list with a blank query.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).performClick()
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SPECIES_LIST).assertIsDisplayed()
         composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
     }
 
@@ -113,6 +138,8 @@ class LowConfidencePickerScreenTest {
                 onPickByArchetype = {},
             )
         }
+        // Reveal the (contained) list by searching, then tap the filtered row.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).performTextInput("Ficus")
         composeRule
             .onNodeWithTag(LowConfidencePickerTags.speciesTag("ficus-lyrata"))
             .performClick()
@@ -208,6 +235,8 @@ class LowConfidencePickerScreenTest {
             }
         }
         composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).assertIsDisplayed()
+        // The contained list is reachable on a small screen once search is engaged.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.SEARCH).performTextInput("Monstera")
         composeRule
             .onNodeWithTag(LowConfidencePickerTags.speciesTag("monstera-deliciosa"))
             .assertIsDisplayed()

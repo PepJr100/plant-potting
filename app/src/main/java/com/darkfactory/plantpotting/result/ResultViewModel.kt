@@ -35,6 +35,13 @@ class ResultViewModel
         private val lowConfidence: Boolean =
             savedStateHandle.get<Boolean>(Routes.ARG_LOW_CONFIDENCE) ?: false
 
+        // D2 — IntType nav arg; the CONFIDENCE_ABSENT sentinel (-1) maps back to null so the UI
+        // degrades gracefully on stub/picker flows.
+        private val confidencePct: Int? =
+            savedStateHandle
+                .get<Int>(Routes.ARG_CONFIDENCE_PCT)
+                ?.takeIf { it >= 0 }
+
         private val _state = MutableStateFlow(initialState(kb))
         val state: StateFlow<ResultUiState> = _state.asStateFlow()
 
@@ -45,6 +52,7 @@ class ResultViewModel
                     notFound = true,
                     source = source,
                     lowConfidence = lowConfidence,
+                    confidencePct = confidencePct,
                 )
             return ResultUiState(
                 scientificName = species.scientificName,
@@ -53,6 +61,7 @@ class ResultViewModel
                 notFound = false,
                 source = source,
                 lowConfidence = lowConfidence,
+                confidencePct = confidencePct,
             )
         }
     }

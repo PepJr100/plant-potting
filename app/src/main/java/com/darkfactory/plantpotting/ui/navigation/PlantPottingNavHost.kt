@@ -58,6 +58,7 @@ fun PlantPottingNavHost() {
                                     speciesId = command.speciesId,
                                     source = command.source,
                                     lowConfidence = command.lowConfidence,
+                                    confidencePct = command.confidencePct,
                                 ),
                             )
                         is NavCommand.LowConfidence ->
@@ -82,6 +83,10 @@ fun PlantPottingNavHost() {
                     navArgument(Routes.ARG_LOW_CONFIDENCE) {
                         type = NavType.BoolType
                         defaultValue = false
+                    },
+                    navArgument(Routes.ARG_CONFIDENCE_PCT) {
+                        type = NavType.IntType
+                        defaultValue = Routes.CONFIDENCE_ABSENT
                     },
                 ),
         ) {

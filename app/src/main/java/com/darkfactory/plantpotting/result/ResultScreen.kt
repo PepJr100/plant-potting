@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,6 +67,23 @@ fun ResultScreen(
             colors = AssistChipDefaults.assistChipColors(),
             modifier = Modifier.testTag(ResultScreenTags.SOURCE_BADGE),
         )
+        // PLANTPOTTING-0010 D2 — numeric confidence + progress bar on the on-device high-confidence
+        // path; absent (null) on stub/picker flows → render nothing.
+        state.confidencePct?.let { pct ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(id = R.string.result_confidence_label, pct),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag(ResultScreenTags.CONFIDENCE_PCT),
+            )
+            LinearProgressIndicator(
+                progress = pct / 100f,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(ResultScreenTags.CONFIDENCE_BAR),
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { onSeePottingMix(state.speciesId) },
@@ -98,6 +117,10 @@ object ResultScreenTags {
     const val SCIENTIFIC_NAME = "result.scientificName"
     const val COMMON_NAME = "result.commonName"
     const val SOURCE_BADGE = "result.sourceBadge"
+
+    // PLANTPOTTING-0010 D2 — confidence %/bar (present only when confidencePct is non-null).
+    const val CONFIDENCE_PCT = "result.confidencePct"
+    const val CONFIDENCE_BAR = "result.confidenceBar"
 
     /**
      * Backward-compatible alias for tests / scripts that still reference the legacy

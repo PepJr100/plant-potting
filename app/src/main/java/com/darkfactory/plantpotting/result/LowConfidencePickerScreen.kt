@@ -19,8 +19,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -49,6 +53,12 @@ fun LowConfidencePickerScreen(
     val filtered by viewModel.filteredSpecies.collectAsState()
     val searchActive = query.isNotBlank()
     val searchEmpty = searchActive && filtered.isEmpty()
+    // PLANTPOTTING-0010 A4 — the species list is *contained within* the search control: it is
+    // revealed only when the user engages the search (focus) or has typed a query, instead of an
+    // always-visible full-list LazyColumn. Candidate chips, the no-candidates card, the search-empty
+    // state and the archetype CTA are all preserved.
+    var searchFocused by remember { mutableStateOf(false) }
+    val listRevealed = searchActive || searchFocused
 
     Column(
         modifier =
@@ -123,47 +133,70 @@ fun LowConfidencePickerScreen(
             onValueChange = viewModel::onQueryChange,
             label = { Text("Search species") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SEARCH),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { searchFocused = it.isFocused }
+                    .testTag(LowConfidencePickerTags.SEARCH),
         )
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            if (searchEmpty) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .testTag(LowConfidencePickerTags.SEARCH_EMPTY),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.low_conf_search_empty, query),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SPECIES_LIST)) {
-                    items(filtered, key = { it.id }) { sp ->
-                        TextButton(
-                            onClick = { onSpeciesPicked(sp.id) },
-                            modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.speciesTag(sp.id)),
-                        ) {
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Text(
-                                    text = sp.scientificName,
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontStyle = FontStyle.Italic),
-                                )
-                                if (sp.commonNames.isNotEmpty()) {
+            when {
+                searchEmpty ->
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .testTag(LowConfidencePickerTags.SEARCH_EMPTY),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.low_conf_search_empty, query),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                listRevealed ->
+                    LazyColumn(modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.SPECIES_LIST)) {
+                        items(filtered, key = { it.id }) { sp ->
+                            TextButton(
+                                onClick = { onSpeciesPicked(sp.id) },
+                                modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.speciesTag(sp.id)),
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
                                     Text(
-                                        text = sp.commonNames.first(),
-                                        style = MaterialTheme.typography.bodySmall,
+                                        text = sp.scientificName,
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontStyle = FontStyle.Italic),
                                     )
+                                    if (sp.commonNames.isNotEmpty()) {
+                                        Text(
+                                            text = sp.commonNames.first(),
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                else ->
+                    // Contained state: list collapsed until the search is engaged. A tap-prompt
+                    // invites the user to reveal the full list without it dominating the screen.
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .testTag(LowConfidencePickerTags.SEARCH_PROMPT),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.low_conf_search_prompt, viewModel.allSpecies.size),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
             }
         }
         OutlinedButton(
@@ -182,6 +215,7 @@ object LowConfidencePickerTags {
     const val NO_CANDIDATES_EMPTY = "lowConf.noCandidatesEmpty"
     const val SEARCH = "lowConf.search"
     const val SEARCH_EMPTY = "lowConf.searchEmpty"
+    const val SEARCH_PROMPT = "lowConf.searchPrompt"
     const val SPECIES_LIST = "lowConf.speciesList"
     const val PICK_BY_ARCHETYPE = "lowConf.pickByArchetype"
 

@@ -23,14 +23,14 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
 
 - [ ] 2–3 selectable Compose theme candidates, visible in a debug build and captured as screenshots, so the
       principal picks from real renders (not a hardcoded redesign).
-- [ ] Numeric confidence **percentage + progress bar** on the post-identification path, without changing the
+- [x] Numeric confidence **percentage + progress bar** on the post-identification path, without changing the
       frozen `PlantIdentifier` / `IdentificationResult` contract.
 - [ ] A **"My Plants"** collection backed by the app's first local-persistence layer, populated by an
       **explicit user "Save" action**.
 - [ ] An **"Add this plant"** wireframe for strong-confidence model classes that have no KB entry, logging a
       local-only request tally.
 - [x] **One** persistence layer shared by saved plants and add-request totals.
-- [ ] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
+- [x] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
 - [ ] Bundled, **license-clean (CC0/PD)** reference imagery on plant detail / recipe views, within an explicit
       APK-size budget, with a checked-in attribution manifest.
 - [x] A bounded **text-only KB expansion** over remaining popular unmapped model classes; Pilea stays unmapped.
@@ -162,19 +162,21 @@ is currently invisible (it collapses into the low-confidence verdict).
       mappings as **editorial / model-vocabulary coverage, not calibrated** behaviour.
 
 ### Phase 3 — Pillar A polish on existing screens (independent of persistence)
-- [ ] **Confidence (D2):** add optional `confidencePct` nav arg to `Routes.RESULT` + `PlantPottingNavHost` +
+- [x] **Confidence (D2):** add optional `confidencePct` nav arg to `Routes.RESULT` + `PlantPottingNavHost` +
       `ResultViewModel`/`ResultUiState`; read the top candidate's probability in `CameraViewModel`'s success
       path and pass it; render % + `LinearProgressIndicator` on `ResultScreen` (new test tag). Surface on
-      `RecommendationScreen` too if it flows through cleanly.
-- [ ] Confidence tests: `CameraViewModelTest` (threaded on success), `ResultViewModelTest` (arg parse +
+      `RecommendationScreen` too if it flows through cleanly. *(ResultScreen only — RecommendationScreen is
+      reached by speciesId-only / archetype-only nav with no probability in scope; not threaded.)*
+- [x] Confidence tests: `CameraViewModelTest` (threaded on success), `ResultViewModelTest` (arg parse +
       absent-arg graceful default), `ResultScreen` render test (bar + %; no % when absent), and the
       margin-confidence `ranked[0]` assertion from D2.
-- [ ] **Search containment (A4):** in `LowConfidencePickerScreen`, contain the species list **within** the
+- [x] **Search containment (A4):** in `LowConfidencePickerScreen`, contain the species list **within** the
       search control (reveal on focus/non-blank, or move into a dropdown/expandable surface) instead of an
       always-visible `SPECIES_LIST` LazyColumn. **Preserve** candidate chips, the no-candidates card, the
       search-empty state, and the archetype CTA; keep existing `LowConfidencePickerTags` stable where possible.
-- [ ] Search-containment tests: update `LowConfidencePickerScreenTest` (+ `LowConfidenceFlowTest` if affected);
-      keep chip / search / archetype paths green.
+- [x] Search-containment tests: update `LowConfidencePickerScreenTest` (+ `LowConfidenceFlowTest` if affected);
+      keep chip / search / archetype paths green. *(LowConfidenceFlowTest unaffected — both its paths type a
+      query, which reveals the contained list.)*
 
 ### Phase 4 — Pillar A: "My Plants" folder (depends on Phase 1)
 - [ ] Add an **explicit "Save to My Plants" action** on `ResultScreen` (and/or `RecommendationScreen`) that

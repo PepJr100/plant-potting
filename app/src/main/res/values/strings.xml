@@ -26,11 +26,13 @@
     <string name="result_badge_cloud">Cloud match unavailable in this offline build</string>
     <string name="result_see_potting_mix">See potting mix</string>
     <string name="result_not_found">We couldn\'t find this plant in the knowledge base.</string>
+    <string name="result_confidence_label">Confidence: %1$d%%</string>
 
     <!-- Low-confidence picker -->
     <string name="low_conf_subtitle">We\'re best at common houseplants — confirm or pick from the list below.</string>
     <string name="low_conf_no_candidates">No close matches — pick from the full list below.</string>
     <string name="low_conf_search_empty">No species match \"%1$s\"</string>
+    <string name="low_conf_search_prompt">Tap to search all %1$d species</string>
     <string name="low_conf_pick_other">None of these look like my plant</string>
     <string name="low_conf_candidate_chevron_content_description">Pick this species</string>
 

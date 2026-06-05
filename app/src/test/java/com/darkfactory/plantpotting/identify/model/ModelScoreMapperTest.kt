@@ -73,6 +73,20 @@ class ModelScoreMapperTest {
     }
 
     @Test
+    fun marginConfidenceWinnerProbabilityTracksRankedZero() {
+        // PLANTPOTTING-0010 D2 subtlety — in the margin-confidence branch the winner is still
+        // ranked[0], so the first MAPPED candidate's probability equals bestProb. This is what the
+        // camera flow threads as `confidencePct`; assert the invariant holds.
+        val scores = floatArrayOf(0.50f, 0.18f, 0.12f, 0.10f, 0.10f)
+        val out = mapper().map(scores)
+        assertThat(out.result.lowConfidence).isFalse()
+        assertThat(out.result.speciesId).isEqualTo("monstera-deliciosa")
+        assertThat(out.candidates.first().speciesId).isEqualTo("monstera-deliciosa")
+        // candidates.first().probability == scores[ranked[0]] == bestProb.
+        assertThat(out.candidates.first().probability).isWithin(1e-6f).of(0.50f)
+    }
+
+    @Test
     fun aboveMarginMinButTooCloseToSecondIsLowConfidence() {
         // best = 0.50; second = 0.40; margin 0.10 < 0.18 → low-conf path.
         val scores = floatArrayOf(0.50f, 0.40f, 0.05f, 0.03f, 0.02f)

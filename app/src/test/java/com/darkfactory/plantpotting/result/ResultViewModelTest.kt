@@ -59,4 +59,37 @@ class ResultViewModelTest {
         val vm = ResultViewModel(savedStateHandle = saved, kb = kb)
         assertThat(vm.state.value.notFound).isTrue()
     }
+
+    // -- PLANTPOTTING-0010 D2 — confidence nav arg ----------------------------
+
+    @Test
+    fun confidencePctArgIsParsedIntoState() {
+        val saved =
+            SavedStateHandle(
+                mapOf(Routes.ARG_SPECIES_ID to "ficus-lyrata", Routes.ARG_CONFIDENCE_PCT to 87),
+            )
+        val vm = ResultViewModel(savedStateHandle = saved, kb = kb)
+        assertThat(vm.state.value.confidencePct).isEqualTo(87)
+    }
+
+    @Test
+    fun absentConfidenceSentinelMapsToNull() {
+        // The CONFIDENCE_ABSENT sentinel (-1) must degrade to null, not render as "-1%".
+        val saved =
+            SavedStateHandle(
+                mapOf(
+                    Routes.ARG_SPECIES_ID to "ficus-lyrata",
+                    Routes.ARG_CONFIDENCE_PCT to Routes.CONFIDENCE_ABSENT,
+                ),
+            )
+        val vm = ResultViewModel(savedStateHandle = saved, kb = kb)
+        assertThat(vm.state.value.confidencePct).isNull()
+    }
+
+    @Test
+    fun missingConfidenceArgDefaultsToNull() {
+        val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to "ficus-lyrata"))
+        val vm = ResultViewModel(savedStateHandle = saved, kb = kb)
+        assertThat(vm.state.value.confidencePct).isNull()
+    }
 }

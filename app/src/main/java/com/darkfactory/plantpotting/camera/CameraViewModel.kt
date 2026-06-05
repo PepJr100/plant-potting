@@ -42,10 +42,22 @@ class CameraViewModel
                                     (identifier as? CandidateProvider)?.mostRecentCandidates ?: emptyList()
                                 NavCommand.LowConfidence(candidates)
                             } else {
+                                // D2 — the high-confidence winner is the first mapped candidate
+                                // (ranked[0]); read its softmax via the side-channel and pass an
+                                // integer percentage. Null when the identifier isn't a
+                                // CandidateProvider (stub flows) — the result screen degrades to
+                                // no %/bar.
+                                val confidencePct =
+                                    (identifier as? CandidateProvider)
+                                        ?.mostRecentCandidates
+                                        ?.firstOrNull()
+                                        ?.probability
+                                        ?.let { (it * 100).toInt().coerceIn(0, 100) }
                                 NavCommand.Success(
                                     speciesId = result.speciesId,
                                     source = result.source,
                                     lowConfidence = false,
+                                    confidencePct = confidencePct,
                                 )
                             }
                         _state.value = CameraUiState.Success(result.speciesId)
