@@ -29,7 +29,7 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
       **explicit user "Save" action**.
 - [ ] An **"Add this plant"** wireframe for strong-confidence model classes that have no KB entry, logging a
       local-only request tally.
-- [ ] **One** persistence layer shared by saved plants and add-request totals.
+- [x] **One** persistence layer shared by saved plants and add-request totals.
 - [ ] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
 - [ ] Bundled, **license-clean (CC0/PD)** reference imagery on plant detail / recipe views, within an explicit
       APK-size budget, with a checked-in attribution manifest.
@@ -133,16 +133,18 @@ is currently invisible (it collapses into the low-confidence verdict).
       only ~1–6.8% of houseplant imagery is license-clean) so integration in Phase 6 isn't blocked at the end.
 
 ### Phase 1 — Shared persistence foundation (unblocks My Plants + Add-this-plant)
-- [ ] Add `androidx.datastore` to `gradle/libs.versions.toml` + `app/build.gradle.kts` (local-only).
-- [ ] **Immediately** re-run `./gradlew verifyNoNetworking` to confirm the new dependency doesn't trip the
+- [x] Add `androidx.datastore` to `gradle/libs.versions.toml` + `app/build.gradle.kts` (local-only).
+- [x] **Immediately** re-run `./gradlew verifyNoNetworking` to confirm the new dependency doesn't trip the
       forbidden-substring audit (before stacking feature work on it).
-- [ ] Create `persistence/`: `@Serializable` DTOs (`IdentifiedPlant`, `AddPlantRequest`), a `PlantLogStore`
+- [x] Create `persistence/`: `@Serializable` DTOs (`IdentifiedPlant`, `AddPlantRequest`), a `PlantLogStore`
       interface, and a `DataStorePlantLogStore` impl (one DataStore document; reuses `kotlinx.serialization.json`).
-- [ ] Implement an injectable `TimeProvider`/`Clock`; use it for all timestamps.
-- [ ] Add `PersistenceModule` (Hilt) binding `PlantLogStore` (`@Singleton`, app-context DataStore).
-- [ ] Cap `identifiedPlants` length (most-recent-N) with eviction on write.
-- [ ] Unit tests: append/read round-trip, request-counter increment+total, N-cap eviction, fake-clock
-      timestamps, empty-store cold read.
+- [x] Implement an injectable `TimeProvider`/`Clock`; use it for all timestamps.
+- [x] Add `PersistenceModule` (Hilt) binding `PlantLogStore` (`@Singleton`, app-context DataStore).
+- [x] Cap `identifiedPlants` length (most-recent-N) with eviction on write.
+- [x] Unit tests: append/read round-trip, request-counter increment+total, N-cap eviction, fake-clock
+      timestamps, empty-store cold read. (Store logic over an in-memory DataStore + serializer round-trip;
+      the file-backed survives-restart round-trip is an instrumented test in Phase 4 — DataStore's atomic
+      rename is flaky on the Windows host JVM but correct on Android.)
 
 ### Phase 2 — Pillar C: text-only KB expansion (independent, lowest-risk — land early)
 - [x] Diff `house_plant_species_mobilenetv2/labels.csv` against `plant_class_map.json`; list the remaining 21

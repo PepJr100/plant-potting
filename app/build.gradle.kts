@@ -133,6 +133,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 
+    // Local on-device persistence (PLANTPOTTING-0010) — typed DataStore, local-file only.
+    implementation(libs.androidx.datastore)
+
     // TensorFlow Lite (on-device inference). PLANTPOTTING-0003 §4.1 — do NOT add
     // tensorflow-lite-task-vision; the hand-rolled InterpreterFacade keeps unit
     // tests JVM-only.
