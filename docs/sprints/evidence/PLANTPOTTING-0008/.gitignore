@@ -1,0 +1,28 @@
+# PLANTPOTTING-0008 is an ASSESS-ONLY data-availability spike. NO training
+# images are downloaded or committed. Any tiny off-repo eyeball sample lives
+# OUTSIDE the project tree (a local scratch dir) and is never staged. This
+# .gitignore is belt-and-braces: if a media file ever lands here by accident,
+# git will not stage it. The committed deliverables are TEXT reports only
+# (data-availability-report.md, source-counts.csv, query-log.md, etc.).
+
+# Image / media — must never be committed by this sprint.
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.bmp
+*.tiff
+*.tif
+
+# Bulk-download / sample staging dirs — must never exist in the repo.
+downloads/
+samples/
+raw/
+eyeball/
+scratch/
+
+# API response caches (if a query helper ever caches to disk).
+cache/
+*.cache
+*.json.cache
