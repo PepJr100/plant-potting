@@ -20,8 +20,15 @@ class KbContentArchetypesTest {
     }
 
     @Test
-    fun bundlesExactlyEightArchetypes() {
-        assertThat(archetypes).hasSize(8)
+    fun bundlesExactlyNineArchetypes() {
+        // PLANTPOTTING-0009: +carnivorous-peat-sand (Venus Flytrap) = 9.
+        assertThat(archetypes).hasSize(9)
+    }
+
+    @Test
+    fun carnivorousPeatSandArchetypeIsPresent() {
+        // PLANTPOTTING-0009: the only new archetype this sprint.
+        assertThat(archetypes.map { it.id }).contains("carnivorous-peat-sand")
     }
 
     @Test

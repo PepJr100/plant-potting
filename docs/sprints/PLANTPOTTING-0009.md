@@ -242,27 +242,29 @@ this gate confirms them.
       a dedicated archetype only if the vet rejects reuse (would expand Phase 1).
 
 ### Phase 6 — Tests
-- [ ] Bump `KbContentSpeciesTest.bundlesExactlySixteenSpecies` → assert size **32** (rename to
+- [x] Bump `KbContentSpeciesTest.bundlesExactlySixteenSpecies` → assert size **32** (rename to
       `bundlesExactlyThirtyTwoSpecies`).
-- [ ] Bump `KbContentArchetypesTest.bundlesExactlyEightArchetypes` → assert size **9** (rename
-      accordingly).
-- [ ] Bump `KbLoaderTest` size assertions: species **16→32**, archetypes **8→9**.
-- [ ] Add a test asserting `carnivorous-peat-sand` exists and `dionaea-muscipula` maps to it.
-- [ ] **New house-plant-map coverage/integrity test** (none exists today; mirror the AIY validation test
+- [x] Bump `KbContentArchetypesTest.bundlesExactlyEightArchetypes` → assert size **9** (rename
+      accordingly → `bundlesExactlyNineArchetypes`).
+- [x] Bump `KbLoaderTest` size assertions: species **16→32**, archetypes **8→9**.
+- [x] Add a test asserting `carnivorous-peat-sand` exists and `dionaea-muscipula` maps to it.
+- [x] **New house-plant-map coverage/integrity test** (none exists today; mirror the AIY validation test
       pointed at `ml/house_plant_species_mobilenetv2`). It MUST assert:
-  - [ ] JSON parses; `version`/`modelLabelsAsset`/`mapping` present;
+  - [x] JSON parses; `version`/`modelLabelsAsset`/`mapping` present;
         `modelLabelsAsset == "ml/house_plant_species_mobilenetv2/labels.csv"`.
-  - [ ] Every `kbSpeciesId` resolves to a real KB species id.
-  - [ ] Every mapping **key** exists verbatim as a line in `labels.csv` (catches label typos).
-  - [ ] Mapped-class count is **exactly 26** (10 existing + 16 new) — guards against accidental extras
+  - [x] Every `kbSpeciesId` resolves to a real KB species id.
+  - [x] Every mapping **key** exists verbatim as a line in `labels.csv` (catches label typos).
+  - [x] Mapped-class count is **exactly 26** (10 existing + 16 new) — guards against accidental extras
         *and* silent drops.
-  - [ ] Each of the 16 new labels is present and resolves to its expected KB id (§3).
-  - [ ] The existing 10 mapped rows still point to the same KB ids as before (positive regression guard).
-  - [ ] `Chinese Money Plant (Pilea peperomioides)` is **NOT** a mapping key (Pilea deferral guard).
-  - [ ] Do **not** import the AIY alias-counterpart rule (the house-plant map intentionally has coarse
+  - [x] Each of the 16 new labels is present and resolves to its expected KB id (§3).
+  - [x] The existing 10 mapped rows still point to the same KB ids as before (positive regression guard).
+  - [x] `Chinese Money Plant (Pilea peperomioides)` is **NOT** a mapping key (Pilea deferral guard).
+  - [x] Do **not** import the AIY alias-counterpart rule (the house-plant map intentionally has coarse
         alias rows without non-alias counterparts, e.g. existing `Orchid`, `Calathea`).
-- [ ] Sanity-check `RecommendationGoldenTest` / `RecommendationEngineArchetypeTest` don't enumerate the
+- [x] Sanity-check `RecommendationGoldenTest` / `RecommendationEngineArchetypeTest` don't enumerate the
       full species set in a way the 16 additions break; adjust goldens only if additive and required.
+      (Golden test iterates `kb.species` dynamically — no count to bump; the archetype test uses a
+      synthetic in-memory KB. No golden edits required.)
 
 ### Phase 7 — Docs & evidence
 - [ ] Update `docs/kb/ml-mapping-notes.md`: the 16 new mappings, the coarse/genus rows, the Pilea

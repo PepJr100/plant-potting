@@ -28,8 +28,9 @@ class KbContentSpeciesTest {
     private val archetypeIds: Set<String> by lazy { archetypes.map { it.id }.toSet() }
 
     @Test
-    fun bundlesExactlySixteenSpecies() {
-        assertThat(species).hasSize(16)
+    fun bundlesExactlyThirtyTwoSpecies() {
+        // PLANTPOTTING-0009: 16 original + 16 delta species = 32.
+        assertThat(species).hasSize(32)
     }
 
     @Test
@@ -96,6 +97,16 @@ class KbContentSpeciesTest {
         val found = kb.findSpecies("Calathea orbifolia")
         assertThat(found).isNotNull()
         assertThat(found!!.scientificName).isEqualTo("Goeppertia orbifolia")
+    }
+
+    @Test
+    fun dionaeaMuscipulaMapsToCarnivorousPeatSand() {
+        // PLANTPOTTING-0009: Venus Flytrap is the only species needing the new archetype.
+        val dionaea = species.single { it.id == "dionaea-muscipula" }
+        assertThat(dionaea.mapping).isInstanceOf(ArchetypeMapping.Single::class.java)
+        val single = dionaea.mapping as ArchetypeMapping.Single
+        assertThat(single.archetypeId).isEqualTo("carnivorous-peat-sand")
+        assertThat(archetypeIds).contains("carnivorous-peat-sand")
     }
 
     @Test
