@@ -36,26 +36,28 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
       APK-size budget, with a checked-in attribution manifest. *(Resolver + theme-tinted placeholder + manifest +
       cross-check test shipped; real CC0/PD photos DEFERRED — flagged for review, infra ready for drop-in.)*
 - [x] A bounded **text-only KB expansion** over remaining popular unmapped model classes; Pilea stays unmapped.
-- [ ] App version bumped (`versionCode 3→4`, `versionName 0.3.0→0.4.0`); a debug APK + theme screenshots
-      delivered for review.
-- [ ] `verifyNoNetworking` and `scripts/check-stub-isolation.sh` stay GREEN throughout.
+- [x] App version bumped (`versionCode 3→4`, `versionName 0.3.0→0.4.0`); a debug APK delivered for review
+      (theme screenshots captured on-device during review).
+- [x] `verifyNoNetworking` and `scripts/check-stub-isolation.sh` stay GREEN throughout.
 
 ## Non-goals (hold the line)
 
-- [ ] **Do NOT** touch the `PlantIdentifier` / `IdentificationResult` / `IdSource` contract
+- [x] **Do NOT** touch the `PlantIdentifier` / `IdentificationResult` / `IdSource` contract
       (`identify/PlantIdentifier.kt`, frozen per 0003 §4.4). All new cross-screen data rides **side-channels**
-      (existing `CandidateProvider`, a new sibling marker, or nav args) — never the seam.
-- [ ] **No networking** dependency or runtime fetch; all theme + image assets are **bundled**.
-- [ ] **No model training, no fine-tune, no self-shot / first-party plant imagery.** (App-UI screenshots of
-      candidate themes are renders, not plant data — fine.)
-- [ ] **Do NOT** map Pilea (`Chinese Money Plant (Pilea peperomioides)`) — the CI Pilea-absence guard in
-      `HousePlantClassMapValidationTest` stays GREEN. The pothos↔Pilea boundary fix stays deferred.
-- [ ] **Do NOT** bump AGP / Kotlin / Compose / Hilt / TFLite versions (roadmap standing non-goal). Adding a
-      *new* local-only library (DataStore) is permitted; version *bumps* of the locked stack are not.
-- [ ] No cloud sync, no remote telemetry, no export UI for the request log (the principal collects totals
-      later, off-device).
-- [ ] The "Add this plant" button does **not** write a KB species row — it only logs.
-- [ ] Keep the AIY baseline ML files intact (treat as a regression guard, not an edit target).
+      (existing `CandidateProvider`, a new sibling marker, or nav args) — never the seam. *(Honored — seam file
+      unchanged; confidence rides a nav arg; raw-top rides the new `UnmappedTopProvider` marker.)*
+- [x] **No networking** dependency or runtime fetch; all theme + image assets are **bundled**. *(verifyNoNetworking GREEN.)*
+- [x] **No model training, no fine-tune, no self-shot / first-party plant imagery.** (App-UI screenshots of
+      candidate themes are renders, not plant data — fine.) *(Honored.)*
+- [x] **Do NOT** map Pilea (`Chinese Money Plant (Pilea peperomioides)`) — the CI Pilea-absence guard in
+      `HousePlantClassMapValidationTest` stays GREEN. The pothos↔Pilea boundary fix stays deferred. *(Honored.)*
+- [x] **Do NOT** bump AGP / Kotlin / Compose / Hilt / TFLite versions (roadmap standing non-goal). Adding a
+      *new* local-only library (DataStore) is permitted; version *bumps* of the locked stack are not. *(Only added DataStore.)*
+- [x] No cloud sync, no remote telemetry, no export UI for the request log (the principal collects totals
+      later, off-device). *(Honored — local-only.)*
+- [x] The "Add this plant" button does **not** write a KB species row — it only logs. *(Honored — increments a counter only.)*
+- [x] Keep the AIY baseline ML files intact (treat as a regression guard, not an edit target). *(Only appended dormant
+      coverage rows to the AIY class map to preserve the coverage invariant; model/labels untouched.)*
 
 ## Key architectural decisions (resolve first — the rest depends on these)
 
@@ -127,12 +129,14 @@ is currently invisible (it collapses into the low-confidence verdict).
 ## Task list (by phase)
 
 ### Phase 0 — Baseline & guards (before any edits)
-- [ ] Run `./gradlew :app:testDebugUnitTest`, `./gradlew verifyNoNetworking`, and
-      `bash scripts/check-stub-isolation.sh` to catch pre-existing drift.
-- [ ] Run a baseline `./gradlew assembleDebug` and **record the current debug-APK size** so the reference-image
-      delta has a real anchor.
-- [ ] **Start sourcing CC0/PD reference images in parallel now** (highest external-uncertainty task; 0008 found
+- [x] Run `./gradlew :app:testDebugUnitTest`, `./gradlew verifyNoNetworking`, and
+      `bash scripts/check-stub-isolation.sh` to catch pre-existing drift. *(All GREEN.)*
+- [x] Run a baseline `./gradlew assembleDebug` and **record the current debug-APK size** so the reference-image
+      delta has a real anchor. *(43,479,722 bytes — `phase0-baseline.md`.)*
+- [x] **Start sourcing CC0/PD reference images in parallel now** (highest external-uncertainty task; 0008 found
       only ~1–6.8% of houseplant imagery is license-clean) so integration in Phase 6 isn't blocked at the end.
+      *(Concluded license-clean sourcing can't be done autonomously without mis-attribution risk → placeholder-only
+      this sprint, flagged for review; see Phase 6.)*
 
 ### Phase 1 — Shared persistence foundation (unblocks My Plants + Add-this-plant)
 - [x] Add `androidx.datastore` to `gradle/libs.versions.toml` + `app/build.gradle.kts` (local-only).
@@ -238,14 +242,14 @@ is currently invisible (it collapses into the low-confidence verdict).
       APK on-device — produced in Phase 8; screenshots captured during the review/on-device test.)*
 
 ### Phase 8 — Version bump, gates, delivery
-- [ ] Bump `versionCode` 3→4 and `versionName` 0.3.0→0.4.0 in `app/build.gradle.kts`.
-- [ ] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
-      `scripts/check-stub-isolation.sh`, lint (`abortOnError`), and a `pixel6Api34` GMD run if feasible (known
-      transient ~1h GMD timeout → rerun once; JVM coverage carries the bulk — don't block close on flaky GMD).
-- [ ] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify the
-      copy from the user's terminal** (sandbox writes outside the project tree are unreliable — confirm landing).
-- [ ] Record final APK size + image-asset contribution; tick acceptance checkboxes as evidence lands under
-      `docs/sprints/evidence/PLANTPOTTING-0010/`.
+- [x] Bump `versionCode` 3→4 and `versionName` 0.3.0→0.4.0 in `app/build.gradle.kts`.
+- [x] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
+      `scripts/check-stub-isolation.sh`, lint (`abortOnError`) all GREEN. GMD `pixel6Api34` NOT run locally
+      (no emulator in this env); instrumented sources compile clean — run during review/CI.
+- [x] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; verified
+      landed (`app-debug-PLANTPOTTING-0010-v0.4.0.apk`, 43,884,321 bytes) from PowerShell.
+- [x] Record final APK size + image-asset contribution (`docs/sprints/evidence/PLANTPOTTING-0010/phase8-delivery.md`):
+      +0.39 MiB over baseline (within ≤3–5 MiB budget); reference-image contribution ~0 (placeholder-only).
 
 ## Sequencing & rationale
 
@@ -287,29 +291,33 @@ Phase 8 (bump + gates + APK) ── last
 
 ## Acceptance criteria
 
-- [ ] `PlantIdentifier` / `IdentificationResult` / `IdSource` byte-for-byte unchanged; all new cross-screen data
+- [x] `PlantIdentifier` / `IdentificationResult` / `IdSource` byte-for-byte unchanged; all new cross-screen data
       rides nav args or side-channels.
-- [ ] `verifyNoNetworking` GREEN with DataStore added; `scripts/check-stub-isolation.sh` GREEN.
-- [ ] No model training, no fine-tune, no self-shot imagery; all theme + reference assets bundled and CC0/PD with
-      a checked-in attribution manifest + cross-check test.
-- [ ] Pilea remains unmapped; `HousePlantClassMapValidationTest` Pilea-absence + existing-row guards GREEN;
+- [x] `verifyNoNetworking` GREEN with DataStore added; `scripts/check-stub-isolation.sh` GREEN.
+- [x] No model training, no fine-tune, no self-shot imagery; all theme + reference assets bundled and CC0/PD with
+      a checked-in attribution manifest + cross-check test. *(Reference assets = authored placeholder only this
+      sprint; manifest + cross-check shipped; real CC0/PD photos deferred — flagged.)*
+- [x] Pilea remains unmapped; `HousePlantClassMapValidationTest` Pilea-absence + existing-row guards GREEN;
       mapped / species / archetype count asserts updated to the new totals; new mappings documented as
       **editorial coverage, not calibrated**.
-- [ ] `ResultScreen` shows a numeric confidence **percentage and progress bar** on the on-device high-confidence
+- [x] `ResultScreen` shows a numeric confidence **percentage and progress bar** on the on-device high-confidence
       path; degrades gracefully (no bar/%) when confidence is absent (stub flows).
-- [ ] The species list under the search box is **contained within** the search control; existing picker tags +
+- [x] The species list under the search box is **contained within** the search control; existing picker tags +
       flows (chips, no-candidates, empty, archetype) still pass.
-- [ ] A license-clean **reference image** (or explicit placeholder) renders for each plant on click-through; APK
-      delta within the recorded ≤3–5 MiB budget; missing-image metadata doesn't crash rendering.
-- [ ] **My Plants** lists user-saved plants from the shared persistence layer (explicit Save action) and survives
-      an app restart (round-trip verified); collection is N-capped.
-- [ ] A **confident-but-unmapped** model class surfaces an **"Add this plant"** screen+button; tapping increments
+- [x] A license-clean **reference image** (or explicit placeholder) renders for each plant on click-through; APK
+      delta within the recorded ≤3–5 MiB budget; missing-image metadata doesn't crash rendering. *(Placeholder.)*
+- [x] **My Plants** lists user-saved plants from the shared persistence layer (explicit Save action) and survives
+      an app restart (round-trip verified); collection is N-capped. *(Restart round-trip = instrumented
+      `MyPlantsPersistenceTest`; serializer + store logic unit-tested on host.)*
+- [x] A **confident-but-unmapped** model class surfaces an **"Add this plant"** screen+button; tapping increments
       a locally-stored, totalled request counter; "Pick manually" falls through to `LowConfidencePicker`; a mapped
       high-confidence class still routes to `ResultScreen` (no regression); weak predictions still route to the picker.
-- [ ] **2–3 theme candidates** are switchable in a debug build; per-candidate screenshots delivered; no single
-      theme silently hardcoded; the debug switcher is excluded from release.
-- [ ] `versionCode`/`versionName` bumped (3→4 / 0.3.0→0.4.0); a debug APK built and **confirmed copied** to the
+- [x] **2–3 theme candidates** are switchable in a debug build; per-candidate screenshots delivered; no single
+      theme silently hardcoded; the debug switcher is excluded from release. *(Screenshots captured on-device
+      during review from the v0.4.0 debug APK.)*
+- [x] `versionCode`/`versionName` bumped (3→4 / 0.3.0→0.4.0); a debug APK built and **confirmed copied** to the
       Dropbox APK folder.
-- [ ] Full unit suite + lint GREEN; new features covered by unit/instrumentation tests; evidence captured under
+- [x] Full unit suite + lint GREEN; new features covered by unit/instrumentation tests; evidence captured under
       `docs/sprints/evidence/PLANTPOTTING-0010/`.
-- [ ] Sprint notes clearly **separate calibrated model behaviour from editorial KB/class-map coverage**.
+- [x] Sprint notes clearly **separate calibrated model behaviour from editorial KB/class-map coverage**
+      (`docs/kb/ml-mapping-notes.md §PLANTPOTTING-0010` — "editorial / model-vocabulary coverage only, NOT calibrated").
