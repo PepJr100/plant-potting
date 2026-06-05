@@ -1,5 +1,5 @@
 ---
-through_sid: PLANTPOTTING-0008
+through_sid: PLANTPOTTING-0010
 ---
 
 # Feature ideas — async funnel
@@ -13,7 +13,7 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none open — last raw idea folded into PLANTPOTTING-0008)_
+_(none open — both raw ideas folded into PLANTPOTTING-0010)_
 
 ## developed idea
 
@@ -22,6 +22,18 @@ _(none yet — raw ideas that have been fleshed out into a paragraph go here)_
 ## idea decisions
 
 ### accepted and added to roadmap or sprint
+
+- **PLANTPOTTING-0010 = combined app-experience sprint (both open raw ideas folded in).** Raw idea #1
+  (*strong-confidence match with no KB entry → surface it + a wireframe "add this plant" button that
+  totals requests for later*) became **Pillar B** of the sprint. Raw idea #2 (*UI/UX improvements:
+  pickable clean/elegant theme, confidence number + progress bar, a "My Plants" folder, species list
+  contained within the search-species control, a reference picture per plant*) became **Pillar A**.
+  A text-only KB expansion over the remaining unmapped model classes is **Pillar C**. All three sit
+  behind the frozen `PlantIdentifier` seam and the network-free gate; the pothos↔Pilea boundary fix
+  (the roadmap's prior Next) is deliberately **deferred** and Pilea stays unmapped. Theme delivery is
+  2–3 candidate Compose themes shipped in a debug APK + screenshots so the principal picks from real
+  renders (Claude can't produce polished design images). _Accepted 2026-06-05 (`/sprint-planner`):
+  plan at `docs/sprints/PLANTPOTTING-0010.md`._
 
 - **PLANTPOTTING-0008 (folded-in UX bug) = shutter button greys out after back-nav from results.**
   Raw idea *"taking picture then going back from results screen causes the 'take picture' button to
