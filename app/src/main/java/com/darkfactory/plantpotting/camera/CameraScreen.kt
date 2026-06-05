@@ -50,6 +50,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.darkfactory.plantpotting.R
 import kotlinx.coroutines.flow.collectLatest
 import java.io.ByteArrayOutputStream
@@ -86,6 +88,32 @@ fun CameraScreen(
                 CameraScreenTestRegistry.current = null
             }
         }
+    }
+
+    // PLANTPOTTING-0008 Phase 3 — re-enable the shutter on return-to-camera.
+    // A capture advances the view model to CameraUiState.Success, and that view
+    // model survives in the back-stack-entry's ViewModelStore. A Success only
+    // navigates to the result screen (it doesn't pop the camera entry), so
+    // pressing system-back returns here with the state still Success → the
+    // shutter would stay disabled. Resetting terminal Success to Idle on
+    // ON_RESUME restores the shutter.
+    //
+    // Rule: reset ONLY terminal Success. We deliberately do NOT reset Failure —
+    // the failure banner owns its own retry affordance (CameraUiState.Failure →
+    // Retry button), and resetting on resume would silently dismiss it. The
+    // in-flight states (Capturing/Identifying) are non-terminal and never match,
+    // so an in-flight identify is never interrupted by this observer.
+    DisposableEffect(lifecycleOwner, viewModel) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME &&
+                    viewModel.state.value is CameraUiState.Success
+                ) {
+                    viewModel.reset()
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
