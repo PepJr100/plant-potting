@@ -250,9 +250,74 @@ class CameraViewModelTest {
             }
         }
 
+    // -- PLANTPOTTING-0010 Pillar B (D3) — Add-this-plant routing ---------------
+
+    @Test
+    fun confidentUnmappedRoutesToAddPlant() =
+        runTest {
+            val fake =
+                FakeUnmappedTopIdentifier(
+                    lowConfidence = true,
+                    top =
+                        com.darkfactory.plantpotting.identify.model.TopPrediction(
+                            modelClassLabel = "Chinese Money Plant (Pilea peperomioides)",
+                            probabilityPct = 96,
+                            isConfidentUnmapped = true,
+                        ),
+                )
+            val vm = CameraViewModel(fake)
+            vm.navigate.test {
+                vm.onCaptureReady(byteArrayOf(0))
+                val event = awaitItem()
+                assertThat(event).isInstanceOf(NavCommand.AddPlant::class.java)
+                val add = event as NavCommand.AddPlant
+                assertThat(add.modelClassLabel).isEqualTo("Chinese Money Plant (Pilea peperomioides)")
+                assertThat(add.confidencePct).isEqualTo(96)
+            }
+        }
+
+    @Test
+    fun lowConfidenceNotConfidentUnmappedStillRoutesToPicker() =
+        runTest {
+            // A weak/ambiguous unmapped top must NOT be carved out — it still goes to the picker.
+            val fake =
+                FakeUnmappedTopIdentifier(
+                    lowConfidence = true,
+                    top =
+                        com.darkfactory.plantpotting.identify.model.TopPrediction(
+                            modelClassLabel = "Tulip",
+                            probabilityPct = 30,
+                            isConfidentUnmapped = false,
+                        ),
+                )
+            val vm = CameraViewModel(fake)
+            vm.navigate.test {
+                vm.onCaptureReady(byteArrayOf(0))
+                assertThat(awaitItem()).isInstanceOf(NavCommand.LowConfidence::class.java)
+            }
+        }
+
     private class FakePlantIdentifier(
         private val result: IdentificationResult,
     ) : PlantIdentifier {
+        override suspend fun identify(jpeg: ByteArray): IdentificationResult = result
+    }
+
+    private class FakeUnmappedTopIdentifier(
+        lowConfidence: Boolean,
+        private val top: com.darkfactory.plantpotting.identify.model.TopPrediction,
+    ) : PlantIdentifier,
+        com.darkfactory.plantpotting.identify.model.UnmappedTopProvider {
+        private val result =
+            IdentificationResult(
+                speciesId = "",
+                displayName = "",
+                source = IdSource.ON_DEVICE_MODEL,
+                lowConfidence = lowConfidence,
+            )
+
+        override val mostRecentTop get() = top
+
         override suspend fun identify(jpeg: ByteArray): IdentificationResult = result
     }
 

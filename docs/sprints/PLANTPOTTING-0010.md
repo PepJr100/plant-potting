@@ -25,9 +25,9 @@ which **stays deferred**; Pilea stays unmapped (CI-enforced).
       principal picks from real renders (not a hardcoded redesign).
 - [x] Numeric confidence **percentage + progress bar** on the post-identification path, without changing the
       frozen `PlantIdentifier` / `IdentificationResult` contract.
-- [ ] A **"My Plants"** collection backed by the app's first local-persistence layer, populated by an
+- [x] A **"My Plants"** collection backed by the app's first local-persistence layer, populated by an
       **explicit user "Save" action**.
-- [ ] An **"Add this plant"** wireframe for strong-confidence model classes that have no KB entry, logging a
+- [x] An **"Add this plant"** wireframe for strong-confidence model classes that have no KB entry, logging a
       local-only request tally.
 - [x] **One** persistence layer shared by saved plants and add-request totals.
 - [x] The species list **contained within** the search-species control in `LowConfidencePickerScreen`.
@@ -179,28 +179,30 @@ is currently invisible (it collapses into the low-confidence verdict).
       query, which reveals the contained list.)*
 
 ### Phase 4 — Pillar A: "My Plants" folder (depends on Phase 1)
-- [ ] Add an **explicit "Save to My Plants" action** on `ResultScreen` (and/or `RecommendationScreen`) that
+- [x] Add an **explicit "Save to My Plants" action** on `ResultScreen` (and/or `RecommendationScreen`) that
       appends an `IdentifiedPlant` via `PlantLogStore` — **user-initiated, not auto-append on every scan**
       (avoids double-write ambiguity + history noise); reflect saved state in `ResultUiState`.
-- [ ] Add `MyPlantsScreen` + `MyPlantsViewModel` reading `PlantLogStore`: previously-saved plants (name, source
+- [x] Add `MyPlantsScreen` + `MyPlantsViewModel` reading `PlantLogStore`: previously-saved plants (name, source
       badge, confidence, saved time), most-recent first; empty state when none.
-- [ ] Add `Routes.MY_PLANTS` + nav wiring; add an entry point (e.g. an icon/button on `CameraScreen`). Tapping
-      a row navigates to that plant's recommendation/result.
-- [ ] My Plants tests: VM ordering + empty state; screen render test (rows + empty); a flow test for
-      identify → Save → row appears; **persistence round-trip survives app restart**.
+- [x] Add `Routes.MY_PLANTS` + nav wiring; add an entry point (a list icon on `CameraScreen`). Tapping
+      a row navigates to that plant's result.
+- [x] My Plants tests: VM ordering + empty state; screen render test (rows + empty); a flow test for
+      identify → Save → row appears; **persistence round-trip survives app restart** (instrumented
+      `MyPlantsPersistenceTest` — real DataStore on-device; serializer/store logic unit-tested on the host).
 
 ### Phase 5 — Pillar B: "Add this plant" wireframe (depends on Phase 1 + D3)
-- [ ] Extend `MappedScore` with `topLabel` / `topProbability` / `topIsMapped`; populate in
-      `ModelScoreMapper.map` (raw `ranked[0]`). **Do not** alter verdict logic.
-- [ ] Expose raw-top info via a side-channel (widen `CandidateProvider` or add a sibling marker on
+- [x] Extend `MappedScore` with `topLabel` / `topProbability` / `topIsMapped`; populate in
+      `ModelScoreMapper.map` (raw `ranked[0]`). **Do not** alter verdict logic. *(+ derived
+      `topIsConfidentUnmapped` so the threshold comparison stays in the mapper, not the VM.)*
+- [x] Expose raw-top info via a side-channel (new sibling marker `UnmappedTopProvider` on
       `OnDevicePlantIdentifier`); leave test fakes free not to implement it.
-- [ ] Add `NavCommand.AddPlant(modelClassLabel, confidencePct)` + `Routes.ADD_THIS_PLANT`; in `CameraViewModel`
+- [x] Add `NavCommand.AddPlant(modelClassLabel, confidencePct)` + `Routes.ADD_THIS_PLANT`; in `CameraViewModel`
       route confident-but-unmapped (raw-top ≥ high threshold && `!topIsMapped`) to it; all else unchanged.
-- [ ] Add `AddThisPlantScreen` (+ VM): model-class name, confidence, **"Add this plant"** button (logs only),
+- [x] Add `AddThisPlantScreen` (+ VM): model-class name, confidence, **"Add this plant"** button (logs only),
       **"Pick manually"** secondary button → existing `LowConfidencePicker`.
-- [ ] On "Add this plant" tap, increment that class's counter in `PlantLogStore.addPlantRequests`; show a
+- [x] On "Add this plant" tap, increment that class's counter in `PlantLogStore.addPlantRequests`; show a
       confirmation state; document the increment semantics (each tap = one request is acceptable).
-- [ ] B tests: `ModelScoreMapperTest` (raw-top fields incl. an unmapped-but-high fixture), `CameraViewModelTest`
+- [x] B tests: `ModelScoreMapperTest` (raw-top fields incl. an unmapped-but-high fixture), `CameraViewModelTest`
       (routes AddPlant vs LowConfidencePicker correctly; mapped-high still → `Success`, no regression),
       AddThisPlant VM/screen test (button increments store).
 

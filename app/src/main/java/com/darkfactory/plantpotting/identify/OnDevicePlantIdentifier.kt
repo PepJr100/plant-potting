@@ -5,6 +5,8 @@ import com.darkfactory.plantpotting.identify.model.CandidateProvider
 import com.darkfactory.plantpotting.identify.model.ImagePreprocessor
 import com.darkfactory.plantpotting.identify.model.InterpreterFacade
 import com.darkfactory.plantpotting.identify.model.ModelScoreMapper
+import com.darkfactory.plantpotting.identify.model.TopPrediction
+import com.darkfactory.plantpotting.identify.model.UnmappedTopProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -34,12 +36,19 @@ class OnDevicePlantIdentifier
         private val mapper: ModelScoreMapper,
         @InferenceDispatcher private val dispatcher: CoroutineDispatcher,
     ) : PlantIdentifier,
-        CandidateProvider {
+        CandidateProvider,
+        UnmappedTopProvider {
         @Volatile
         private var lastCandidates: List<Candidate> = emptyList()
 
+        @Volatile
+        private var lastTop: TopPrediction? = null
+
         override val mostRecentCandidates: List<Candidate>
             get() = lastCandidates
+
+        override val mostRecentTop: TopPrediction?
+            get() = lastTop
 
         override suspend fun identify(jpeg: ByteArray): IdentificationResult =
             withContext(dispatcher) {
@@ -48,12 +57,20 @@ class OnDevicePlantIdentifier
                     val scores = facade.runInference(preprocessed)
                     val mapped = mapper.map(scores)
                     lastCandidates = mapped.candidates
+                    lastTop =
+                        TopPrediction(
+                            modelClassLabel = mapped.topLabel,
+                            probabilityPct = (mapped.topProbability * 100).toInt().coerceIn(0, 100),
+                            isConfidentUnmapped = mapped.topIsConfidentUnmapped,
+                        )
                     mapped.result
                 } catch (e: IdentificationFailureException) {
                     lastCandidates = emptyList()
+                    lastTop = null
                     throw e
                 } catch (e: Throwable) {
                     lastCandidates = emptyList()
+                    lastTop = null
                     throw IdentificationFailureException(
                         "On-device identifier failed: ${e.message}",
                         e,

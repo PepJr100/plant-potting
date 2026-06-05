@@ -13,6 +13,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -77,7 +78,7 @@ fun ResultScreen(
                 modifier = Modifier.testTag(ResultScreenTags.CONFIDENCE_PCT),
             )
             LinearProgressIndicator(
-                progress = pct / 100f,
+                progress = { pct / 100f },
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -90,6 +91,21 @@ fun ResultScreen(
             modifier = Modifier.testTag(ResultScreenTags.SEE_POTTING_MIX),
         ) {
             Text(stringResource(id = R.string.result_see_potting_mix))
+        }
+        // PLANTPOTTING-0010 Phase 4 — explicit Save to My Plants (user-initiated, not auto-append).
+        if (state.saved) {
+            Text(
+                text = stringResource(id = R.string.result_saved),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag(ResultScreenTags.SAVED_INDICATOR),
+            )
+        } else {
+            OutlinedButton(
+                onClick = { viewModel.saveToMyPlants() },
+                modifier = Modifier.testTag(ResultScreenTags.SAVE_TO_MY_PLANTS),
+            ) {
+                Text(stringResource(id = R.string.result_save_to_my_plants))
+            }
         }
     }
 }
@@ -131,4 +147,8 @@ object ResultScreenTags {
     const val STUB_BADGE = SOURCE_BADGE
     const val SEE_POTTING_MIX = "result.seePottingMix"
     const val NOT_FOUND = "result.notFound"
+
+    // PLANTPOTTING-0010 Phase 4 — Save to My Plants.
+    const val SAVE_TO_MY_PLANTS = "result.saveToMyPlants"
+    const val SAVED_INDICATOR = "result.saved"
 }

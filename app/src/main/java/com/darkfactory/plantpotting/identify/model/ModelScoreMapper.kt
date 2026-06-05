@@ -44,6 +44,12 @@ class ModelScoreMapper
             val bestProb = scores[bestIdx]
             val secondProb = if (ranked.size > 1) scores[ranked[1]] else 0f
 
+            // PLANTPOTTING-0010 D3 — raw top-1 facts, captured BEFORE (and independent of) the
+            // verdict logic below. A confident-but-unmapped top routes to "Add this plant".
+            val topLabel = labels[bestIdx]
+            val topIsMapped = mapping.lookup(topLabel) != null
+            val topIsConfidentUnmapped = !topIsMapped && bestProb >= thresholds.highConfidencePlain
+
             val mappedCandidates =
                 ranked
                     .asSequence()
@@ -82,9 +88,19 @@ class ModelScoreMapper
                             lowConfidence = false,
                         ),
                     candidates = mappedCandidates,
+                    topLabel = topLabel,
+                    topProbability = bestProb,
+                    topIsMapped = topIsMapped,
+                    topIsConfidentUnmapped = topIsConfidentUnmapped,
                 )
             } else {
-                lowConfidence(mappedCandidates)
+                lowConfidence(
+                    candidates = mappedCandidates,
+                    topLabel = topLabel,
+                    topProbability = bestProb,
+                    topIsMapped = topIsMapped,
+                    topIsConfidentUnmapped = topIsConfidentUnmapped,
+                )
             }
         }
 
@@ -101,7 +117,13 @@ class ModelScoreMapper
             )
         }
 
-        private fun lowConfidence(candidates: List<Candidate>): MappedScore =
+        private fun lowConfidence(
+            candidates: List<Candidate>,
+            topLabel: String = "",
+            topProbability: Float = 0f,
+            topIsMapped: Boolean = false,
+            topIsConfidentUnmapped: Boolean = false,
+        ): MappedScore =
             MappedScore(
                 result =
                     IdentificationResult(
@@ -111,5 +133,9 @@ class ModelScoreMapper
                         lowConfidence = true,
                     ),
                 candidates = candidates,
+                topLabel = topLabel,
+                topProbability = topProbability,
+                topIsMapped = topIsMapped,
+                topIsConfidentUnmapped = topIsConfidentUnmapped,
             )
     }

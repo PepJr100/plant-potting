@@ -14,8 +14,10 @@ import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
+import com.darkfactory.plantpotting.result.AddThisPlantScreen
 import com.darkfactory.plantpotting.result.ArchetypePickerScreen
 import com.darkfactory.plantpotting.result.LowConfidencePickerScreen
+import com.darkfactory.plantpotting.result.MyPlantsScreen
 import com.darkfactory.plantpotting.result.RecommendationScreen
 import com.darkfactory.plantpotting.result.ResultScreen
 import dagger.hilt.android.EntryPointAccessors
@@ -50,6 +52,7 @@ fun PlantPottingNavHost() {
         composable(Routes.CAMERA) {
             CameraScreen(
                 viewModel = hiltViewModel(),
+                onOpenMyPlants = { navController.navigate(Routes.MY_PLANTS) },
                 onNavigate = { command ->
                     when (command) {
                         is NavCommand.Success ->
@@ -63,6 +66,10 @@ fun PlantPottingNavHost() {
                             )
                         is NavCommand.LowConfidence ->
                             navController.navigate(Routes.lowConfidencePicker(command.candidates))
+                        is NavCommand.AddPlant ->
+                            navController.navigate(
+                                Routes.addThisPlant(command.modelClassLabel, command.confidencePct),
+                            )
                         is NavCommand.Failure -> {
                             // Failure stays on the camera screen via CameraUiState.Failure;
                             // no navigation per PLANTPOTTING-0003 §5.8.
@@ -136,6 +143,43 @@ fun PlantPottingNavHost() {
                 },
                 onPickByArchetype = {
                     navController.navigate(Routes.ARCHETYPE_PICKER)
+                },
+            )
+        }
+        composable(Routes.MY_PLANTS) {
+            MyPlantsScreen(
+                viewModel = hiltViewModel(),
+                onPlantClick = { row ->
+                    navController.navigate(
+                        Routes.result(
+                            speciesId = row.speciesId,
+                            source = row.source,
+                            lowConfidence = false,
+                            confidencePct = row.confidencePct,
+                        ),
+                    )
+                },
+            )
+        }
+        composable(
+            route = Routes.ADD_THIS_PLANT,
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_MODEL_CLASS_LABEL) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                    navArgument(Routes.ARG_CONFIDENCE_PCT) {
+                        type = NavType.IntType
+                        defaultValue = Routes.CONFIDENCE_ABSENT
+                    },
+                ),
+        ) {
+            AddThisPlantScreen(
+                viewModel = hiltViewModel(),
+                onPickManually = {
+                    // Fall through to the existing manual picker (no mapped candidates to seed).
+                    navController.navigate(Routes.lowConfidencePicker(emptyList()))
                 },
             )
         }

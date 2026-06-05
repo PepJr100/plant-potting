@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -61,6 +63,7 @@ import java.util.concurrent.Executor
 fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigate: (NavCommand) -> Unit,
+    onOpenMyPlants: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -215,6 +218,22 @@ fun CameraScreen(
             }
         }
 
+        // PLANTPOTTING-0010 Phase 4 — entry point into the My Plants folder.
+        IconButton(
+            onClick = onOpenMyPlants,
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .testTag(CameraScreenTags.MY_PLANTS_ENTRY),
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.List,
+                contentDescription = stringResource(id = R.string.my_plants_open_content_description),
+                tint = Color.White,
+            )
+        }
+
         val shutterLabel = stringResource(id = R.string.camera_shutter_label)
         val shutterEnabled =
             (state is CameraUiState.Idle || state is CameraUiState.Failure) &&
@@ -249,6 +268,9 @@ fun CameraScreen(
 object CameraScreenTags {
     const val PREVIEW = "camera.preview"
     const val SHUTTER = "camera.shutter"
+
+    /** PLANTPOTTING-0010 Phase 4 — opens the My Plants folder. */
+    const val MY_PLANTS_ENTRY = "camera.myPlantsEntry"
 
     /** Back-compat tag preserved on the banner body text (was top-center Text pre-0005). */
     const val ERROR = "camera.error"

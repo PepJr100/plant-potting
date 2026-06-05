@@ -39,7 +39,11 @@ class ResultScreenConfidenceTest {
                 Routes.ARG_SOURCE to source.name,
                 Routes.ARG_CONFIDENCE_PCT to (confidencePct ?: Routes.CONFIDENCE_ABSENT),
             )
-        return ResultViewModel(savedStateHandle = SavedStateHandle(args), kb = kb)
+        return ResultViewModel(
+            savedStateHandle = SavedStateHandle(args),
+            kb = kb,
+            plantLogStore = com.darkfactory.plantpotting.persistence.FakePlantLogStore(),
+        )
     }
 
     @Test
