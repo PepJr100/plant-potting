@@ -14,6 +14,7 @@
     <string name="home_about_title">How it works</string>
     <string name="home_about_body">Point the camera at a houseplant. PlantPotting identifies it on-device (nothing leaves your phone) and recommends the right potting-mix recipe. Save plants to My Plants, or browse mixes by care type.</string>
     <string name="home_about_dismiss">Got it</string>
+    <string name="home_debug_theme">🎨 Theme (debug)</string>
 
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>
@@ -69,6 +70,7 @@
     <!-- Recommendation screen -->
     <string name="recommendation_blend_chip">Blend recipe</string>
     <string name="recommendation_recipe_heading">Recipe</string>
+    <string name="recommendation_recipe_heading_for">Recommended mix</string>
     <string name="recommendation_proportion_header">%</string>
     <string name="recommendation_retake">Retake</string>
     <string name="recommendation_not_found">No recipe available for this plant.</string>

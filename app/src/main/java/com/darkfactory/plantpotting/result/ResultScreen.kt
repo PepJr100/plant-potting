@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -75,6 +76,7 @@ fun ResultScreen(
                     painter = painterResource(id = PlantImageResolver.drawableFor(state.speciesId)),
                     contentDescription = stringResource(id = R.string.result_reference_image_description),
                     colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    contentScale = if (hasRealImage) ContentScale.Crop else ContentScale.Fit,
                     modifier =
                         if (hasRealImage) {
                             Modifier.fillMaxWidth().height(180.dp).testTag(ResultScreenTags.REFERENCE_IMAGE)

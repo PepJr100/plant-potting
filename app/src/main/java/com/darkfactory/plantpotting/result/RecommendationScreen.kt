@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,10 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 
+/**
+ * PLANTPOTTING-0010 (review feedback / Dribbble layout) — the potting-mix page in the card layout
+ * language: a rounded header card (archetype name + blend chip), the rationale, then the recipe as
+ * a list of rounded rows each with a proportion "pill".
+ */
 @Composable
 fun RecommendationScreen(
     viewModel: RecommendationViewModel,
@@ -38,8 +45,9 @@ fun RecommendationScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         when (val s = state) {
             RecommendationUiState.Loading -> {
@@ -64,63 +72,90 @@ private fun ColumnScope.ReadyContent(
     s: RecommendationUiState.Ready,
     onRetake: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = s.archetypeName,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .testTag(RecommendationScreenTags.ARCHETYPE_NAME),
-        )
-        if (s.isBlend) {
-            AssistChip(
-                onClick = {},
-                label = { Text(stringResource(id = R.string.recommendation_blend_chip)) },
-                modifier = Modifier.testTag(RecommendationScreenTags.BLEND_CHIP),
+    // Hero header card.
+    Card(
+        shape = MaterialTheme.shapes.large,
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+            Text(
+                text = stringResource(id = R.string.recommendation_recipe_heading_for),
+                style = MaterialTheme.typography.labelLarge,
             )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = s.archetypeName,
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .testTag(RecommendationScreenTags.ARCHETYPE_NAME),
+                )
+                if (s.isBlend) {
+                    AssistChip(
+                        onClick = {},
+                        label = { Text(stringResource(id = R.string.recommendation_blend_chip)) },
+                        modifier = Modifier.testTag(RecommendationScreenTags.BLEND_CHIP),
+                    )
+                }
+            }
         }
     }
+
     Text(
         text = s.rationale,
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.testTag(RecommendationScreenTags.RATIONALE),
     )
-    Spacer(modifier = Modifier.height(8.dp))
+
     Text(
         text = stringResource(id = R.string.recommendation_recipe_heading),
-        style = MaterialTheme.typography.titleMedium,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
     )
-    LazyColumn(
-        modifier =
-            Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .testTag(RecommendationScreenTags.RECIPE_LIST),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+    // Plain column (recipes are short, ≤6 rows) inside the scrollable screen so every row renders.
+    Column(
+        modifier = Modifier.fillMaxWidth().testTag(RecommendationScreenTags.RECIPE_LIST),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(s.recipe) { ingredient ->
-            Row(
+        s.recipe.forEach { ingredient ->
+            Card(
+                shape = MaterialTheme.shapes.medium,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
                         .testTag(RecommendationScreenTags.RECIPE_ROW),
-                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = ingredient.ingredient,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(
-                    text = "${ingredient.proportionPct}%",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                    textAlign = TextAlign.End,
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = ingredient.ingredient,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ) {
+                        Text(
+                            text = "${ingredient.proportionPct}%",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        )
+                    }
+                }
             }
         }
     }
+    Spacer(modifier = Modifier.height(4.dp))
     Button(
         onClick = onRetake,
         modifier =

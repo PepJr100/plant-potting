@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.lifecycle.SavedStateHandle
 import com.darkfactory.plantpotting.kb.model.RecipeIngredient
 import com.darkfactory.plantpotting.recommend.Recommendation
@@ -50,7 +51,9 @@ class RecommendationScreenTest {
         // Recipe rows: ingredient and integer percent both visible.
         composeRule.onNodeWithText("Coco coir").assertIsDisplayed()
         composeRule.onNodeWithText("50%").assertIsDisplayed()
-        composeRule.onNodeWithText("Long-fibre sphagnum").assertIsDisplayed()
+        // The recommendation screen is now scrollable (richer card layout); the last recipe row
+        // sits below the fold, so scroll to it before asserting.
+        composeRule.onNodeWithText("Long-fibre sphagnum").performScrollTo().assertIsDisplayed()
         // PLANTPOTTING-0002 §3.6: each recipe row carries a RECIPE_ROW tag
         // so `scripts/integration-flow.ps1` can count rows via uiautomator
         // dump rather than scraping ingredient text.

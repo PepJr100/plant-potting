@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -17,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 
@@ -37,24 +40,39 @@ fun AddThisPlantScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
             text = stringResource(id = R.string.add_plant_headline),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.testTag(AddThisPlantTags.HEADLINE),
         )
-        Text(
-            text = state.modelClassLabel,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.testTag(AddThisPlantTags.CLASS_NAME),
-        )
-        Text(
-            text = stringResource(id = R.string.result_confidence_label, state.confidencePct),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.testTag(AddThisPlantTags.CONFIDENCE),
-        )
+        Card(
+            shape = MaterialTheme.shapes.large,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    text = state.modelClassLabel,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.testTag(AddThisPlantTags.CLASS_NAME),
+                )
+                Text(
+                    text = stringResource(id = R.string.result_confidence_label, state.confidencePct),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.testTag(AddThisPlantTags.CONFIDENCE),
+                )
+            }
+        }
         Text(
             text = stringResource(id = R.string.add_plant_explainer),
             style = MaterialTheme.typography.bodyMedium,

@@ -71,6 +71,7 @@ fun PlantPottingNavHost() {
                         ),
                     )
                 },
+                onOpenThemeSwitcher = { navController.navigate(Routes.THEME_SWITCHER) },
             )
             if (showAbout) {
                 AlertDialog(
@@ -99,7 +100,6 @@ fun PlantPottingNavHost() {
             CameraScreen(
                 viewModel = hiltViewModel(),
                 onOpenMyPlants = { navController.navigate(Routes.MY_PLANTS) },
-                onOpenThemeSwitcher = { navController.navigate(Routes.THEME_SWITCHER) },
                 onNavigate = { command ->
                     when (command) {
                         is NavCommand.Success ->

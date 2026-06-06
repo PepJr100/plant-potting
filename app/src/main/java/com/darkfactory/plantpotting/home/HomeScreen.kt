@@ -1,6 +1,7 @@
 package com.darkfactory.plantpotting.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,10 @@ fun HomeScreen(
     onBrowseMixes: () -> Unit,
     onAbout: () -> Unit,
     onRecentClick: (MyPlantRow) -> Unit,
+    onOpenThemeSwitcher: () -> Unit = {},
+    // Debug-only theme switcher entry (relocated off the camera). Excluded from release; parameterised
+    // so the exclusion is deterministically testable.
+    showDebugAffordances: Boolean = com.darkfactory.plantpotting.BuildConfig.DEBUG,
 ) {
     Column(
         modifier =
@@ -80,8 +85,8 @@ fun HomeScreen(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(id = R.string.home_greeting),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 Text(
                     text = stringResource(id = R.string.home_greeting_sub),
@@ -175,6 +180,21 @@ fun HomeScreen(
                 }
             }
         }
+
+        if (showDebugAffordances) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = stringResource(id = R.string.home_debug_theme),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                modifier =
+                    Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable(onClick = onOpenThemeSwitcher)
+                        .padding(8.dp)
+                        .testTag(HomeTags.THEME_SWITCHER_ENTRY),
+            )
+        }
     }
 }
 
@@ -212,6 +232,7 @@ private fun RecentPlantCard(
     plant: MyPlantRow,
     onClick: () -> Unit,
 ) {
+    val hasRealImage = com.darkfactory.plantpotting.result.PlantImageResolver.hasRealImage(plant.speciesId)
     Card(
         onClick = onClick,
         shape = MaterialTheme.shapes.large,
@@ -221,7 +242,8 @@ private fun RecentPlantCard(
             Image(
                 painter = painterResource(id = com.darkfactory.plantpotting.result.PlantImageResolver.drawableFor(plant.speciesId)),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                contentScale = if (hasRealImage) androidx.compose.ui.layout.ContentScale.Crop else androidx.compose.ui.layout.ContentScale.Fit,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -247,6 +269,7 @@ object HomeTags {
     const val ABOUT = "home.about"
     const val RECENT_ROW = "home.recentRow"
     const val RECENT_EMPTY = "home.recentEmpty"
+    const val THEME_SWITCHER_ENTRY = "home.themeSwitcherEntry"
 
     fun recentCardTag(speciesId: String): String = "home.recent.$speciesId"
 }
