@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.ui.HomeButton
 
 /**
  * PLANTPOTTING-0010 (review feedback / Dribbble layout) — the potting-mix page. Order: the identified
@@ -72,13 +72,23 @@ private fun ColumnScope.ReadyContent(
     s: RecommendationUiState.Ready,
     onHome: () -> Unit,
 ) {
-    // 1 — Plant name.
+    // 1 — Plant name (carded).
     if (s.plantName.isNotBlank()) {
-        Text(
-            text = s.plantName,
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.testTag(RecommendationScreenTags.PLANT_NAME),
-        )
+        Card(
+            shape = MaterialTheme.shapes.large,
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = s.plantName,
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(20.dp).testTag(RecommendationScreenTags.PLANT_NAME),
+            )
+        }
     }
 
     // 2 — Picture.
@@ -192,12 +202,11 @@ private fun ColumnScope.ReadyContent(
     }
 
     Spacer(modifier = Modifier.height(4.dp))
-    Button(
-        onClick = onHome,
-        modifier = Modifier.fillMaxWidth().testTag(RecommendationScreenTags.HOME_BUTTON),
-    ) {
-        Text(stringResource(id = R.string.action_home))
-    }
+    HomeButton(
+        onHome = onHome,
+        modifier = Modifier.fillMaxWidth(),
+        tag = RecommendationScreenTags.HOME_BUTTON,
+    )
 }
 
 object RecommendationScreenTags {

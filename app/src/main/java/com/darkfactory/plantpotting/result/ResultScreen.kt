@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.identify.IdSource
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 
 @Composable
 fun ResultScreen(
@@ -53,13 +53,13 @@ fun ResultScreen(
                 .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        HomeIconButton(onHome = onHome)
         if (state.notFound) {
             Text(
                 text = stringResource(id = R.string.result_not_found),
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.testTag(ResultScreenTags.NOT_FOUND),
+                modifier = Modifier.padding(top = 8.dp).testTag(ResultScreenTags.NOT_FOUND),
             )
+            HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
             return@Column
         }
 
@@ -145,11 +145,12 @@ fun ResultScreen(
         } else {
             OutlinedButton(
                 onClick = { viewModel.saveToMyPlants() },
-                modifier = Modifier.testTag(ResultScreenTags.SAVE_TO_MY_PLANTS),
+                modifier = Modifier.fillMaxWidth().testTag(ResultScreenTags.SAVE_TO_MY_PLANTS),
             ) {
                 Text(stringResource(id = R.string.result_save_to_my_plants))
             }
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 

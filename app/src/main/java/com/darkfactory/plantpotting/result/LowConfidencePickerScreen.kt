@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 
 /**
  * PLANTPOTTING-0005 §2.1 — the post-shutter screen for unmapped / weak / uncertain
@@ -69,11 +69,10 @@ fun LowConfidencePickerScreen(
                 .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        HomeIconButton(onHome = onHome)
         Text(
             text = "We couldn't identify your plant confidently.",
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.testTag(LowConfidencePickerTags.HEADLINE),
+            modifier = Modifier.padding(top = 8.dp).testTag(LowConfidencePickerTags.HEADLINE),
         )
         Text(
             text = stringResource(id = R.string.low_conf_subtitle),
@@ -208,6 +207,7 @@ fun LowConfidencePickerScreen(
         ) {
             Text(stringResource(id = R.string.low_conf_pick_other))
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -33,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,11 +58,10 @@ fun MyPlantsScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        HomeIconButton(onHome = onHome)
         Text(
             text = stringResource(id = R.string.my_plants_title),
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.testTag(MyPlantsTags.TITLE),
+            modifier = Modifier.padding(top = 8.dp).testTag(MyPlantsTags.TITLE),
         )
 
         if (state.isEmpty) {
@@ -78,22 +77,23 @@ fun MyPlantsScreen(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-            return@Column
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().testTag(MyPlantsTags.LIST),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            // De-dup keeps speciesId unique, so it's a stable list key.
-            items(state.rows, key = { it.speciesId }) { row ->
-                MyPlantRowCard(
-                    row = row,
-                    onClick = { onPlantClick(row) },
-                    onRemove = { viewModel.remove(row.speciesId) },
-                )
+            Spacer(modifier = Modifier.weight(1f))
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(1f).fillMaxWidth().testTag(MyPlantsTags.LIST),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // De-dup keeps speciesId unique, so it's a stable list key.
+                items(state.rows, key = { it.speciesId }) { row ->
+                    MyPlantRowCard(
+                        row = row,
+                        onClick = { onPlantClick(row) },
+                        onRemove = { viewModel.remove(row.speciesId) },
+                    )
+                }
             }
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 

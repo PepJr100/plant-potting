@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 
 /**
  * PLANTPOTTING-0010 Pillar B — the "Add this plant" wireframe. Shown when the model is *strongly*
@@ -45,11 +45,10 @@ fun AddThisPlantScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        HomeIconButton(onHome = onHome)
         Text(
             text = stringResource(id = R.string.add_plant_headline),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.testTag(AddThisPlantTags.HEADLINE),
+            modifier = Modifier.padding(top = 8.dp).testTag(AddThisPlantTags.HEADLINE),
         )
         Card(
             shape = MaterialTheme.shapes.large,
@@ -104,6 +103,7 @@ fun AddThisPlantScreen(
         ) {
             Text(stringResource(id = R.string.add_plant_pick_manually))
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 

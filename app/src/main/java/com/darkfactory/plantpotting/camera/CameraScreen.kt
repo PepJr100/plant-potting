@@ -50,7 +50,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.darkfactory.plantpotting.R
@@ -217,16 +217,6 @@ fun CameraScreen(
             }
         }
 
-        // PLANTPOTTING-0010 (review feedback) — Home affordance (replaces the My Plants menu icon).
-        HomeIconButton(
-            onHome = onHome,
-            tint = Color.White,
-            modifier =
-                Modifier
-                    .align(Alignment.TopStart)
-                    .padding(8.dp),
-        )
-
         val shutterLabel = stringResource(id = R.string.camera_shutter_label)
         val shutterEnabled =
             (state is CameraUiState.Idle || state is CameraUiState.Failure) &&
@@ -240,7 +230,7 @@ fun CameraScreen(
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 48.dp)
+                    .padding(bottom = 104.dp)
                     .size(72.dp)
                     .testTag(CameraScreenTags.SHUTTER)
                     .alpha(if (shutterEnabled) 1f else 0.5f)
@@ -251,6 +241,18 @@ fun CameraScreen(
                 contentDescription = shutterLabel,
             )
         }
+
+        // PLANTPOTTING-0010 (review feedback) — full-width Home button at the bottom, like every
+        // other screen. Sits below the (raised) shutter.
+        HomeButton(
+            onHome = onHome,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
+        )
     }
 
     DisposableEffect(Unit) {

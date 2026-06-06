@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.darkfactory.plantpotting.ui.HomeIconButton
+import com.darkfactory.plantpotting.ui.HomeButton
 
 /**
  * PLANTPOTTING-0010 (review feedback / Dribbble layout) — "Browse mixes": each substrate archetype
@@ -34,14 +34,13 @@ fun ArchetypePickerScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        HomeIconButton(onHome = onHome)
         Text(
             text = "Browse mixes",
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.testTag(ArchetypePickerTags.HEADLINE),
+            modifier = Modifier.padding(top = 8.dp).testTag(ArchetypePickerTags.HEADLINE),
         )
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().testTag(ArchetypePickerTags.LIST),
+            modifier = Modifier.weight(1f).fillMaxWidth().testTag(ArchetypePickerTags.LIST),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(viewModel.archetypes, key = { it.id }) { archetype ->
@@ -70,6 +69,7 @@ fun ArchetypePickerScreen(
                 }
             }
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 
