@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -33,11 +35,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.identify.IdSource
+import com.darkfactory.plantpotting.ui.HomeIconButton
 
 @Composable
 fun ResultScreen(
     viewModel: ResultViewModel,
     onSeePottingMix: (String) -> Unit,
+    onHome: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -45,9 +49,11 @@ fun ResultScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        HomeIconButton(onHome = onHome)
         if (state.notFound) {
             Text(
                 text = stringResource(id = R.string.result_not_found),

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.ui.HomeIconButton
 
 /**
  * PLANTPOTTING-0005 §2.1 — the post-shutter screen for unmapped / weak / uncertain
@@ -48,6 +49,7 @@ fun LowConfidencePickerScreen(
     viewModel: LowConfidencePickerViewModel,
     onSpeciesPicked: (String) -> Unit,
     onPickByArchetype: () -> Unit,
+    onHome: () -> Unit = {},
 ) {
     val query by viewModel.query.collectAsState()
     val filtered by viewModel.filteredSpecies.collectAsState()
@@ -64,9 +66,10 @@ fun LowConfidencePickerScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        HomeIconButton(onHome = onHome)
         Text(
             text = "We couldn't identify your plant confidently.",
             style = MaterialTheme.typography.titleMedium,

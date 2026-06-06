@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PlantPotting</string>
+    <string name="action_home">Home</string>
 
     <!-- Home / start screen -->
     <string name="home_greeting">Hello 🌱</string>
@@ -14,7 +15,6 @@
     <string name="home_about_title">How it works</string>
     <string name="home_about_body">Point the camera at a houseplant. PlantPotting identifies it on-device (nothing leaves your phone) and recommends the right potting-mix recipe. Save plants to My Plants, or browse mixes by care type.</string>
     <string name="home_about_dismiss">Got it</string>
-    <string name="home_debug_theme">🎨 Theme (debug)</string>
 
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>

@@ -25,7 +25,6 @@ import com.darkfactory.plantpotting.home.HomeScreen
 import com.darkfactory.plantpotting.home.HomeViewModel
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
-import com.darkfactory.plantpotting.ui.theme.DebugThemeSwitcherScreen
 import com.darkfactory.plantpotting.result.AddThisPlantScreen
 import com.darkfactory.plantpotting.result.ArchetypePickerScreen
 import com.darkfactory.plantpotting.result.LowConfidencePickerScreen
@@ -46,6 +45,14 @@ fun PlantPottingNavHost() {
                     AppEntryPoints::class.java,
                 ).cameraPermissionGuard()
         }
+
+    // Review feedback — a consistent "Home" action: return to the (single) Home instance.
+    val goHome: () -> Unit = {
+        navController.navigate(Routes.HOME) {
+            popUpTo(Routes.HOME) { inclusive = false }
+            launchSingleTop = true
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -71,7 +78,6 @@ fun PlantPottingNavHost() {
                         ),
                     )
                 },
-                onOpenThemeSwitcher = { navController.navigate(Routes.THEME_SWITCHER) },
             )
             if (showAbout) {
                 AlertDialog(
@@ -99,7 +105,7 @@ fun PlantPottingNavHost() {
         composable(Routes.CAMERA) {
             CameraScreen(
                 viewModel = hiltViewModel(),
-                onOpenMyPlants = { navController.navigate(Routes.MY_PLANTS) },
+                onHome = goHome,
                 onNavigate = { command ->
                     when (command) {
                         is NavCommand.Success ->
@@ -149,6 +155,7 @@ fun PlantPottingNavHost() {
                 onSeePottingMix = { speciesId ->
                     navController.navigate(Routes.recommendation(speciesId))
                 },
+                onHome = goHome,
             )
         }
         composable(
@@ -160,11 +167,7 @@ fun PlantPottingNavHost() {
         ) {
             RecommendationScreen(
                 viewModel = hiltViewModel(),
-                onRetake = {
-                    navController.navigate(Routes.CAMERA) {
-                        popUpTo(Routes.CAMERA) { inclusive = true }
-                    }
-                },
+                onHome = goHome,
             )
         }
         composable(
@@ -191,6 +194,7 @@ fun PlantPottingNavHost() {
                 onPickByArchetype = {
                     navController.navigate(Routes.ARCHETYPE_PICKER)
                 },
+                onHome = goHome,
             )
         }
         composable(Routes.MY_PLANTS) {
@@ -206,6 +210,7 @@ fun PlantPottingNavHost() {
                         ),
                     )
                 },
+                onHome = goHome,
             )
         }
         composable(
@@ -228,10 +233,8 @@ fun PlantPottingNavHost() {
                     // Fall through to the existing manual picker (no mapped candidates to seed).
                     navController.navigate(Routes.lowConfidencePicker(emptyList()))
                 },
+                onHome = goHome,
             )
-        }
-        composable(Routes.THEME_SWITCHER) {
-            DebugThemeSwitcherScreen(viewModel = hiltViewModel())
         }
         composable(Routes.ARCHETYPE_PICKER) {
             ArchetypePickerScreen(
@@ -239,6 +242,7 @@ fun PlantPottingNavHost() {
                 onArchetypePicked = { archetypeId ->
                     navController.navigate(Routes.archetypeRecommendation(archetypeId))
                 },
+                onHome = goHome,
             )
         }
         composable(
@@ -250,11 +254,7 @@ fun PlantPottingNavHost() {
         ) {
             RecommendationScreen(
                 viewModel = hiltViewModel(),
-                onRetake = {
-                    navController.navigate(Routes.CAMERA) {
-                        popUpTo(Routes.CAMERA) { inclusive = true }
-                    }
-                },
+                onHome = goHome,
             )
         }
     }

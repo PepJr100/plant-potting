@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.camera.CameraScreenTags
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
@@ -65,18 +66,18 @@ class EndToEndFlowTest {
         composeRule.onNodeWithText("On-device match").assertIsDisplayed()
         composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
 
-        // Navigate to the recommendation screen.
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
+        // Navigate to the recommendation screen (Result is scrollable; the CTA may be below the fold).
+        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
 
         // Recommendation screen: archetype name + recipe rows whose proportions sum to 100.
-        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
+        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).performScrollTo().assertIsDisplayed()
         composeRule
             .onAllNodesWithTag(RecommendationScreenTags.RECIPE_LIST)
             .onFirst()
             .assertIsDisplayed()
 
-        // Retake returns to the camera.
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).performClick()
+        // The Home button (replaces Retake) returns to the landing screen.
+        composeRule.onNodeWithTag(RecommendationScreenTags.HOME_BUTTON).performScrollTo().performClick()
     }
 }
 

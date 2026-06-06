@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.lifecycle.SavedStateHandle
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.kb.model.Archetype
@@ -51,8 +52,10 @@ class ResultScreenConfidenceTest {
         composeRule.setContent {
             ResultScreen(viewModel = vm(confidencePct = 92), onSeePottingMix = {})
         }
+        // ResultScreen is scrollable (hero image pushes content down); scroll the bar (bottom-most
+        // of the %/bar pair) into view, which brings the adjacent % with it.
+        composeRule.onNodeWithTag(ResultScreenTags.CONFIDENCE_BAR).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(ResultScreenTags.CONFIDENCE_PCT).assertIsDisplayed()
-        composeRule.onNodeWithTag(ResultScreenTags.CONFIDENCE_BAR).assertIsDisplayed()
         composeRule.onNodeWithText("Confidence: 92%").assertIsDisplayed()
     }
 

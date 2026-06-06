@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.ui.HomeIconButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -46,6 +47,7 @@ import java.util.Locale
 fun MyPlantsScreen(
     viewModel: MyPlantsViewModel,
     onPlantClick: (MyPlantRow) -> Unit,
+    onHome: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -53,9 +55,10 @@ fun MyPlantsScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        HomeIconButton(onHome = onHome)
         Text(
             text = stringResource(id = R.string.my_plants_title),
             style = MaterialTheme.typography.headlineMedium,

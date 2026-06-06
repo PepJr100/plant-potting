@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.ui.HomeIconButton
 
 /**
  * PLANTPOTTING-0010 Pillar B — the "Add this plant" wireframe. Shown when the model is *strongly*
@@ -33,6 +34,7 @@ import com.darkfactory.plantpotting.R
 fun AddThisPlantScreen(
     viewModel: AddThisPlantViewModel,
     onPickManually: () -> Unit,
+    onHome: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -40,9 +42,10 @@ fun AddThisPlantScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        HomeIconButton(onHome = onHome)
         Text(
             text = stringResource(id = R.string.add_plant_headline),
             style = MaterialTheme.typography.titleMedium,

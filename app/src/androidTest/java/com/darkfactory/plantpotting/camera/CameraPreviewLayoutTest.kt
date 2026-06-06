@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.ViewModelProbe
@@ -69,20 +70,19 @@ class CameraPreviewLayoutTest {
             ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
         }
 
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).assertIsDisplayed()
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
+        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
 
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).assertIsDisplayed()
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).performClick()
-
-        // Back on the camera screen.
+        // Recommendation page now ends with a Home button (Retake was removed). Tap it → Home,
+        // then re-enter the camera via Identify and re-check the preview fills the parent.
+        composeRule.onNodeWithTag(RecommendationScreenTags.HOME_BUTTON).performScrollTo().performClick()
+        composeRule.startIdentifyFromHome()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule
                 .onAllNodesWithTag(CameraScreenTags.SHUTTER)
                 .fetchSemanticsNodes(atLeastOneRootRequired = false)
                 .isNotEmpty()
         }
-        assertPreviewFillsParent("after Retake")
+        assertPreviewFillsParent("after Home + re-identify")
     }
 
     private fun assertPreviewFillsParent(label: String) {

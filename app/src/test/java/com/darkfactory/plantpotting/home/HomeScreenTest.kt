@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.result.MyPlantRow
 import com.darkfactory.plantpotting.ui.theme.PlantPottingTheme
@@ -31,8 +30,6 @@ class HomeScreenTest {
         onBrowseMixes: () -> Unit = {},
         onAbout: () -> Unit = {},
         onRecentClick: (MyPlantRow) -> Unit = {},
-        onOpenThemeSwitcher: () -> Unit = {},
-        showDebugAffordances: Boolean = true,
     ) {
         composeRule.setContent {
             PlantPottingTheme {
@@ -43,8 +40,6 @@ class HomeScreenTest {
                     onBrowseMixes = onBrowseMixes,
                     onAbout = onAbout,
                     onRecentClick = onRecentClick,
-                    onOpenThemeSwitcher = onOpenThemeSwitcher,
-                    showDebugAffordances = showDebugAffordances,
                 )
             }
         }
@@ -77,22 +72,6 @@ class HomeScreenTest {
         composeRule.onNodeWithTag(HomeTags.BROWSE_MIXES).performClick()
         composeRule.onNodeWithTag(HomeTags.ABOUT).performClick()
         assertThat(listOf(identify, myPlants, browse, about)).containsExactly(true, true, true, true)
-    }
-
-    @Test
-    fun debugThemeEntryPresentAndClickableWhenDebugOn() {
-        var opened = false
-        content(showDebugAffordances = true, onOpenThemeSwitcher = { opened = true })
-        // The discreet debug entry sits at the bottom of the scrollable Home content.
-        composeRule.onNodeWithTag(HomeTags.THEME_SWITCHER_ENTRY).performScrollTo().performClick()
-        assertThat(opened).isTrue()
-    }
-
-    @Test
-    fun debugThemeEntryAbsentWhenDebugOff() {
-        // Release-exclusion guarantee for the relocated theme switcher.
-        content(showDebugAffordances = false)
-        composeRule.onNodeWithTag(HomeTags.THEME_SWITCHER_ENTRY).assertDoesNotExist()
     }
 
     @Test

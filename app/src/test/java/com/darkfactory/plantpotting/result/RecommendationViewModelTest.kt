@@ -1,6 +1,7 @@
 package com.darkfactory.plantpotting.result
 
 import androidx.lifecycle.SavedStateHandle
+import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import com.darkfactory.plantpotting.kb.model.RecipeIngredient
 import com.darkfactory.plantpotting.recommend.Recommendation
 import com.darkfactory.plantpotting.recommend.RecommendationEngine
@@ -9,6 +10,8 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class RecommendationViewModelTest {
+    private val emptyKb = KnowledgeBase(archetypes = emptyMap(), species = emptyList(), speciesIndex = emptyMap())
+
     @Test
     fun engineSuccessProducesReadyState() {
         val engine =
@@ -28,7 +31,7 @@ class RecommendationViewModelTest {
                 override fun recommendByArchetype(archetypeId: String): Recommendation = error("not used")
             }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to "monstera-deliciosa"))
-        val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine)
+        val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine, kb = emptyKb)
         val ready = vm.state.value as RecommendationUiState.Ready
         assertThat(ready.archetypeName).isEqualTo("Aroid Chunky")
         assertThat(ready.recipe).hasSize(2)
@@ -44,7 +47,7 @@ class RecommendationViewModelTest {
                 override fun recommendByArchetype(archetypeId: String): Recommendation = error("not used")
             }
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to "ghost"))
-        val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine)
+        val vm = RecommendationViewModel(savedStateHandle = saved, engine = engine, kb = emptyKb)
         assertThat(vm.state.value).isEqualTo(RecommendationUiState.NotFound)
     }
 }

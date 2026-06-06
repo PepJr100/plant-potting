@@ -28,9 +28,6 @@ object Routes {
     const val MY_PLANTS = "my-plants"
     const val ADD_THIS_PLANT = "add-this-plant?label={label}&confidencePct={confidencePct}"
 
-    /** PLANTPOTTING-0010 D5 — debug-only theme switcher (reached from a BuildConfig.DEBUG affordance). */
-    const val THEME_SWITCHER = "debug-theme-switcher"
-
     const val ARG_SPECIES_ID = "speciesId"
     const val ARG_SOURCE = "source"
     const val ARG_LOW_CONFIDENCE = "lowConfidence"
