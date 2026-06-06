@@ -64,10 +64,22 @@ Key finding: **Smithsonian NMNH _Botany_ = herbarium specimen sheets** (not usab
 _Gardens_ (unit OFEO-SG) = live-plant studio photos** (CC0) — that's where the Phalaenopsis came from
 (GBIF had no CC0 phalaenopsis). The Gardens collection is orchid-heavy, so it yielded only phalaenopsis.
 
-**Still at 1 photo (no clean CC0 live-plant photo found anywhere):** `aglaonema`, `dieffenbachia`,
-`schefflera`, `goeppertia-orbifolia`. **Net fixture set: 25 photos across 14 species** — 10 of 14 species
-now have ≥2 independent base photos (snake ×3, ficus ×3; aloe/jade/ZZ/peace-lily/monstera/pothos/
-kalanchoe/phalaenopsis ×2).
+## Fourth sourcing pass (broad GBIF / iNaturalist research-grade CC0 — widen species coverage)
+
+To grow coverage beyond the original 14 species, a broad pass over the **iNaturalist research-grade
+dataset** (community-verified species ID, live-plant photos) filtered to CC0 added **+16 new eval
+species** (one photo each): anthurium-andraeanum, maranta-leuconeura, nephrolepis-exaltata,
+pachira-aquatica, dypsis-lutescens, tradescantia, hedera-helix, euphorbia-pulcherrima, dionaea-muscipula,
+strelitzia-reginae, aspidistra-elatior, asplenium-nidus, asparagus-setaceus, hypoestes-phyllostachya,
+cycas-revoluta, yucca. (Restricting to the iNat dataset avoids the herbarium-specimen problem entirely.)
+These are real-world field photos — *ideal* for an honest accuracy eval (more representative than studio
+shots). No CC0 found for: saintpaulia-ionantha, alocasia, dracaena (marginata), begonia, ctenanthe,
+schlumbergera-bridgesii.
+
+**Net fixture set: 41 photos across 30 species** (of the model's 38 mapped classes) — 10 species have ≥2
+independent base photos (snake ×3, ficus ×3; aloe/jade/ZZ/peace-lily/monstera/pothos/kalanchoe/phalaenopsis
+×2). Still at 1 photo / not yet covered: aglaonema, dieffenbachia, schefflera, goeppertia + the 6
+no-CC0 species above (8 of 38 mapped classes remain untested — no clean CC0/PD photo exists for them).
 
 ## Method notes
 

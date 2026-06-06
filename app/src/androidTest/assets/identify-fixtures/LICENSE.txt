@@ -297,3 +297,40 @@ kalanchoe__02.jpg  (kalanchoe, 2nd base photo — wild, in leaf litter)
 phalaenopsis__01.jpg  (moth orchid, 2nd base photo — Smithsonian Gardens studio shot, bloomless)
   Smithsonian Gardens (Orchid Collection, OFEO-SG), photo Creekside Digital, CC0.
   https://ids.si.edu/ids/deliveryService?id=SG-2015-1940A-101
+
+
+-- PLANTPOTTING-0011 pass 4 (GBIF / iNaturalist research-grade CC0; +16 new eval species) --
+All CC0 (iNaturalist), centre-crop 480x480 q80. Real-world field photos (ideal for an honest eval).
+
+anthurium-andraeanum__01.jpg  (anthurium-andraeanum)
+  kristen_276, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/606694703/original.jpg
+maranta-leuconeura__01.jpg  (maranta-leuconeura)
+  Tiago Lubiana, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/614804276/original.jpg
+nephrolepis-exaltata__01.jpg  (nephrolepis-exaltata)
+  Sterling Herron, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/476778856/original.jpg
+pachira-aquatica__01.jpg  (pachira-aquatica)
+  Stephen Lewis, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/605063107/original.jpg
+dypsis-lutescens__01.jpg  (dypsis-lutescens)
+  naturedom12, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/610551251/original.jpg
+tradescantia__01.jpg  (tradescantia)
+  Lauren Bosch, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/604535003/original.jpg
+hedera-helix__01.jpg  (hedera-helix)
+  Stephen James McWilliam, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/604866759/original.jpg
+euphorbia-pulcherrima__01.jpg  (euphorbia-pulcherrima)
+  Yolanda M. Leon, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/608427884/original.jpg
+dionaea-muscipula__01.jpg  (dionaea-muscipula)
+  JD Flores, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/630760018/original.jpg
+strelitzia-reginae__01.jpg  (strelitzia-reginae)
+  Jordan, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/655864600/original.jpg
+aspidistra-elatior__01.jpg  (aspidistra-elatior)
+  Mason Brock, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/505097158/original.jpg
+asplenium-nidus__01.jpg  (asplenium-nidus)
+  葉子, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/633490005/original.jpg
+asparagus-setaceus__01.jpg  (asparagus-setaceus)
+  Paweł Sadkowski, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/612245786/original.jpg
+hypoestes-phyllostachya__01.jpg  (hypoestes-phyllostachya)
+  citi2024, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/617145474/original.jpg
+cycas-revoluta__01.jpg  (cycas-revoluta)
+  Rosie Bibby, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/471752890/original.jpg
+yucca__01.jpg  (yucca)
+  terrifricker, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/609022027/original.jpg
