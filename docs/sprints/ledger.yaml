@@ -59,3 +59,8 @@ sprints:
     executor: opus (claude-opus-4-8)
     created: "2026-06-05T20:47:09+00:00"
     updated: "2026-06-06T02:34:25+00:00"
+  - id: PLANTPOTTING-0011
+    title: "Accuracy & trust: real-photo eval harness + confidence abstention + no-training accuracy levers"
+    status: planned
+    created: "2026-06-06T16:05:47+00:00"
+    updated: "2026-06-06T16:17:38+00:00"
