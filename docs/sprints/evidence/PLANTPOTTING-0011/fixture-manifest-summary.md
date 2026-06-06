@@ -32,6 +32,24 @@ a tiny clean set (D2).
 | `hedera-helix` (English ivy) | **No CC0/PD** result among the top 40 Commons matches (all CC-BY / CC-BY-SA / GFDL). |
 | `dracaena` (*D. marginata*) | **No CC0/PD** result among the top 40 Commons matches. |
 
+## Second sourcing pass (deepen single-photo species toward ≥2)
+
+Added 4 more CC0 photos, manually vetted — species now with **≥2 independent base photos**:
+snake plant (3), aloe vera (2), jade (2), ZZ plant (2), peace lily (2, incl. the grandfathered CC BY-SA).
+
+| added | species | license | author |
+|---|---|---|---|
+| `zamioculcas-zamiifolia__01.jpg` | ZZ plant | CC0 | Philsacor |
+| `aloe-vera__02.jpg` | aloe vera | CC0 | Brainmachine |
+| `crassula-ovata__01.jpg` | jade plant | CC0 | W.carter |
+| `spathiphyllum-wallisii__01.jpg` | peace lily | CC0 | CesarAlbertoHerrera |
+
+**Hit the supply wall (no 2nd distinct CC0/PD photo in Commons top results) — stay at 1 photo:**
+`epipremnum-aureum` (pothos), `monstera-deliciosa`, `phalaenopsis`, `ficus-elastica`, `aglaonema`,
+`dieffenbachia`, `schefflera`, `kalanchoe`, `goeppertia-orbifolia`. This is the honest ceiling under
+the CC0/PD-only + no-self-shot constraints — deepening further would require relaxing the licence rule
+or first-party photos (both sprint non-goals). **Net fixture set: 20 photos across 14 species.**
+
 ## Method notes
 
 - Center-crop to square → resize 480×480 → JPEG q80 (matches the pre-existing fixtures exactly).

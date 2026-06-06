@@ -255,3 +255,23 @@ schefflera__01.jpg  (umbrella tree, bonsai form)
 kalanchoe__01.jpg  (flowering kalanchoe, orange clusters)
   Sabalo22, CC0, via Wikimedia Commons.
   https://commons.wikimedia.org/wiki/File:Kalanchoe_blossfeldiana_(Florist_Kalanchoe).jpg
+
+
+-- PLANTPOTTING-0011 pass 2 (deepen single-photo species to >=2 where CC0/PD supply allows) --
+All CC0; same centre-crop 480x480 q80 processing.
+
+zamioculcas-zamiifolia__01.jpg  (ZZ plant, 2nd base photo — white pot, outdoor)
+  Philsacor, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Zz_plant.jpg
+
+aloe-vera__02.jpg  (aloe vera, 2nd base photo — windowsill)
+  Brainmachine, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Aloe_Vera_Plant.JPG
+
+crassula-ovata__01.jpg  (jade plant, 2nd base photo — trunk/branch close-up)
+  W.carter, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Among_the_branches_of_a_potted_jade_plant.jpg
+
+spathiphyllum-wallisii__01.jpg  (peace lily — CC0 companion to the grandfathered CC BY-SA fixture)
+  CesarAlbertoHerrera, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Maseta.jpg

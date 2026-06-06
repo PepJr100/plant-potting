@@ -175,8 +175,10 @@ drift the score path.
       `margin` columns. *(`AccuracyEvalCsvSchemaTest`; header-only CSV committed so the schema is locked now)*
 - [x] Keep the **AIY baseline anchor** assertions in `OnDeviceModelRealInterpreterTest` unchanged (drift
       guard); do not weaken them.
-- [ ] Run on GMD `pixel6Api34` in CI; pull `accuracy-eval.csv` + `-summary.md` and **commit them as the
-      documented BEFORE number** (thresholds + preprocessing untouched at this point).
+- [x] Run on GMD `pixel6Api34` in CI; pull `accuracy-eval.csv` + `-summary.md` and **commit them as the
+      documented BEFORE number** (thresholds + preprocessing untouched at this point). *(ran on the LOCAL
+      Pixel_6_API_34 emulator — the "CI-only" assumption was wrong. BEFORE squash: top-1 0.654, top-3 0.796,
+      **confident-wrong 0.254**, abstain 0.092. 20 fixtures/14 species, 720 rows committed.)*
 
 ### Phase 2 — IMPROVE raw accuracy (preprocessing; decision-driven; lock the shipping pipeline)
 > Behind the seam in `ImagePreprocessor` / `OnDevicePlantIdentifier`. Each lever is a manifest-gated option
