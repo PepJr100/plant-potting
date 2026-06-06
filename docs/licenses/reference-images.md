@@ -37,7 +37,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 
 | Image file (`drawable-nodpi/`) | KB speciesId | License | Source (Wikimedia Commons) |
 |---|---|---|---|
-| monstera_deliciosa.webp | monstera-deliciosa | CC0 | File:Monstera deliciosa - zrající plodenství.jpg |
+| monstera_deliciosa.webp | monstera-deliciosa | Unsplash License | Unsplash — Natalie Kovach (https://unsplash.com/photos/ph7QQq63lCs) |
 | monstera_adansonii.webp | monstera-adansonii | CC0 | File:Monstera adansonii 112059105.jpg (Jacob Rehage) |
 | epipremnum_aureum.webp | epipremnum-aureum | CC0 | File:Epipremnum aureum in wild.jpg |
 | spathiphyllum_wallisii.webp | spathiphyllum-wallisii | Public domain | File:SpathiphyllumWallisii.jpg |
@@ -53,7 +53,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | aglaonema.webp | aglaonema | CC0 | File:Konya Kelebekler Vadisi Aglaonema.jpg |
 | anthurium_andraeanum.webp | anthurium-andraeanum | CC BY 3.0 | File:Starr-100623-7786-Anthurium andraeanum-red flowers potted plants in shade house (Forest & Kim Starr) |
 | dieffenbachia.webp | dieffenbachia | CC0 | File:Dieffenbachia moralis holotype 01.jpg |
-| aloe_vera.webp | aloe-vera | CC0 | File:Aloe vera for sale.jpg |
+| aloe_vera.webp | aloe-vera | Unsplash License | Unsplash — feey (https://unsplash.com/photos/xQKp9qCPAH0) |
 | kalanchoe.webp | kalanchoe | CC0 | File:Kalanchoe blossfeldiana (Florist Kalanchoe).jpg |
 | maranta_leuconeura.webp | maranta-leuconeura | Public domain | File:Maranta leuconeura D2411.jpg |
 | nephrolepis_exaltata.webp | nephrolepis-exaltata | CC0 | File:Helecho de Boston (Nephrolepis exaltata).jpg |
@@ -63,13 +63,13 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | schefflera.webp | schefflera | CC0 | File:Schefflera arboricola (bonsai), Phipps Conservatory, 2014-03-01.jpg |
 | euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Unsplash License | Unsplash — Jessica Fadel (https://unsplash.com/photos/2B3quIShwJM) |
 | dionaea_muscipula.webp | dionaea-muscipula | CC0 | File:Venus flytrap in pot.jpg (Deltapug) |
-| chamaedorea_elegans.webp | chamaedorea-elegans | Public domain | File:Chamaedoreaaelegans.jpg (Biotaman) |
+| chamaedorea_elegans.webp | chamaedorea-elegans | Unsplash License | Unsplash — Natalie Kinnear (https://unsplash.com/photos/Uii3CSyuItI) |
 | strelitzia_reginae.webp | strelitzia-reginae | Public domain | File:Strelitzia larger.jpg |
 | aspidistra_elatior.webp | aspidistra-elatior | Public domain | File:Aspidistra-elatior-variegata.jpg |
 | asparagus_setaceus.webp | asparagus-setaceus | Public domain | File:Asparagus plumosa WPC.jpg |
 | begonia.webp | begonia | Unsplash License | Unsplash — Sanni Sahil (https://unsplash.com/photos/KcUNr5_DK5A) |
 | hypoestes_phyllostachya.webp | hypoestes-phyllostachya | Public domain | File:2006 08 14 Hypoestes Phyllostachya.jpg |
-| beaucarnea_recurvata.webp | beaucarnea-recurvata | CC0 | File:Beaucarnea recurvata serrated leaf margin.jpg |
+| beaucarnea_recurvata.webp | beaucarnea-recurvata | Unsplash License | Unsplash — feey (https://unsplash.com/photos/CU5E8ogHmuY) |
 | schlumbergera_bridgesii.webp | schlumbergera-bridgesii | CC0 | File:Christmas Cactus October 2022.jpg |
 | philodendron_hederaceum.webp | philodendron-hederaceum | CC0 | File:Philodendron sp.jpg |
 | philodendron_pink_princess.webp | philodendron-pink-princess | CC0 | File:Pink princess philodendron.jpg (Cmushore) |
@@ -79,7 +79,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | hedera_helix.webp | hedera-helix | Public domain | File:Hedera helix lombozata.jpg |
 | asplenium_nidus.webp | asplenium-nidus | Public domain | File:Neottopteris nidus - Kunming Botanical Garden - DSC03126.JPG |
 | cycas_revoluta.webp | cycas-revoluta | Public domain | File:Center of sago palm (Cycas revoluta) close-up.jpg |
-| yucca.webp | yucca | Public domain | File:Yucca elephantipes a P. Letamendi.JPG |
+| yucca.webp | yucca | Unsplash License | Unsplash — Anca Gabriela Zosin (https://unsplash.com/photos/f3e9p4_lqRw) |
 | ctenanthe.webp | ctenanthe | CC0 | File:Ctenanthe oppenheimiana - Shinjuku Gyo-en Greenhouse - DSC05761.jpg |
 
 _Full source URLs (descriptionurl per file) are recorded in
