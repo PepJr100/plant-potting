@@ -9,21 +9,25 @@ Built as a vehicle to apply what I'd learned about agentic engineering and to re
 
 ## How does the agentic harness work
 
-The goal here was simple: explore the factors that build the best-quality product while observing two rules — **(1) code must not be written by humans, and (2) code must not be reviewed by humans.** What fills the gap those rules open up is a **skill-driven, multi-model pipeline** with explicit seams between phases. The work moves through a repeating cycle, each step a `/slash-command` skill, with the sprint ledger (`docs/sprints/ledger.yaml`) as the source of truth for which sprint is in which state:
+The goal here was simple: explore the factors that build the best-quality product while observing two rules: **1. Code must not be written by humans. 2. Code must not be reviewed by humans.** What fills the gap those rules open up is a **skill-driven, multi-model pipeline** with explicit seams between phases. The work moves through a repeating cycle, each step a `/slash-command` skill, with the sprint ledger (`docs/sprints/ledger.yaml`) as the source of truth for which sprint is in which state:
 
-```
-   roadmap ──▶ sprint-planner ──▶ sprint-execute ──▶ sprint-review ──▶ (roadmap bump)
-   (the long     (3 models draft,    (1 model builds    (I exercise the     ▲
-    narrative)    critique, merge)     it, TDD-gated)     real app, log)      │
-        └──────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    R["roadmap<br/>(the long narrative)"] --> P["sprint-planner<br/>(3 models draft, critique, merge)"]
+    P --> E["sprint-execute<br/>(1 model builds it, TDD-gated)"]
+    E --> V["sprint-review<br/>(I exercise the real app, log)"]
+    V --> B["roadmap bump"]
+    B --> R
 ```
 
 The phases are shaped around three convictions:
-- **One model has one set of blind spots**, so:
-  - *Planning* is multi-model: codex, gemini, and claude each produce an independent draft, then cross-critique each other, then Opus synthesizes the strongest plan. Not the average, the best of each. 
+- **One model has one set of blind spots**:
+  - So *Planning* is multi-model: codex, gemini, and claude each produce an independent draft, then cross-critique each other, then Opus synthesizes the strongest plan. Not the average, the best of each. 
   - *Execution* is single-model (one implementer, so the diff stays coherent) under a strict brief: failing test first, integration tests mandatory, `- [ ]` → `- [x]` checkboxes flipped in the plan file as each task lands. 
-- **The plan is the contract** — a checkbox list with explicit non-goals, risks, and acceptance criteria living on disk, so drift is visible rather than hiding in someone's head; each seam hands off through a gated `origin/main` so no phase can quietly lose a plan or a feedback file. 
-- **I own "Product" choices** - Through all of it I keep my hand on the steering wheel: I owned the problem framing, the research and knowledge pyramid that sat behind the recommendations, and the product choices at every seam. Which intent concentrates into the next plan, what counts as "done," what gets deferred. The harness writes and tests the code; the **judgment about *what* to build and *whether it's right* stays mine.**
+- **The plan is the contract**
+  - A checkbox list with explicit non-goals, risks, and acceptance criteria living on disk, so drift is visible rather than hiding in someone's head; each seam hands off through a gated `origin/main` so no phase can quietly lose a plan or a feedback file. 
+- **I own "Product" choices**
+  - Through all of it I keep my hand on the steering wheel: I owned the problem framing, the research and knowledge pyramid that sat behind the recommendations, and the product choices at every seam. Which intent concentrates into the next plan, what counts as "done," what gets deferred. The harness writes and tests the code; the **judgment about *what* to build and *whether it's right* stays mine.**
 
 That last phase is where the learning loop closes. `sprint-review` walks me through exercising the **real** output. Running the app, hitting the live path, and captures structured feedback that becomes the *input* to the next sprint's intent. Offline gates (tests, lint, types) only prove the code is internally consistent; the bugs that actually mattered here surfaced when a human drove the live product, not from the test suite. Two cycles run in parallel: a Plan-Do-Learn loop on the **product**, and a second one on the **harness itself** — refining the process for working at the pace AI enables.
 
@@ -102,30 +106,23 @@ What you can do today:
 
 Architecture sketch:
 
-```
-camera capture (JPEG bytes)
-        │
-        ▼
-PlantIdentifier (interface)
-   ├── StubPlantIdentifier      ← deterministic, test default
-   └── OnDevicePlantIdentifier  ← production
-            │
-            ▼
-   ImagePreprocessor → TfLiteInterpreterFacade → ModelScoreMapper
-            │   (House Plant Species MobileNetV2, FLOAT32; AIY V1/3 baseline also bundled)
-            ▼
-   IdentificationResult { speciesId, displayName, source, lowConfidence }
-        │
-        ▼
-   high-conf (mapped)         → ResultScreen (reference photo + confidence + Save)
-   high-conf (unmapped)       → "Add this plant" wireframe (local request tally)
-   low-conf                   → LowConfidencePicker → ResultScreen (lowConfidence=true)
-        │
-        ▼
-   RecommendationScreen (plant name + photo + KB-driven archetype + recipe)
+```mermaid
+flowchart TD
+    CAM["camera capture (JPEG bytes)"] --> PI["PlantIdentifier (interface)"]
+    PI -.->|"test default"| STUB["StubPlantIdentifier<br/>(deterministic)"]
+    PI ==>|"production"| OD["OnDevicePlantIdentifier"]
+    OD --> PIPE["ImagePreprocessor → TfLiteInterpreterFacade → ModelScoreMapper<br/>(House Plant Species MobileNetV2, FLOAT32;<br/>AIY V1/3 baseline also bundled)"]
+    STUB --> IR
+    PIPE --> IR["IdentificationResult<br/>speciesId, displayName, source, lowConfidence"]
+    IR --> RT{"top-1 vs threshold"}
+    RT -->|"high-conf, mapped"| RES["ResultScreen<br/>(reference photo + confidence + Save)"]
+    RT -->|"high-conf, unmapped"| ADD["Add this plant wireframe<br/>(local request tally)"]
+    RT -->|"low-conf"| LCP["LowConfidencePicker"]
+    LCP --> RES
+    RES --> REC["RecommendationScreen<br/>(name + photo + KB archetype + recipe)"]
 
-   Home ─┬─ Identify (→ camera)     My Plants (DataStore-backed, save/remove)
-         └─ Browse mixes (archetypes)   reference photos via PlantImageResolver
+    subgraph NAV ["Home navigation"]
+    end
 ```
 
 KB: `app/src/main/assets/kb/species.json` (44 species) and `archetypes.json`
@@ -412,5 +409,3 @@ Project conventions in `.claude/CLAUDE.md`:
 
 - `.claude/skills/` is gitignored. A fresh clone has the skills missing —
   install them locally before `/sprint-*` works.
-- npm `.ps1` shims are broken on the developer machine; sub-spawns of
-  `claude` and `gh` from bash use full paths.
