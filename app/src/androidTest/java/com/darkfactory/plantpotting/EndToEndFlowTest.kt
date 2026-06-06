@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.camera.CameraScreenTags
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
@@ -49,6 +50,7 @@ class EndToEndFlowTest {
         // immediately to the camera screen. Wait for the camera screen to
         // compose before reaching for the view model, then drive
         // onCaptureReady directly (the GMD AOSP image has no camera sensor).
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null
@@ -57,25 +59,36 @@ class EndToEndFlowTest {
             ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
         }
 
-        // Result screen: source-driven badge visible. Production wiring is now the
-        // on-device model (PLANTPOTTING-0003 §5.6), so the badge reads "On-device match"
-        // — not the legacy "Stub identifier" copy.
-        composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).assertIsDisplayed()
-        composeRule.onNodeWithText("On-device match").assertIsDisplayed()
-        composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
+        // Result screen: wait for it to compose (navigation is async), then verify the source badge.
+        // The screen is scrollable (hero image), so scroll the badge into view before asserting.
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule
+                .onAllNodesWithTag(ResultScreenTags.SOURCE_BADGE)
+                .fetchSemanticsNodes(atLeastOneRootRequired = false)
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("On-device match").assertExists()
+        composeRule.onNodeWithText("Monstera deliciosa").assertExists()
 
-        // Navigate to the recommendation screen.
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
+        // Navigate to the recommendation screen (the CTA may be below the fold).
+        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
 
         // Recommendation screen: archetype name + recipe rows whose proportions sum to 100.
-        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule
+                .onAllNodesWithTag(RecommendationScreenTags.ARCHETYPE_NAME)
+                .fetchSemanticsNodes(atLeastOneRootRequired = false)
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).performScrollTo().assertIsDisplayed()
         composeRule
             .onAllNodesWithTag(RecommendationScreenTags.RECIPE_LIST)
             .onFirst()
-            .assertIsDisplayed()
+            .assertExists()
 
-        // Retake returns to the camera.
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).performClick()
+        // The Home button (replaces Retake) returns to the landing screen.
+        composeRule.onNodeWithTag(RecommendationScreenTags.HOME_BUTTON).performScrollTo().performClick()
     }
 }
 

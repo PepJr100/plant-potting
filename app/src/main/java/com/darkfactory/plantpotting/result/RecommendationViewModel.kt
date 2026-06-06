@@ -2,6 +2,7 @@ package com.darkfactory.plantpotting.result
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import com.darkfactory.plantpotting.recommend.RecommendationEngine
 import com.darkfactory.plantpotting.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ class RecommendationViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         engine: RecommendationEngine,
+        kb: KnowledgeBase,
     ) : ViewModel() {
         private val rawSpeciesId: String =
             savedStateHandle.get<String>(Routes.ARG_SPECIES_ID).orEmpty()
@@ -28,16 +30,20 @@ class RecommendationViewModel
         val state: StateFlow<RecommendationUiState> = _state.asStateFlow()
 
         init {
-            _state.value = computeInitialState(engine)
+            _state.value = computeInitialState(engine, kb)
         }
 
-        private fun computeInitialState(engine: RecommendationEngine): RecommendationUiState =
+        private fun computeInitialState(
+            engine: RecommendationEngine,
+            kb: KnowledgeBase,
+        ): RecommendationUiState =
             if (rawArchetypeId.isNotEmpty()) {
                 val archetypeId =
                     runCatching { URLDecoder.decode(rawArchetypeId, "UTF-8") }
                         .getOrDefault(rawArchetypeId)
                 runCatching {
                     val rec = engine.recommendByArchetype(archetypeId)
+                    // Archetype-only path (Browse mixes): no identified plant.
                     RecommendationUiState.Ready(
                         archetypeName = rec.archetypeName,
                         rationale = rec.rationale,
@@ -51,11 +57,18 @@ class RecommendationViewModel
                         .getOrDefault(rawSpeciesId)
                 runCatching {
                     val rec = engine.recommend(speciesId)
+                    val species = kb.findSpecies(speciesId)
+                    val plantName =
+                        species
+                            ?.let { it.commonNames.firstOrNull()?.takeIf(String::isNotBlank) ?: it.scientificName }
+                            .orEmpty()
                     RecommendationUiState.Ready(
                         archetypeName = rec.archetypeName,
                         rationale = rec.rationale,
                         recipe = rec.recipe,
                         isBlend = rec.isBlend,
+                        speciesId = species?.id ?: speciesId,
+                        plantName = plantName,
                     )
                 }.getOrElse { RecommendationUiState.NotFound }
             }

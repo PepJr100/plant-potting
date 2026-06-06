@@ -2,13 +2,17 @@ package com.darkfactory.plantpotting.result
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.kb.model.KnowledgeBase
+import com.darkfactory.plantpotting.persistence.PlantLogStore
 import com.darkfactory.plantpotting.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import javax.inject.Inject
 
@@ -18,6 +22,7 @@ class ResultViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         kb: KnowledgeBase,
+        private val plantLogStore: PlantLogStore,
     ) : ViewModel() {
         private val rawId: String =
             savedStateHandle.get<String>(Routes.ARG_SPECIES_ID).orEmpty()
@@ -35,8 +40,33 @@ class ResultViewModel
         private val lowConfidence: Boolean =
             savedStateHandle.get<Boolean>(Routes.ARG_LOW_CONFIDENCE) ?: false
 
+        // D2 — IntType nav arg; the CONFIDENCE_ABSENT sentinel (-1) maps back to null so the UI
+        // degrades gracefully on stub/picker flows.
+        private val confidencePct: Int? =
+            savedStateHandle
+                .get<Int>(Routes.ARG_CONFIDENCE_PCT)
+                ?.takeIf { it >= 0 }
+
         private val _state = MutableStateFlow(initialState(kb))
         val state: StateFlow<ResultUiState> = _state.asStateFlow()
+
+        /**
+         * PLANTPOTTING-0010 Phase 4 — explicit, user-initiated save to My Plants (never auto-append
+         * on every scan). No-op when the species wasn't found or it's already saved.
+         */
+        fun saveToMyPlants() {
+            val current = _state.value
+            if (current.notFound || current.saved) return
+            viewModelScope.launch {
+                plantLogStore.saveIdentifiedPlant(
+                    speciesId = current.speciesId,
+                    displayName = current.commonName.ifBlank { current.scientificName },
+                    source = current.source.name,
+                    confidencePct = current.confidencePct,
+                )
+                _state.update { it.copy(saved = true) }
+            }
+        }
 
         private fun initialState(kb: KnowledgeBase): ResultUiState {
             val species =
@@ -45,6 +75,7 @@ class ResultViewModel
                     notFound = true,
                     source = source,
                     lowConfidence = lowConfidence,
+                    confidencePct = confidencePct,
                 )
             return ResultUiState(
                 scientificName = species.scientificName,
@@ -53,6 +84,7 @@ class ResultViewModel
                 notFound = false,
                 source = source,
                 lowConfidence = lowConfidence,
+                confidencePct = confidencePct,
             )
         }
     }

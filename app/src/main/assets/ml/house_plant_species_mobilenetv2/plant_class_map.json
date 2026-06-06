@@ -1,7 +1,7 @@
 {
   "version": 1,
   "modelLabelsAsset": "ml/house_plant_species_mobilenetv2/labels.csv",
-  "_comment": "PLANTPOTTING-0007 + PLANTPOTTING-0009 — maps the House Plant Species (47-class) MobileNetV2 model labels to KB speciesIds. Labels are the model's exact output-index order (see labels.csv); runtime lookup is EXACT-MATCH on the verbatim label string (including any parenthetical). PLANTPOTTING-0009 added 16 delta species: coverage is now 26 of 47 model classes (was 10). Coarse rows (alias:true with a _note) map a broader model class onto the KB's single representative species; routing honesty still applies (a coarse high-confidence hit maps, a weak one routes low-confidence). The 16 new mappings are editorial/model-vocabulary coverage only — NOT calibrated with real-photo probes (known gap). 'Rattlesnake Plant (Calathea lancifolia)' is deliberately NOT mapped to goeppertia-orbifolia (different Calathea species). 'Chinese Money Plant (Pilea peperomioides)' is deliberately LEFT UNMAPPED this sprint — it ships in a later sprint bundled with the pothos<->Pilea boundary fix so a wrong-but-confident card cannot surface. See docs/kb/ml-mapping-notes.md.",
+  "_comment": "PLANTPOTTING-0007 + PLANTPOTTING-0009 + PLANTPOTTING-0010 — maps the House Plant Species (47-class) MobileNetV2 model labels to KB speciesIds. Labels are the model's exact output-index order (see labels.csv); runtime lookup is EXACT-MATCH on the verbatim label string (including any parenthetical). PLANTPOTTING-0009 added 16 delta species (10->26); PLANTPOTTING-0010 added 12 more popular-slice species: coverage is now 38 of 47 model classes. Coarse rows (alias:true with a _note) map a broader model class onto the KB's single representative species; routing honesty still applies (a coarse high-confidence hit maps, a weak one routes low-confidence). The 16 new mappings are editorial/model-vocabulary coverage only — NOT calibrated with real-photo probes (known gap). 'Rattlesnake Plant (Calathea lancifolia)' is deliberately NOT mapped to goeppertia-orbifolia (different Calathea species). 'Chinese Money Plant (Pilea peperomioides)' is deliberately LEFT UNMAPPED this sprint — it ships in a later sprint bundled with the pothos<->Pilea boundary fix so a wrong-but-confident card cannot surface. See docs/kb/ml-mapping-notes.md.",
   "mapping": {
     "Monstera Deliciosa (Monstera deliciosa)": { "kbSpeciesId": "monstera-deliciosa" },
     "Pothos (Ivy arum)":                        { "kbSpeciesId": "epipremnum-aureum", "alias": true, "_note": "Pothos common-name == Epipremnum aureum" },
@@ -28,6 +28,18 @@
     "English Ivy (Hedera helix)":               { "kbSpeciesId": "hedera-helix" },
     "Schefflera":                               { "kbSpeciesId": "schefflera", "alias": true, "_note": "COARSE/genus: bare model class 'Schefflera' mapped to the KB's representative Schefflera entry (PLANTPOTTING-0009)." },
     "Poinsettia (Euphorbia pulcherrima)":       { "kbSpeciesId": "euphorbia-pulcherrima" },
-    "Venus Flytrap":                            { "kbSpeciesId": "dionaea-muscipula" }
+    "Venus Flytrap":                            { "kbSpeciesId": "dionaea-muscipula" },
+    "Parlor Palm (Chamaedorea elegans)":        { "kbSpeciesId": "chamaedorea-elegans" },
+    "Bird of Paradise (Strelitzia reginae)":    { "kbSpeciesId": "strelitzia-reginae" },
+    "Cast Iron Plant (Aspidistra elatior)":     { "kbSpeciesId": "aspidistra-elatior" },
+    "Birds Nest Fern (Asplenium nidus)":        { "kbSpeciesId": "asplenium-nidus" },
+    "Asparagus Fern (Asparagus setaceus)":      { "kbSpeciesId": "asparagus-setaceus" },
+    "Begonia (Begonia spp.)":                   { "kbSpeciesId": "begonia", "alias": true, "_note": "COARSE/genus: model class 'Begonia (Begonia spp.)' mapped to the KB's representative Begonia entry (PLANTPOTTING-0010). The separate 'Iron Cross begonia (Begonia masoniana)' class is intentionally left unmapped (rex-type, distinct moisture preference)." },
+    "Polka Dot Plant (Hypoestes phyllostachya)": { "kbSpeciesId": "hypoestes-phyllostachya" },
+    "Ponytail Palm (Beaucarnea recurvata)":     { "kbSpeciesId": "beaucarnea-recurvata" },
+    "Sago Palm (Cycas revoluta)":               { "kbSpeciesId": "cycas-revoluta" },
+    "Yucca":                                    { "kbSpeciesId": "yucca", "alias": true, "_note": "COARSE/genus: bare model class 'Yucca' mapped to the KB's representative cane-form Yucca entry (PLANTPOTTING-0010)." },
+    "Ctenanthe":                                { "kbSpeciesId": "ctenanthe", "alias": true, "_note": "COARSE/genus: bare model class 'Ctenanthe' mapped to the KB's representative Ctenanthe entry (PLANTPOTTING-0010)." },
+    "Christmas Cactus (Schlumbergera bridgesii)": { "kbSpeciesId": "schlumbergera-bridgesii", "_note": "COARSE care-lane: Schlumbergera is an epiphytic forest cactus mapped to the chunky-airy 'aroid-chunky' lane (not a gritty desert mix); see ml-mapping-notes §PLANTPOTTING-0010 (PLANTPOTTING-0010)." }
   }
 }

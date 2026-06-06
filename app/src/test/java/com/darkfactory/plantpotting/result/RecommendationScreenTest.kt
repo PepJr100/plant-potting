@@ -6,8 +6,12 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.lifecycle.SavedStateHandle
+import com.darkfactory.plantpotting.kb.model.ArchetypeMapping
+import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import com.darkfactory.plantpotting.kb.model.RecipeIngredient
+import com.darkfactory.plantpotting.kb.model.Species
 import com.darkfactory.plantpotting.recommend.Recommendation
 import com.darkfactory.plantpotting.recommend.RecommendationEngine
 import com.darkfactory.plantpotting.ui.navigation.Routes
@@ -24,7 +28,7 @@ class RecommendationScreenTest {
     @get:Rule val composeRule = createComposeRule()
 
     @Test
-    fun rendersArchetypeNameRationaleAndRecipeForSingleMapping() {
+    fun rendersPlantNameArchetypeRationaleAndRecipeForSingleMapping() {
         val rec =
             Recommendation(
                 archetypeName = "Moisture-Retentive",
@@ -38,22 +42,18 @@ class RecommendationScreenTest {
                 rationale = "Suits Spathiphyllum wallisii: terrestrial aroid.",
                 isBlend = false,
             )
-        val vm = makeVm(speciesId = "spathiphyllum-wallisii", recommendation = rec)
+        val vm = makeVm(speciesId = "spathiphyllum-wallisii", commonName = "Peace lily", recommendation = rec)
         composeRule.setContent {
-            RecommendationScreen(viewModel = vm, onRetake = {})
+            RecommendationScreen(viewModel = vm, onHome = {})
         }
-        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
-        composeRule.onNodeWithText("Moisture-Retentive").assertIsDisplayed()
-        composeRule
-            .onNodeWithText("Suits Spathiphyllum wallisii: terrestrial aroid.")
-            .assertIsDisplayed()
-        // Recipe rows: ingredient and integer percent both visible.
-        composeRule.onNodeWithText("Coco coir").assertIsDisplayed()
+        // Order: plant name → picture → description → recommended mix → recipe.
+        composeRule.onNodeWithText("Peace lily").assertIsDisplayed()
+        composeRule.onNodeWithTag(RecommendationScreenTags.PLANT_IMAGE).assertIsDisplayed()
+        composeRule.onNodeWithText("Suits Spathiphyllum wallisii: terrestrial aroid.").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Moisture-Retentive").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Coco coir").performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("50%").assertIsDisplayed()
-        composeRule.onNodeWithText("Long-fibre sphagnum").assertIsDisplayed()
-        // PLANTPOTTING-0002 §3.6: each recipe row carries a RECIPE_ROW tag
-        // so `scripts/integration-flow.ps1` can count rows via uiautomator
-        // dump rather than scraping ingredient text.
+        composeRule.onNodeWithText("Long-fibre sphagnum").performScrollTo().assertIsDisplayed()
         val rowCount =
             composeRule
                 .onAllNodesWithTag(RecommendationScreenTags.RECIPE_ROW)
@@ -67,25 +67,19 @@ class RecommendationScreenTest {
         val rec =
             Recommendation(
                 archetypeName = "Aroid Chunky / Succulent Gritty blend",
-                recipe =
-                    listOf(
-                        RecipeIngredient("Pine or orchid bark", 24),
-                        RecipeIngredient("Coco coir", 15),
-                        RecipeIngredient("Perlite or pumice", 12),
-                        RecipeIngredient("Pumice or akadama", 16),
-                    ),
+                recipe = listOf(RecipeIngredient("Pine or orchid bark", 24), RecipeIngredient("Coco coir", 76)),
                 rationale = "Suits Hoya carnosa: lithophytic/semi-terrestrial.",
                 isBlend = true,
             )
-        val vm = makeVm(speciesId = "hoya-carnosa", recommendation = rec)
+        val vm = makeVm(speciesId = "hoya-carnosa", commonName = "Wax plant", recommendation = rec)
         composeRule.setContent {
-            RecommendationScreen(viewModel = vm, onRetake = {})
+            RecommendationScreen(viewModel = vm, onHome = {})
         }
-        composeRule.onNodeWithTag(RecommendationScreenTags.BLEND_CHIP).assertIsDisplayed()
+        composeRule.onNodeWithTag(RecommendationScreenTags.BLEND_CHIP).performScrollTo().assertIsDisplayed()
     }
 
     @Test
-    fun retakeButtonEmitsCallback() {
+    fun homeButtonEmitsCallback() {
         val rec =
             Recommendation(
                 archetypeName = "Standard Houseplant",
@@ -93,17 +87,18 @@ class RecommendationScreenTest {
                 rationale = "Suits Ficus lyrata.",
                 isBlend = false,
             )
-        val vm = makeVm("ficus-lyrata", rec)
-        var retook = false
+        val vm = makeVm("ficus-lyrata", "Fiddle-leaf fig", rec)
+        var home = false
         composeRule.setContent {
-            RecommendationScreen(viewModel = vm, onRetake = { retook = true })
+            RecommendationScreen(viewModel = vm, onHome = { home = true })
         }
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).performClick()
-        assertThat(retook).isTrue()
+        composeRule.onNodeWithTag(RecommendationScreenTags.HOME_BUTTON).performScrollTo().performClick()
+        assertThat(home).isTrue()
     }
 
     private fun makeVm(
         speciesId: String,
+        commonName: String,
         recommendation: Recommendation,
     ): RecommendationViewModel {
         val engine =
@@ -112,7 +107,23 @@ class RecommendationScreenTest {
 
                 override fun recommendByArchetype(archetypeId: String): Recommendation = recommendation
             }
+        val species =
+            Species(
+                id = speciesId,
+                scientificName = "Test scientific",
+                commonNames = listOf(commonName),
+                aliases = emptyList(),
+                mapping = ArchetypeMapping.Single("standard"),
+                speciesRationale = "x",
+                citations = listOf("Brief"),
+            )
+        val kb =
+            KnowledgeBase(
+                archetypes = emptyMap(),
+                species = listOf(species),
+                speciesIndex = mapOf(speciesId to species),
+            )
         val saved = SavedStateHandle(mapOf(Routes.ARG_SPECIES_ID to speciesId))
-        return RecommendationViewModel(savedStateHandle = saved, engine = engine)
+        return RecommendationViewModel(savedStateHandle = saved, engine = engine, kb = kb)
     }
 }

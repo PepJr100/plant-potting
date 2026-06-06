@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.camera.CameraScreenTags
@@ -74,6 +75,7 @@ class LowConfidenceFlowTest {
 
     @Test
     fun lowConfidenceChipPathReachesRecommendation() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null
@@ -99,12 +101,13 @@ class LowConfidenceFlowTest {
         composeRule.onNodeWithText("On-device match (low confidence)").assertIsDisplayed()
 
         // RecommendationScreen reachable via See potting mix.
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
-        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
+        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
+        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun lowConfidenceSearchPathReachesRecommendation() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null
@@ -124,7 +127,7 @@ class LowConfidenceFlowTest {
         composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).assertIsDisplayed()
         composeRule.onNodeWithText("On-device match (low confidence)").assertIsDisplayed()
 
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
-        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).assertIsDisplayed()
+        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
+        composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).performScrollTo().assertIsDisplayed()
     }
 }

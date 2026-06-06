@@ -35,6 +35,18 @@
     "Hedera helix":            { "kbSpeciesId": "hedera-helix", "_note": "PLANTPOTTING-0009 dormant coverage row." },
     "Schefflera":              { "kbSpeciesId": "schefflera", "_note": "PLANTPOTTING-0009 dormant coverage row." },
     "Euphorbia pulcherrima":   { "kbSpeciesId": "euphorbia-pulcherrima", "_note": "PLANTPOTTING-0009 dormant coverage row." },
-    "Dionaea muscipula":       { "kbSpeciesId": "dionaea-muscipula", "_note": "PLANTPOTTING-0009 dormant coverage row." }
+    "Dionaea muscipula":       { "kbSpeciesId": "dionaea-muscipula", "_note": "PLANTPOTTING-0009 dormant coverage row." },
+    "Chamaedorea elegans":     { "kbSpeciesId": "chamaedorea-elegans", "_note": "PLANTPOTTING-0010 dormant coverage row (keeps the every-KB-species-reachable invariant)." },
+    "Strelitzia reginae":      { "kbSpeciesId": "strelitzia-reginae", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Aspidistra elatior":      { "kbSpeciesId": "aspidistra-elatior", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Asplenium nidus":         { "kbSpeciesId": "asplenium-nidus", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Asparagus setaceus":      { "kbSpeciesId": "asparagus-setaceus", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Begonia (spp.)":          { "kbSpeciesId": "begonia", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Hypoestes phyllostachya": { "kbSpeciesId": "hypoestes-phyllostachya", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Beaucarnea recurvata":    { "kbSpeciesId": "beaucarnea-recurvata", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Cycas revoluta":          { "kbSpeciesId": "cycas-revoluta", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Yucca (spp.)":            { "kbSpeciesId": "yucca", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Ctenanthe (spp.)":        { "kbSpeciesId": "ctenanthe", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Schlumbergera bridgesii": { "kbSpeciesId": "schlumbergera-bridgesii", "_note": "PLANTPOTTING-0010 dormant coverage row." }
   }
 }

@@ -14,6 +14,7 @@ import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
 import com.darkfactory.plantpotting.permission.FakeGuardStateRule
 import com.darkfactory.plantpotting.result.ResultScreenTags
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -76,7 +77,8 @@ class CameraShutterOnReturnTest {
 
     @Test
     fun shutterReEnablesAfterReturningToCameraFromResult() {
-        // 1. Camera screen is the start destination (permission pre-granted).
+        // 1. From Home, tap Identify → permission pre-granted → camera. Back-stack: [Home, Camera].
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsEnabled()
         composeRule.waitUntil(timeoutMillis = 5_000) {

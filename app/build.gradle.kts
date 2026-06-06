@@ -14,8 +14,8 @@ android {
         applicationId = "com.darkfactory.plantpotting"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
 
         testInstrumentationRunner = "com.darkfactory.plantpotting.HiltTestRunner"
         vectorDrawables {
@@ -132,6 +132,9 @@ dependencies {
     // Serialization + coroutines
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Local on-device persistence (PLANTPOTTING-0010) — typed DataStore, local-file only.
+    implementation(libs.androidx.datastore)
 
     // TensorFlow Lite (on-device inference). PLANTPOTTING-0003 §4.1 — do NOT add
     // tensorflow-lite-task-vision; the hand-rolled InterpreterFacade keeps unit

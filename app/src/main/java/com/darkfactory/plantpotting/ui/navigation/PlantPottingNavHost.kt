@@ -1,21 +1,34 @@
 package com.darkfactory.plantpotting.ui.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.camera.CameraScreen
 import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
+import com.darkfactory.plantpotting.home.HomeScreen
+import com.darkfactory.plantpotting.home.HomeViewModel
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
+import com.darkfactory.plantpotting.result.AddThisPlantScreen
 import com.darkfactory.plantpotting.result.ArchetypePickerScreen
 import com.darkfactory.plantpotting.result.LowConfidencePickerScreen
+import com.darkfactory.plantpotting.result.MyPlantsScreen
 import com.darkfactory.plantpotting.result.RecommendationScreen
 import com.darkfactory.plantpotting.result.ResultScreen
 import dagger.hilt.android.EntryPointAccessors
@@ -33,10 +46,52 @@ fun PlantPottingNavHost() {
                 ).cameraPermissionGuard()
         }
 
+    // Review feedback — a consistent "Home" action: return to the (single) Home instance.
+    val goHome: () -> Unit = {
+        navController.navigate(Routes.HOME) {
+            popUpTo(Routes.HOME) { inclusive = false }
+            launchSingleTop = true
+        }
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.PERMISSION,
+        startDestination = Routes.HOME,
     ) {
+        composable(Routes.HOME) {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val recent by homeViewModel.recentPlants.collectAsState()
+            var showAbout by remember { mutableStateOf(false) }
+            HomeScreen(
+                recentPlants = recent,
+                onIdentify = { navController.navigate(Routes.PERMISSION) },
+                onMyPlants = { navController.navigate(Routes.MY_PLANTS) },
+                onBrowseMixes = { navController.navigate(Routes.ARCHETYPE_PICKER) },
+                onAbout = { showAbout = true },
+                onRecentClick = { row ->
+                    navController.navigate(
+                        Routes.result(
+                            speciesId = row.speciesId,
+                            source = row.source,
+                            lowConfidence = false,
+                            confidencePct = row.confidencePct,
+                        ),
+                    )
+                },
+            )
+            if (showAbout) {
+                AlertDialog(
+                    onDismissRequest = { showAbout = false },
+                    confirmButton = {
+                        TextButton(onClick = { showAbout = false }) {
+                            Text(stringResource(id = R.string.home_about_dismiss))
+                        }
+                    },
+                    title = { Text(stringResource(id = R.string.home_about_title)) },
+                    text = { Text(stringResource(id = R.string.home_about_body)) },
+                )
+            }
+        }
         composable(Routes.PERMISSION) {
             PermissionScreenHost(
                 guard = guard,
@@ -50,6 +105,7 @@ fun PlantPottingNavHost() {
         composable(Routes.CAMERA) {
             CameraScreen(
                 viewModel = hiltViewModel(),
+                onHome = goHome,
                 onNavigate = { command ->
                     when (command) {
                         is NavCommand.Success ->
@@ -58,10 +114,15 @@ fun PlantPottingNavHost() {
                                     speciesId = command.speciesId,
                                     source = command.source,
                                     lowConfidence = command.lowConfidence,
+                                    confidencePct = command.confidencePct,
                                 ),
                             )
                         is NavCommand.LowConfidence ->
                             navController.navigate(Routes.lowConfidencePicker(command.candidates))
+                        is NavCommand.AddPlant ->
+                            navController.navigate(
+                                Routes.addThisPlant(command.modelClassLabel, command.confidencePct),
+                            )
                         is NavCommand.Failure -> {
                             // Failure stays on the camera screen via CameraUiState.Failure;
                             // no navigation per PLANTPOTTING-0003 §5.8.
@@ -83,6 +144,10 @@ fun PlantPottingNavHost() {
                         type = NavType.BoolType
                         defaultValue = false
                     },
+                    navArgument(Routes.ARG_CONFIDENCE_PCT) {
+                        type = NavType.IntType
+                        defaultValue = Routes.CONFIDENCE_ABSENT
+                    },
                 ),
         ) {
             ResultScreen(
@@ -90,6 +155,7 @@ fun PlantPottingNavHost() {
                 onSeePottingMix = { speciesId ->
                     navController.navigate(Routes.recommendation(speciesId))
                 },
+                onHome = goHome,
             )
         }
         composable(
@@ -101,11 +167,7 @@ fun PlantPottingNavHost() {
         ) {
             RecommendationScreen(
                 viewModel = hiltViewModel(),
-                onRetake = {
-                    navController.navigate(Routes.CAMERA) {
-                        popUpTo(Routes.CAMERA) { inclusive = true }
-                    }
-                },
+                onHome = goHome,
             )
         }
         composable(
@@ -132,6 +194,46 @@ fun PlantPottingNavHost() {
                 onPickByArchetype = {
                     navController.navigate(Routes.ARCHETYPE_PICKER)
                 },
+                onHome = goHome,
+            )
+        }
+        composable(Routes.MY_PLANTS) {
+            MyPlantsScreen(
+                viewModel = hiltViewModel(),
+                onPlantClick = { row ->
+                    navController.navigate(
+                        Routes.result(
+                            speciesId = row.speciesId,
+                            source = row.source,
+                            lowConfidence = false,
+                            confidencePct = row.confidencePct,
+                        ),
+                    )
+                },
+                onHome = goHome,
+            )
+        }
+        composable(
+            route = Routes.ADD_THIS_PLANT,
+            arguments =
+                listOf(
+                    navArgument(Routes.ARG_MODEL_CLASS_LABEL) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                    navArgument(Routes.ARG_CONFIDENCE_PCT) {
+                        type = NavType.IntType
+                        defaultValue = Routes.CONFIDENCE_ABSENT
+                    },
+                ),
+        ) {
+            AddThisPlantScreen(
+                viewModel = hiltViewModel(),
+                onPickManually = {
+                    // Fall through to the existing manual picker (no mapped candidates to seed).
+                    navController.navigate(Routes.lowConfidencePicker(emptyList()))
+                },
+                onHome = goHome,
             )
         }
         composable(Routes.ARCHETYPE_PICKER) {
@@ -140,6 +242,7 @@ fun PlantPottingNavHost() {
                 onArchetypePicked = { archetypeId ->
                     navController.navigate(Routes.archetypeRecommendation(archetypeId))
                 },
+                onHome = goHome,
             )
         }
         composable(
@@ -151,11 +254,7 @@ fun PlantPottingNavHost() {
         ) {
             RecommendationScreen(
                 viewModel = hiltViewModel(),
-                onRetake = {
-                    navController.navigate(Routes.CAMERA) {
-                        popUpTo(Routes.CAMERA) { inclusive = true }
-                    }
-                },
+                onHome = goHome,
             )
         }
     }

@@ -18,10 +18,22 @@ sealed class NavCommand {
         val speciesId: String,
         val source: IdSource,
         val lowConfidence: Boolean,
+        // PLANTPOTTING-0010 D2 — integer confidence (0..100) from the on-device top candidate's
+        // softmax, surfaced via the CandidateProvider side-channel; null for stub flows.
+        val confidencePct: Int? = null,
     ) : NavCommand()
 
     data class LowConfidence(
         val candidates: List<Candidate>,
+    ) : NavCommand()
+
+    /**
+     * PLANTPOTTING-0010 Pillar B — a confident-but-unmapped model class (strong prediction, no KB
+     * entry). Carved out of the low-confidence path; routes to the "Add this plant" wireframe.
+     */
+    data class AddPlant(
+        val modelClassLabel: String,
+        val confidencePct: Int,
     ) : NavCommand()
 
     data class Failure(

@@ -7,57 +7,69 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.darkfactory.plantpotting.ui.HomeButton
 
 /**
- * PLANTPOTTING-0003 §6.6 — flat list of 8 archetypes, minimal styling per the §6.3 de-scope
- * order. Tap → archetype-recommendation route via [onArchetypePicked].
+ * PLANTPOTTING-0010 (review feedback / Dribbble layout) — "Browse mixes": each substrate archetype
+ * is a large rounded card (section-header + card-list language), tap → archetype-recommendation.
  */
 @Composable
 fun ArchetypePickerScreen(
     viewModel: ArchetypePickerViewModel,
     onArchetypePicked: (String) -> Unit,
+    onHome: () -> Unit = {},
 ) {
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "Pick a substrate archetype",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.testTag(ArchetypePickerTags.HEADLINE),
+            text = "Browse mixes",
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(top = 8.dp).testTag(ArchetypePickerTags.HEADLINE),
         )
-        LazyColumn(modifier = Modifier.fillMaxWidth().testTag(ArchetypePickerTags.LIST)) {
+        LazyColumn(
+            modifier = Modifier.weight(1f).fillMaxWidth().testTag(ArchetypePickerTags.LIST),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             items(viewModel.archetypes, key = { it.id }) { archetype ->
-                TextButton(
+                Card(
                     onClick = { onArchetypePicked(archetype.id) },
+                    shape = MaterialTheme.shapes.large,
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .testTag(ArchetypePickerTags.archetypeTag(archetype.id)),
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
                         Text(
                             text = archetype.displayName,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         )
                         Text(
                             text = archetype.shortDescription,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         )
                     }
                 }
             }
         }
+        HomeButton(onHome = onHome, modifier = Modifier.fillMaxWidth())
     }
 }
 

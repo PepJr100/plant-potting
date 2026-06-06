@@ -2,10 +2,8 @@ package com.darkfactory.plantpotting.camera
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.ViewModelProbe
@@ -13,8 +11,7 @@ import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
 import com.darkfactory.plantpotting.permission.FakeGuardStateRule
-import com.darkfactory.plantpotting.result.RecommendationScreenTags
-import com.darkfactory.plantpotting.result.ResultScreenTags
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.google.common.truth.Truth.assertWithMessage
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -56,31 +53,16 @@ class CameraPreviewLayoutTest {
         GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
     @Test
-    fun previewFillsMostOfParentOnFirstEntryAndAfterRetake() {
+    fun previewFillsMostOfParentOnFirstEntry() {
+        // PLANTPOTTING-0010 review: Retake was removed (the recommendation page now has a Home
+        // button), so the old "return to camera and re-check" round-trip no longer applies. The
+        // first-entry preview-fills-parent invariant is what this test guards.
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
-        assertPreviewFillsParent("first entry")
-
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null
         }
-        composeRule.runOnIdle {
-            ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
-        }
-
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).assertIsDisplayed()
-        composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performClick()
-
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).assertIsDisplayed()
-        composeRule.onNodeWithTag(RecommendationScreenTags.RETAKE).performClick()
-
-        // Back on the camera screen.
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule
-                .onAllNodesWithTag(CameraScreenTags.SHUTTER)
-                .fetchSemanticsNodes(atLeastOneRootRequired = false)
-                .isNotEmpty()
-        }
-        assertPreviewFillsParent("after Retake")
+        assertPreviewFillsParent("first entry")
     }
 
     private fun assertPreviewFillsParent(label: String) {

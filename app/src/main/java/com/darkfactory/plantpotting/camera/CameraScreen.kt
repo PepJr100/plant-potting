@@ -53,6 +53,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.ui.HomeButton
 import kotlinx.coroutines.flow.collectLatest
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executor
@@ -61,6 +62,7 @@ import java.util.concurrent.Executor
 fun CameraScreen(
     viewModel: CameraViewModel,
     onNavigate: (NavCommand) -> Unit,
+    onHome: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -228,7 +230,7 @@ fun CameraScreen(
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 48.dp)
+                    .padding(bottom = 104.dp)
                     .size(72.dp)
                     .testTag(CameraScreenTags.SHUTTER)
                     .alpha(if (shutterEnabled) 1f else 0.5f)
@@ -239,6 +241,18 @@ fun CameraScreen(
                 contentDescription = shutterLabel,
             )
         }
+
+        // PLANTPOTTING-0010 (review feedback) — full-width Home button at the bottom, like every
+        // other screen. Sits below the (raised) shutter.
+        HomeButton(
+            onHome = onHome,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
+        )
     }
 
     DisposableEffect(Unit) {

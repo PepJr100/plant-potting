@@ -45,6 +45,7 @@ class PermissionDeniedFlowTest {
 
     @Test
     fun permissionScreenIsShownAtStartup() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(PermissionScreenTags.GRANT_BUTTON).assertIsDisplayed()
     }
 }
@@ -87,6 +88,7 @@ class PermissionPermanentlyDeniedFlowTest {
 
     @Test
     fun openSettingsIntentFiresOnPermanentDenial() {
+        composeRule.startIdentifyFromHome()
         // Screen must surface the permanent-denied state directly (no system dialog).
         composeRule.onNodeWithTag(PermissionScreenTags.OPEN_SETTINGS_BUTTON).assertIsDisplayed()
         composeRule.onNodeWithTag(PermissionScreenTags.OPEN_SETTINGS_BUTTON).performClick()

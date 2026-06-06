@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PlantPotting</string>
+    <string name="action_home">Home</string>
+
+    <!-- Home / start screen -->
+    <string name="home_greeting">Hello 🌱</string>
+    <string name="home_greeting_sub">Let\'s pot a plant</string>
+    <string name="home_identify">Identify new plant</string>
+    <string name="home_my_plants">My Plants</string>
+    <string name="home_browse_mixes">Browse mixes</string>
+    <string name="home_about">How it works</string>
+    <string name="home_recent_heading">Your recent plants</string>
+    <string name="home_recent_empty">No plants yet — identify one and save it to see it here.</string>
+    <string name="home_about_title">How it works</string>
+    <string name="home_about_body">Point the camera at a houseplant. PlantPotting identifies it on-device (nothing leaves your phone) and recommends the right potting-mix recipe. Save plants to My Plants, or browse mixes by care type.</string>
+    <string name="home_about_dismiss">Got it</string>
 
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>
@@ -26,17 +40,37 @@
     <string name="result_badge_cloud">Cloud match unavailable in this offline build</string>
     <string name="result_see_potting_mix">See potting mix</string>
     <string name="result_not_found">We couldn\'t find this plant in the knowledge base.</string>
+    <string name="result_confidence_label">Confidence: %1$d%%</string>
+    <string name="result_reference_image_description">Reference photo of the identified plant</string>
+    <string name="result_save_to_my_plants">Save to My Plants</string>
+    <string name="result_saved">Saved to My Plants ✓</string>
+
+    <!-- Add this plant (Pillar B) -->
+    <string name="add_plant_headline">We recognised this plant, but don\'t have a potting-mix guide for it yet.</string>
+    <string name="add_plant_explainer">Add it to let us know you\'d like a guide for this plant. We\'ll count the requests to decide what to add next — nothing leaves your phone.</string>
+    <string name="add_plant_add_button">Add this plant</string>
+    <string name="add_plant_confirmation">Thanks — we\'ve noted your request.</string>
+    <string name="add_plant_pick_manually">Pick manually instead</string>
+
+    <!-- My Plants -->
+    <string name="my_plants_title">My Plants</string>
+    <string name="my_plants_open_content_description">Open My Plants</string>
+    <string name="my_plants_empty">No saved plants yet. Identify a plant and tap \"Save to My Plants\" to add it here.</string>
+    <string name="my_plants_saved_at">Saved %1$s</string>
+    <string name="my_plants_remove_content_description">Remove %1$s from My Plants</string>
 
     <!-- Low-confidence picker -->
     <string name="low_conf_subtitle">We\'re best at common houseplants — confirm or pick from the list below.</string>
     <string name="low_conf_no_candidates">No close matches — pick from the full list below.</string>
     <string name="low_conf_search_empty">No species match \"%1$s\"</string>
+    <string name="low_conf_search_prompt">Tap to search all %1$d species</string>
     <string name="low_conf_pick_other">None of these look like my plant</string>
     <string name="low_conf_candidate_chevron_content_description">Pick this species</string>
 
     <!-- Recommendation screen -->
     <string name="recommendation_blend_chip">Blend recipe</string>
     <string name="recommendation_recipe_heading">Recipe</string>
+    <string name="recommendation_recipe_heading_for">Recommended mix</string>
     <string name="recommendation_proportion_header">%</string>
     <string name="recommendation_retake">Retake</string>
     <string name="recommendation_not_found">No recipe available for this plant.</string>

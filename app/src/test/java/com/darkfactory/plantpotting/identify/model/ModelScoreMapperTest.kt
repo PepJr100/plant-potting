@@ -73,6 +73,20 @@ class ModelScoreMapperTest {
     }
 
     @Test
+    fun marginConfidenceWinnerProbabilityTracksRankedZero() {
+        // PLANTPOTTING-0010 D2 subtlety — in the margin-confidence branch the winner is still
+        // ranked[0], so the first MAPPED candidate's probability equals bestProb. This is what the
+        // camera flow threads as `confidencePct`; assert the invariant holds.
+        val scores = floatArrayOf(0.50f, 0.18f, 0.12f, 0.10f, 0.10f)
+        val out = mapper().map(scores)
+        assertThat(out.result.lowConfidence).isFalse()
+        assertThat(out.result.speciesId).isEqualTo("monstera-deliciosa")
+        assertThat(out.candidates.first().speciesId).isEqualTo("monstera-deliciosa")
+        // candidates.first().probability == scores[ranked[0]] == bestProb.
+        assertThat(out.candidates.first().probability).isWithin(1e-6f).of(0.50f)
+    }
+
+    @Test
     fun aboveMarginMinButTooCloseToSecondIsLowConfidence() {
         // best = 0.50; second = 0.40; margin 0.10 < 0.18 → low-conf path.
         val scores = floatArrayOf(0.50f, 0.40f, 0.05f, 0.03f, 0.02f)
@@ -139,6 +153,40 @@ class ModelScoreMapperTest {
         val out = mapper().map(scores)
         assertThat(out.result.displayName).isEqualTo("Swiss cheese plant")
         assertThat(out.candidates[0].displayName).isEqualTo("Swiss cheese plant")
+    }
+
+    // -- PLANTPOTTING-0010 D3 — raw top-1 fields --------------------------------
+
+    @Test
+    fun confidentUnmappedTopExposesRawTopFieldsAndStaysLowConfidence() {
+        // Top label (idx 3) is unmapped AND clears the 0.55 plain threshold → confident-but-unmapped.
+        val scores = floatArrayOf(0.05f, 0.04f, 0.03f, 0.80f, 0.08f)
+        val out = mapper().map(scores)
+        assertThat(out.result.lowConfidence).isTrue() // verdict unchanged — unmapped never high-conf
+        assertThat(out.topLabel).isEqualTo("Unknown plant A")
+        assertThat(out.topProbability).isWithin(1e-6f).of(0.80f)
+        assertThat(out.topIsMapped).isFalse()
+        assertThat(out.topIsConfidentUnmapped).isTrue()
+    }
+
+    @Test
+    fun weakUnmappedTopIsNotConfidentUnmapped() {
+        // Unmapped top but BELOW the 0.55 plain threshold → ordinary low-confidence (picker), not Add.
+        val scores = floatArrayOf(0.05f, 0.04f, 0.03f, 0.30f, 0.08f)
+        val out = mapper().map(scores)
+        assertThat(out.topIsMapped).isFalse()
+        assertThat(out.topIsConfidentUnmapped).isFalse()
+    }
+
+    @Test
+    fun mappedHighTopIsMappedAndNotConfidentUnmapped() {
+        // A strong MAPPED top → high-confidence Success; never the Add-this-plant slice.
+        val scores = floatArrayOf(0.80f, 0.10f, 0.05f, 0.03f, 0.02f)
+        val out = mapper().map(scores)
+        assertThat(out.result.lowConfidence).isFalse()
+        assertThat(out.topLabel).isEqualTo("Monstera deliciosa")
+        assertThat(out.topIsMapped).isTrue()
+        assertThat(out.topIsConfidentUnmapped).isFalse()
     }
 
     @Test
