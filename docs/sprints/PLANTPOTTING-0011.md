@@ -195,16 +195,19 @@ drift the score path.
       **softmax score vectors** across variants before `mapper.map(...)`. Gate behind a manifest `tta` count
       (default `1` = current). Measure median + **worst-case** latency (existing median-of-5 protocol).
       *(code + harness done; ADOPT/DROP awaits CI scorecard)*
-- [ ] **Orientation / EXIF.** Verify orientation is handled before crop (phone captures are often rotated);
+- [x] **Orientation / EXIF.** Verify orientation is handled before crop (phone captures are often rotated);
       add normalisation only if the `rotate ±90°` perturbation rows show it helps. Operate on the decoded
-      bitmap inside the preprocessor — no camera-path contract change. *(decision-gated on the rotate
-      perturbation rows from the CI scorecard)*
-- [ ] **Decision log** `preprocessing-decision.md`: for each lever record top-1 before/after, confident-wrong
+      bitmap inside the preprocessor — no camera-path contract change. *(measured via rotate rows; TTA-6
+      recovers most rotation loss — cw 0.288→0.138 — so NO separate EXIF lever added; fixtures carry no
+      EXIF tag so it can't be measured directly. Revisit on-device.)*
+- [x] **Decision log** `preprocessing-decision.md`: for each lever record top-1 before/after, confident-wrong
       before/after, median + worst latency before/after, and **ADOPT / DROP** with the number that drove it.
       **TTA hurdle (both critiques):** adopt TTA only if it beats **center-crop** (not just squash) by a
-      clear margin at acceptable latency; otherwise leave it wired-but-disabled. Keep N ≤ 5. *(awaits CI numbers)*
-- [ ] Flip the manifest default **only** for adopted levers; leave the rest wired-but-off. This **locks the
-      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it. *(awaits CI numbers)*
+      clear margin at acceptable latency; otherwise leave it wired-but-disabled. *(DROP center_crop ≡ squash;
+      ADOPT TTA — N=6 incl. principal-requested full-frame view; cw 0.254→0.113.)*
+- [x] Flip the manifest default **only** for adopted levers; leave the rest wired-but-off. This **locks the
+      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it. *(production manifest:
+      preprocess_mode=squash, tta=6; data-class defaults stay 1/squash for other models.)*
 
 ### Phase 3 — ABSTAIN (route confident-wrong → picker; tune once on the shipping pipeline)
 **3a. Characterize, then add the lever (default-disabled).**

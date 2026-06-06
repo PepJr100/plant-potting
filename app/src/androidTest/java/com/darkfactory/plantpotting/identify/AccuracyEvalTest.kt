@@ -68,7 +68,7 @@ class AccuracyEvalTest {
         listOf(
             Mode("squash", PreprocessMode.SQUASH, 1),
             Mode("center_crop", PreprocessMode.CENTER_CROP, 1),
-            Mode("tta5", PreprocessMode.CENTER_CROP, 5),
+            Mode("tta6", PreprocessMode.SQUASH, 6),
         )
 
     private data class Row(
@@ -187,7 +187,7 @@ class AccuracyEvalTest {
         // every row scored cleanly, and the schema includes the load-bearing columns.
         assertThat(rows).isNotEmpty()
         assertThat(rows.none { it.failure.isNotEmpty() }).isTrue()
-        assertThat(rows.map { it.mode }.toSet()).containsExactly("squash", "center_crop", "tta5")
+        assertThat(rows.map { it.mode }.toSet()).containsExactly("squash", "center_crop", "tta6")
     }
 
     private fun scoreRow(

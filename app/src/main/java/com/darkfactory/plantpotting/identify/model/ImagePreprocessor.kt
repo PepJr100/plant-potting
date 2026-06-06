@@ -69,10 +69,11 @@ class ImagePreprocessor
         }
 
         /**
-         * Test-time augmentation ensemble. Returns one tensor per crop:
+         * Test-time augmentation ensemble. Returns one tensor per view:
          *  - `ttaCropCount <= 1` → exactly `[preprocess(jpeg)]` (byte-for-byte the single-crop path).
-         *  - otherwise → centre square + four corner squares (5 crops max; PLANTPOTTING-0011 keeps N ≤ 5),
-         *    each resized to the model input. Deterministic (fixed crop geometry, no RNG).
+         *  - otherwise → centre square + four corner squares + the **full-frame** (no-crop) squash
+         *    (6 views max), each resized to the model input. The full-frame view restores the plant's
+         *    overall shape that the zoomed crops lose. Deterministic (fixed geometry, no RNG).
          */
         fun preprocessVariants(jpeg: ByteArray): List<PreprocessedImage> {
             val bitmap = decode(jpeg)
@@ -122,10 +123,11 @@ class ImagePreprocessor
             return Bitmap.createBitmap(bitmap, x, y, side, side)
         }
 
-        // Centre full square + four corner squares (0.8× the short side), deterministic geometry.
+        // Centre full square + four corner squares (0.8× the short side) + the full frame (no crop),
+        // deterministic geometry. The full-frame view is last so `take(5)` keeps the crop-only set.
         private fun cropVariants(bitmap: Bitmap): List<Bitmap> {
-            val full = min(bitmap.width, bitmap.height)
-            val corner = (full * CORNER_CROP_FRACTION).roundToInt().coerceAtLeast(1)
+            val shortSide = min(bitmap.width, bitmap.height)
+            val corner = (shortSide * CORNER_CROP_FRACTION).roundToInt().coerceAtLeast(1)
             val maxX = bitmap.width - corner
             val maxY = bitmap.height - corner
             return listOf(
@@ -134,6 +136,7 @@ class ImagePreprocessor
                 Bitmap.createBitmap(bitmap, maxX, 0, corner, corner), // top-right
                 Bitmap.createBitmap(bitmap, 0, maxY, corner, corner), // bottom-left
                 Bitmap.createBitmap(bitmap, maxX, maxY, corner, corner), // bottom-right
+                bitmap, // full frame (no crop) — toTensor() squashes it to the model input
             ).take(manifest.ttaCropCount)
         }
 

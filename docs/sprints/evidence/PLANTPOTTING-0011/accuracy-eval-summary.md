@@ -22,16 +22,17 @@ All 20 fixtures are in-vocab, so the in-vocab cut equals ALL. Per-base-image-ave
 **The number to drive down is confident-wrong: 0.254 overall, 0.100 even on clean photos** (the model
 clears the high-confidence gate but names the wrong species). Blur is the worst stressor (0.55).
 
-## Preprocessing comparison (Phase 2 input — threshold-independent top-1)
+## Preprocessing comparison (Phase 2 — DECIDED; see preprocessing-decision.md)
 
 | mode | top-1 | confident-wrong | med-lat | worst-lat | verdict |
 |---|---|---|---|---|---|
-| **squash** (control) | 0.654 | 0.254 | 32 ms | 170 ms | shipping |
-| center_crop | 0.654 | 0.254 | 34 ms | 109 ms | **DROP** — identical top-1, no benefit |
-| tta5 (center+4 corners) | 0.671 | 0.121 | 168 ms | 1275 ms | candidate — +1.7pt top-1, **confident-wrong halved**, but ~5× latency + abstain 0.092→0.208 |
+| **squash** (control) | 0.654 | 0.254 | 30 ms | 103 ms | kept (mode stays squash) |
+| center_crop | 0.654 | 0.254 | 30 ms | 58 ms | **DROPPED** — identical, no benefit |
+| **tta6** (centre + 4 corners + full-frame) | 0.667 | **0.113** | 184 ms | 453 ms | **ADOPTED** — confident-wrong more than halved |
 
-center-crop is a no-op on this set (the model already tolerates the squash). TTA is the only lever that
-moves the needle, and it trades latency + a higher abstain rate for it — a decision to weigh in Phase 2/3.
+center-crop is a no-op on this set. **TTA-6 is adopted** (manifest `tta: 6`) — it more than halves
+confident-wrong at ~6× latency on a one-shot identify. This **locks the shipping pipeline**; Phase 3
+tunes the abstention thresholds against the tta6 numbers above (note tta6 already lifts abstain to 0.221).
 
 ## Honesty caveat (load-bearing)
 

@@ -18,6 +18,9 @@
   "license_file": "ml/house_plant_species_mobilenetv2/LICENSE-house-plant-species.txt",
   "labels_asset": "ml/house_plant_species_mobilenetv2/labels.csv",
   "mapping_asset": "ml/house_plant_species_mobilenetv2/plant_class_map.json",
+  "preprocess_mode": "squash",
+  "tta": 6,
+  "_comment_preprocessing": "PLANTPOTTING-0011 Phase 2 (evidence: docs/sprints/evidence/PLANTPOTTING-0011/preprocessing-decision.md). center_crop measured IDENTICAL to squash on the eval set (no benefit) -> DROPPED, mode stays 'squash'. Multi-crop TTA ADOPTED at 6 views (centre + 4 corners + full-frame): halves the confident-wrong rate (0.254 -> 0.121) at ~5x latency on a one-shot identify. Default tta=1 (off) for any other model; only this production model is locked to 6.",
   "thresholds": {
     "high_confidence_plain": 0.55,
     "high_confidence_margin_min": 0.45,
