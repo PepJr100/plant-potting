@@ -2,8 +2,8 @@
 
 > **RESOLVED (2026-06-06):** the diagrams below were **replaced in place** (overwritten, not deleted —
 > deleting a `.webp` would break the build, since `PlantImageResolver` references each by name).
-> **9 of 11 swapped to real photos** (CC0/PD preferred, CC BY fallback with in-app attribution);
-> **2 retained** (poinsettia, begonia — only CC BY-SA photos exist, which aren't accepted). You do NOT
+> **All 11 swapped to real photos** — CC0/PD preferred, CC BY fallback (in-app attribution), and the
+> last two (poinsettia, begonia) from **Unsplash** (their only Commons photos are CC BY-SA). You do NOT
 > need to delete anything. Final state per image is in `docs/licenses/reference-images.md`.
 
 For your diagram cleanup. Three separate image sets — **the diagrams are all in the reference-image

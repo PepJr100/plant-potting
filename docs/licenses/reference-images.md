@@ -7,10 +7,12 @@ be **CC0 or public-domain** (PD). CI-enforced by
 
 ## License policy (D4; relaxed in PLANTPOTTING-0011)
 
-- **CC0 / public-domain preferred; CC BY allowed _with attribution_.** Originally CC0/PD-only; the
-  principal authorised **CC BY** (attribution) for reference images in PLANTPOTTING-0011 so that
-  botanical-plate diagrams could be replaced with real photographs. **CC BY-SA is still NOT accepted**
-  (share-alike). Sourced from **Wikimedia Commons**; CC0/PD is taken first, CC BY only as a fallback.
+- **CC0 / public-domain preferred; CC BY and the Unsplash License also allowed.** Originally CC0/PD-only;
+  the principal authorised **CC BY** (attribution required) and the **Unsplash License** (permissive;
+  commercial + modify OK; no attribution required; only restriction is "don't build a competing stock-photo
+  service", which we don't) for reference images in PLANTPOTTING-0011, so botanical-plate diagrams could be
+  replaced with real photographs. **CC BY-SA is still NOT accepted** (share-alike). Sourced from **Wikimedia
+  Commons** (CC0/PD first, CC BY fallback) and **Unsplash** (for the two species with no clean Commons photo).
 - **Attribution:** every CC BY image MUST have a row in the bundled `app/src/main/assets/image_credits.tsv`
   and is shown in-app on the **Image credits** screen (legal requirement of CC BY). CC0/PD images need no
   attribution. Enforced by `ImageCreditsTest` + `ReferenceImageManifestTest`.
@@ -59,13 +61,13 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | dypsis_lutescens.webp | dypsis-lutescens | CC0 | File:Dypsis lutescens Medellín - 4.jpg |
 | tradescantia.webp | tradescantia | CC0 | File:Tradescantia zebrina (Maligano Buton Island).jpg |
 | schefflera.webp | schefflera | CC0 | File:Schefflera arboricola (bonsai), Phipps Conservatory, 2014-03-01.jpg |
-| euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Public domain | File:Euphorbia pulcherrima Blanco1.167.jpg |
+| euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Unsplash License | Unsplash — Jessica Fadel (https://unsplash.com/photos/2B3quIShwJM) |
 | dionaea_muscipula.webp | dionaea-muscipula | CC0 | File:Venus flytrap in pot.jpg (Deltapug) |
 | chamaedorea_elegans.webp | chamaedorea-elegans | Public domain | File:Chamaedoreaaelegans.jpg (Biotaman) |
 | strelitzia_reginae.webp | strelitzia-reginae | Public domain | File:Strelitzia larger.jpg |
 | aspidistra_elatior.webp | aspidistra-elatior | Public domain | File:Aspidistra-elatior-variegata.jpg |
 | asparagus_setaceus.webp | asparagus-setaceus | Public domain | File:Asparagus plumosa WPC.jpg |
-| begonia.webp | begonia | Public domain | File:Begonia obliqua00.jpg |
+| begonia.webp | begonia | Unsplash License | Unsplash — Sanni Sahil (https://unsplash.com/photos/KcUNr5_DK5A) |
 | hypoestes_phyllostachya.webp | hypoestes-phyllostachya | Public domain | File:2006 08 14 Hypoestes Phyllostachya.jpg |
 | beaucarnea_recurvata.webp | beaucarnea-recurvata | CC0 | File:Beaucarnea recurvata serrated leaf margin.jpg |
 | schlumbergera_bridgesii.webp | schlumbergera-bridgesii | CC0 | File:Christmas Cactus October 2022.jpg |
@@ -86,8 +88,9 @@ _Full source URLs (descriptionurl per file) are recorded in
 ## PLANTPOTTING-0011 — botanical-plate → photograph swaps
 
 A review of the whole library found 8 botanical-plate diagrams + 2 unrepresentative photos. With the
-CC-BY relaxation (CC0/PD preferred, CC BY allowed with attribution, no CC BY-SA), **9 were swapped to
-real photographs and 2 plates retained** (no clean non-SA photo exists).
+CC-BY relaxation (CC0/PD preferred, CC BY with attribution, then Unsplash License), **all 11 were
+swapped to real photographs** — the last two (poinsettia, begonia, whose only Commons photos are
+CC BY-SA) came from Unsplash.
 
 | image | outcome | license |
 |---|---|---|
@@ -100,8 +103,8 @@ real photographs and 2 plates retained** (no clean non-SA photo exists).
 | dracaena (*D. marginata*) | **SWAPPED** (was Curtis 1808 plate) → dragon-tree photo | CC BY 3.0 (Forest & Kim Starr) |
 | pachira-aquatica | **SWAPPED** (was Aublet 1775 plate) → money-tree photo | CC BY 4.0 (Atlas Þə Biologist) |
 | anthurium-andraeanum | **SWAPPED** (was a spadix macro) → red flamingo-flower plant | CC BY 3.0 (Forest & Kim Starr) |
-| euphorbia-pulcherrima (poinsettia) | **Plate retained** — only non-SA results are illustrations / vintage book scans; real photos are CC BY-SA | Public domain (Blanco plate) |
-| begonia | **Plate retained** — only non-SA results are vintage book illustrations; real photos are CC BY-SA | Public domain (Thornton plate) |
+| euphorbia-pulcherrima (poinsettia) | **SWAPPED** (was Blanco plate) → red poinsettia photo | Unsplash License (Jessica Fadel) |
+| begonia | **SWAPPED** (was Thornton plate) → potted begonia photo | Unsplash License (Sanni Sahil) |
 
 The 3 CC BY swaps (dracaena, pachira, anthurium) are attributed in-app via `image_credits.tsv` on the
 **Image credits** screen (reachable from Home → How it works).
