@@ -39,9 +39,9 @@ recommendation drawn from a bundled knowledge base.
 
 <p align="center"><img src="docs/images/result-screen.png" alt="ResultScreen showing a Monstera deliciosa identification and potting-mix recipe" width="320"></p>
 
-## Current state (post PLANTPOTTING-0009, 2026-06-05)
+## Current state (post PLANTPOTTING-0010, 2026-06-06)
 
-Nine sprints landed on `main`:
+Ten sprints landed on `main`:
 
 | Sprint | Title | Status |
 | --- | --- | --- |
@@ -54,29 +54,38 @@ Nine sprints landed on `main`:
 | PLANTPOTTING-0007 | Houseplant model swap (V1 entry) — survey, eval harness, running prototype | done |
 | PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + camera-button UX fix | done |
 | PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done |
+| PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh, persistence, My Plants, "Add this plant", +12 KB species (→38 mapped), CC0/PD reference photos | done (v0.4.0) |
 
 What you can do today:
 
+- **Start on a Home screen.** The app lands on a card-based Home (greeting, a 2×2
+  tile grid — *Identify new plant* / *My Plants* / *Browse mixes* / *How it works* —
+  and a "recent plants" carousel). A full-width **Home** button sits at the bottom of
+  every screen.
 - **Identify a plant on-device.** Camera capture → JPEG → House Plant Species
   MobileNetV2 TensorFlow Lite model (~10.9 MB, float16, 47 houseplant classes,
   bundled in `app/src/main/assets/ml/house_plant_species_mobilenetv2/` —
-  PLANTPOTTING-0007). It maps **26 of its 47** model classes to KB care cards
-  (up from 10 — PLANTPOTTING-0009 added 16 delta species; Pilea deferred), vs the
-  AIY Plants V1/3 baseline's 5 — which stays bundled in `app/src/main/assets/ml/aiy_plants_v1/`
-  as the regression anchor; the active model is selected by the
-  `ACTIVE_MODEL_ROOT` `BuildConfig` switch). Inference runs entirely on-device;
-  the network policy is enforced at build time by `verifyNoNetworking`.
-- **Get a routing decision.** The model's top-1 score is compared to the
-  threshold policy in `model_manifest.json`; the result is either
-  `ResultScreen` (high-confidence direct match) or `LowConfidencePicker`
-  (model unsure or species not in the model's vocabulary — the user picks from a
-  short list).
-- **See an evidence-tagged recommendation.** `ResultScreen` shows a source
-  badge — `on-device match`, `on-device match (low confidence)`, or
-  `stub identifier` — so the UI never lies about how the species was
-  identified. Tapping *See potting mix* loads `RecommendationScreen`: a named
-  archetype (e.g. *Aroid Chunky*), a horticultural rationale, and a recipe
+  PLANTPOTTING-0007). It maps **38 of its 47** model classes to KB care cards
+  (PLANTPOTTING-0009 took it 10→26; PLANTPOTTING-0010 added 12 more popular-slice
+  species; Pilea deferred), vs the AIY Plants V1/3 baseline's 5 — which stays bundled
+  in `app/src/main/assets/ml/aiy_plants_v1/` as the regression anchor; the active model
+  is selected by the `ACTIVE_MODEL_ROOT` `BuildConfig` switch. Inference runs entirely
+  on-device; the network policy is enforced at build time by `verifyNoNetworking`.
+- **Get a routing decision + confidence.** The model's top-1 score is compared to the
+  threshold policy in `model_manifest.json`; the result is `ResultScreen`
+  (high-confidence — now with a numeric **confidence % + progress bar**),
+  `LowConfidencePicker` (model unsure / out-of-vocab — pick from a contained search
+  list), or the **"Add this plant"** wireframe (strong but *unmapped* class — logs a
+  local request tally).
+- **See an evidence-tagged recommendation with a reference photo.** `ResultScreen`
+  shows the plant's **CC0/PD reference image**, a source badge (`on-device match`,
+  `on-device match (low confidence)`, or `stub identifier`), and the confidence.
+  Tapping *See potting mix* loads `RecommendationScreen`: plant name + picture, a
+  horticultural rationale, the named archetype (e.g. *Aroid Chunky*), and a recipe
   list whose proportions sum to 100%.
+- **Save to My Plants.** An explicit Save action persists the plant to a local
+  **DataStore** (the app's first persistence layer); **My Plants** lists saved plants
+  with thumbnails, de-duplicates by species, and supports per-row removal.
 - **Stub-only fallback** for development. `StubPlantIdentifier` returns a
   deterministic *Monstera deliciosa* and is what the GMD instrumentation
   tests run against by default (the real model is exercised by one dedicated
@@ -99,15 +108,22 @@ PlantIdentifier (interface)
    IdentificationResult { speciesId, displayName, source, lowConfidence }
         │
         ▼
-   high-conf → ResultScreen
-   low-conf  → LowConfidencePicker → ResultScreen (lowConfidence=true)
+   high-conf (mapped)         → ResultScreen (reference photo + confidence + Save)
+   high-conf (unmapped)       → "Add this plant" wireframe (local request tally)
+   low-conf                   → LowConfidencePicker → ResultScreen (lowConfidence=true)
         │
         ▼
-   RecommendationScreen (KB-driven archetype + recipe)
+   RecommendationScreen (plant name + photo + KB-driven archetype + recipe)
+
+   Home ─┬─ Identify (→ camera)     My Plants (DataStore-backed, save/remove)
+         └─ Browse mixes (archetypes)   reference photos via PlantImageResolver
 ```
 
-KB: `app/src/main/assets/kb/species.json` (32 species) and `archetypes.json`
-(9 potting-mix archetypes). Validated at app start.
+KB: `app/src/main/assets/kb/species.json` (44 species) and `archetypes.json`
+(9 potting-mix archetypes). Validated at app start. Local persistence
+(`persistence/PlantLogStore`, DataStore) backs My Plants + the add-request log.
+CC0/PD reference imagery lives in `res/drawable-nodpi/` with attribution in
+`docs/licenses/reference-images.md` (sourced by `scripts/source-reference-images.ps1`).
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for layer status and the gap inventory.
 

@@ -9,31 +9,43 @@ species identification, and read a potting-mix recommendation. For build/run/set
 
 PlantPotting identifies a houseplant from a photo using an **on-device** TensorFlow Lite
 model (no network — identification runs entirely on your phone) and surfaces a
-recipe-driven potting-mix recommendation drawn from a bundled knowledge base.
+recipe-driven potting-mix recommendation drawn from a bundled knowledge base. It also keeps
+a local **My Plants** collection and shows a license-clean reference photo for each plant.
+
+## Home screen
+
+The app opens on a **Home** screen with four tiles — **Identify new plant**, **My Plants**,
+**Browse mixes**, **How it works** — plus a **recent plants** carousel of what you've saved.
+A green **Home** button sits at the bottom of every screen to bring you back here.
 
 ## The flow, step by step
 
-1. **Grant camera access.** On first launch you'll see a permission screen — tap
-   **Grant camera access**. If you previously denied it permanently, the app routes you to
-   Settings and recovers automatically when you return.
+1. **Identify a new plant.** From Home, tap **Identify new plant**. On first launch you'll see
+   a permission screen — tap **Grant camera access** (if you previously denied it permanently,
+   the app routes you to Settings and recovers when you return).
 2. **Frame and capture.** On the camera preview, tap the shutter. A brief overlay shows
    while the model binds and runs.
-3. **One of two outcomes — both expected and correct:**
-   - **High-confidence path** → you land directly on the **Result screen** with the source
-     badge **`on-device match`**. This happens when the model is confident about an
-     in-vocabulary species (e.g. *Monstera deliciosa* or *Crassula ovata*).
-   - **Low-confidence path** → you land on the **Low-confidence picker**. The model
-     couldn't pick a single species above its threshold (the bundled model covers only a
-     couple of the knowledge-base species verbatim, and synthetic/emulator camera scenes
-     rarely clear the bar). Pick the species row that matches your plant to continue; the
-     Result screen then shows the badge **`on-device match (low confidence)`**.
-4. **Read the recommendation.** On the Result screen, tap **See potting mix** to open the
-   **Recommendation screen**:
-   - a named **archetype** (e.g. *Aroid Chunky*),
-   - a short horticultural **rationale**, and
-   - a **recipe** table whose proportions always sum to 100%.
-5. **Retake.** Tap **Retake** (or **Try again** from the failure banner) to return to the
-   camera and capture again.
+3. **One of three outcomes — all expected and correct:**
+   - **High-confidence path** → you land on the **Result screen** with the badge
+     **`on-device match`** and a numeric **confidence % + bar**. This happens when the model
+     is confident about a mapped species.
+   - **Low-confidence path** → you land on the **Low-confidence picker**. The model couldn't
+     pick a single species above its threshold. The species list is contained within the
+     search box — tap to search, then pick the row that matches your plant; the Result screen
+     then shows **`on-device match (low confidence)`**.
+   - **"Add this plant" path** → the model is strongly confident about a class with **no**
+     knowledge-base entry. You see an **Add this plant** screen that locally tallies your
+     request (so the maker knows what to add next), plus a **Pick manually** fall-through.
+4. **Read the result + save.** The **Result screen** shows the plant's **reference photo**, the
+   source badge, and the confidence. Tap **Save to My Plants** to keep it, or **See potting
+   mix** to open the **Recommendation screen**: the plant name + picture, a horticultural
+   **rationale**, the named **archetype** (e.g. *Aroid Chunky*), and a **recipe** whose
+   proportions always sum to 100%.
+5. **My Plants.** Open it from Home (or its Home tile). Saved plants show a thumbnail,
+   confidence, and saved time; tap a row to revisit it, or the trash icon to remove it. The
+   same plant can't be saved twice (it just refreshes).
+6. **Browse mixes.** From Home, **Browse mixes** lists every substrate archetype as a card —
+   tap one to see its recipe without identifying a plant first.
 
 ## Reading the source badge
 
@@ -52,11 +64,16 @@ bottom of the camera screen with a **Try again** action. Tap it to retry.
 
 ## Known limitations
 
-- The active model now maps **26 of its 47** classes to knowledge-base care cards (widened
-  from 10 by PLANTPOTTING-0009, which added 16 species), but plants outside that vocabulary —
-  and uncertain matches — still route to the **low-confidence picker**, so the picker remains
-  common. That's expected today, not a bug. The newly-mapped species are editorial coverage and
-  have **not** yet been calibrated against real photos. Coverage progress is tracked as the
-  **V1** milestone in [`docs/ROADMAP.md`](ROADMAP.md).
+- The active model now maps **38 of its 47** classes to knowledge-base care cards (widened from
+  10 → 26 by PLANTPOTTING-0009, then 26 → 38 by PLANTPOTTING-0010), but plants outside that
+  vocabulary — and uncertain matches — still route to the **low-confidence picker**, so the
+  picker remains common. That's expected today, not a bug. The mapped delta species are
+  editorial coverage and have **not** yet been calibrated against real photos. Coverage progress
+  is tracked as the **V1** milestone in [`docs/ROADMAP.md`](ROADMAP.md).
+- Reference photos are **CC0 / public-domain** (Wikimedia Commons); a few are vintage botanical
+  illustrations rather than photographs where that was the only license-clean option. Species
+  without a clean image fall back to a placeholder.
+- **My Plants** and the "Add this plant" tally are stored **locally only** (DataStore) — nothing
+  syncs or leaves the phone.
 - Identification is best-effort on-device ML, not a botanical authority. The potting-mix
   recommendation is guidance, not a guarantee.
