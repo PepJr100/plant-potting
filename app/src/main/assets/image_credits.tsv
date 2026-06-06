@@ -1,0 +1,7 @@
+# PLANTPOTTING-0011 — in-app attribution for CC BY reference images (CC0/PD need no attribution).
+# Shown on the Image credits screen; cross-checked by ImageCreditsTest against reference-images.md.
+# Columns:
+drawable	species	author	license	source_url
+pachira_aquatica	Money tree (Pachira aquatica)	Atlas Þə Biologist	CC BY 4.0	https://commons.wikimedia.org/wiki/File:Money_tree_(Pachira_aquatica).gif
+dracaena	Dragon tree (Dracaena marginata)	Forest & Kim Starr	CC BY 3.0	https://commons.wikimedia.org/wiki/File:Starr_061231-3032_Dracaena_marginata.jpg
+anthurium_andraeanum	Flamingo flower (Anthurium andraeanum)	Forest & Kim Starr	CC BY 3.0	https://commons.wikimedia.org/wiki/File:Starr-100623-7786-Anthurium_andraeanum-red_flowers_potted_plants_in_shade_house-Pukalani_Plant_Company_Pulehu-Maui_(24411705144).jpg

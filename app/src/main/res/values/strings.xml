@@ -15,6 +15,12 @@
     <string name="home_about_title">How it works</string>
     <string name="home_about_body">Point the camera at a houseplant. PlantPotting identifies it on-device (nothing leaves your phone) and recommends the right potting-mix recipe. Save plants to My Plants, or browse mixes by care type.</string>
     <string name="home_about_dismiss">Got it</string>
+    <string name="home_about_credits">Image credits</string>
+
+    <!-- Image credits screen (PLANTPOTTING-0011) -->
+    <string name="credits_title">Image credits</string>
+    <string name="credits_intro">Plant reference photos are from Wikimedia Commons, used under CC0 or public-domain dedications (no attribution required) or the CC BY licence. The CC BY images are credited below.</string>
+    <string name="credits_attribution">by %1$s — %2$s</string>
 
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>

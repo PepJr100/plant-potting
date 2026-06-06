@@ -5,12 +5,15 @@ PLANTPOTTING-0010 Phase 6 / D4. Every bundled reference image under
 be **CC0 or public-domain** (PD). CI-enforced by
 `ReferenceImageManifestTest.everyBundledReferenceImageHasAManifestEntry`.
 
-## License policy (D4)
+## License policy (D4; relaxed in PLANTPOTTING-0011)
 
-- **CC0 / public-domain only.** Sourced from **Wikimedia Commons** via
-  `scripts/source-reference-images.ps1`, which filters the search results to `LicenseShortName ∈
-  {CC0, Public domain, PD, No restrictions}` and skips everything else (CC-BY-SA etc.). The script is
-  re-runnable.
+- **CC0 / public-domain preferred; CC BY allowed _with attribution_.** Originally CC0/PD-only; the
+  principal authorised **CC BY** (attribution) for reference images in PLANTPOTTING-0011 so that
+  botanical-plate diagrams could be replaced with real photographs. **CC BY-SA is still NOT accepted**
+  (share-alike). Sourced from **Wikimedia Commons**; CC0/PD is taken first, CC BY only as a fallback.
+- **Attribution:** every CC BY image MUST have a row in the bundled `app/src/main/assets/image_credits.tsv`
+  and is shown in-app on the **Image credits** screen (legal requirement of CC BY). CC0/PD images need no
+  attribution. Enforced by `ImageCreditsTest` + `ReferenceImageManifestTest`.
 - **No self-shot / first-party imagery** (sprint non-goal).
 - **Format/budget:** downscaled **WebP** (≤480 px, ~quality 60), rendered with `painterResource` (no
   image library / Coil — network-free). Total ≈ **1.09 MiB** over the Phase-0 baseline — well inside
@@ -33,7 +36,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | Image file (`drawable-nodpi/`) | KB speciesId | License | Source (Wikimedia Commons) |
 |---|---|---|---|
 | monstera_deliciosa.webp | monstera-deliciosa | CC0 | File:Monstera deliciosa - zrající plodenství.jpg |
-| monstera_adansonii.webp | monstera-adansonii | Public domain | File:Monstera adansonii CBM.png |
+| monstera_adansonii.webp | monstera-adansonii | CC0 | File:Monstera adansonii 112059105.jpg (Jacob Rehage) |
 | epipremnum_aureum.webp | epipremnum-aureum | CC0 | File:Epipremnum aureum in wild.jpg |
 | spathiphyllum_wallisii.webp | spathiphyllum-wallisii | Public domain | File:SpathiphyllumWallisii.jpg |
 | ficus_elastica.webp | ficus-elastica | CC0 | File:Ficus elastica 29761125.jpg |
@@ -41,24 +44,24 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | dracaena_trifasciata.webp | dracaena-trifasciata | CC0 | File:Snake plant (Sansevieria trifasciata) Waoleona Buton Island 02.jpg |
 | zamioculcas_zamiifolia.webp | zamioculcas-zamiifolia | CC0 | File:Millonaria (Zamioculcas zamiifolia).jpg |
 | crassula_ovata.webp | crassula-ovata | CC0 | File:Among the branches of a potted jade plant.jpg |
-| chlorophytum_comosum.webp | chlorophytum-comosum | CC0 | File:Seed and Fruit of Chlorophytum comosum.jpg |
-| saintpaulia_ionantha.webp | saintpaulia-ionantha | Public domain | File:Streptocarpus ionanthus (as Saintpaulia ionantha) - Curtis' 121 pl. 7408 (1895).jpg |
+| chlorophytum_comosum.webp | chlorophytum-comosum | CC0 | File:Spider plant with plantlets and flowers.jpg (W.carter) |
+| saintpaulia_ionantha.webp | saintpaulia-ionantha | CC0 | File:Saintpaulia ionantha subsp. velutina - Copenhagen Botanical Garden - DSC07434.JPG (Daderot) |
 | goeppertia_orbifolia.webp | goeppertia-orbifolia | CC0 | File:Calathea orbiculata - Wellington Botanic Garden - DSC09392.jpg |
 | hoya_carnosa.webp | hoya-carnosa | CC0 | File:Hoya carnosa (wax vines).jpg |
 | aglaonema.webp | aglaonema | CC0 | File:Konya Kelebekler Vadisi Aglaonema.jpg |
-| anthurium_andraeanum.webp | anthurium-andraeanum | Public domain | File:Branched spadix of flamingo flower (Anthurium andraeanum).jpg |
+| anthurium_andraeanum.webp | anthurium-andraeanum | CC BY 3.0 | File:Starr-100623-7786-Anthurium andraeanum-red flowers potted plants in shade house (Forest & Kim Starr) |
 | dieffenbachia.webp | dieffenbachia | CC0 | File:Dieffenbachia moralis holotype 01.jpg |
 | aloe_vera.webp | aloe-vera | CC0 | File:Aloe vera for sale.jpg |
 | kalanchoe.webp | kalanchoe | CC0 | File:Kalanchoe blossfeldiana (Florist Kalanchoe).jpg |
 | maranta_leuconeura.webp | maranta-leuconeura | Public domain | File:Maranta leuconeura D2411.jpg |
 | nephrolepis_exaltata.webp | nephrolepis-exaltata | CC0 | File:Helecho de Boston (Nephrolepis exaltata).jpg |
-| pachira_aquatica.webp | pachira-aquatica | Public domain | File:Pachira aquatica Aublet 1775 pl 292.jpg |
+| pachira_aquatica.webp | pachira-aquatica | CC BY 4.0 | File:Money tree (Pachira aquatica).gif (Atlas Þə Biologist) |
 | dypsis_lutescens.webp | dypsis-lutescens | CC0 | File:Dypsis lutescens Medellín - 4.jpg |
 | tradescantia.webp | tradescantia | CC0 | File:Tradescantia zebrina (Maligano Buton Island).jpg |
 | schefflera.webp | schefflera | CC0 | File:Schefflera arboricola (bonsai), Phipps Conservatory, 2014-03-01.jpg |
 | euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Public domain | File:Euphorbia pulcherrima Blanco1.167.jpg |
-| dionaea_muscipula.webp | dionaea-muscipula | Public domain | File:Lavradia glandulosa Dionaea muscipula HistPlRemarqBresil 6(7).jpg |
-| chamaedorea_elegans.webp | chamaedorea-elegans | Public domain | File:Chamaedorea elegans.png |
+| dionaea_muscipula.webp | dionaea-muscipula | CC0 | File:Venus flytrap in pot.jpg (Deltapug) |
+| chamaedorea_elegans.webp | chamaedorea-elegans | Public domain | File:Chamaedoreaaelegans.jpg (Biotaman) |
 | strelitzia_reginae.webp | strelitzia-reginae | Public domain | File:Strelitzia larger.jpg |
 | aspidistra_elatior.webp | aspidistra-elatior | Public domain | File:Aspidistra-elatior-variegata.jpg |
 | asparagus_setaceus.webp | asparagus-setaceus | Public domain | File:Asparagus plumosa WPC.jpg |
@@ -70,7 +73,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | philodendron_pink_princess.webp | philodendron-pink-princess | CC0 | File:Pink princess philodendron.jpg (Cmushore) |
 | phalaenopsis.webp | phalaenopsis | Public domain | File:Flower of Phalaenopsis mannii.JPG |
 | alocasia.webp | alocasia | CC0 | File:Alocasia macrorrhizos 'Nigra' 02.jpg |
-| dracaena.webp | dracaena | Public domain | File:Dracaena fragrans Curtis 1808 v27.jpg |
+| dracaena.webp | dracaena | CC BY 3.0 | File:Starr 061231-3032 Dracaena marginata.jpg (Forest & Kim Starr) |
 | hedera_helix.webp | hedera-helix | Public domain | File:Hedera helix lombozata.jpg |
 | asplenium_nidus.webp | asplenium-nidus | Public domain | File:Neottopteris nidus - Kunming Botanical Garden - DSC03126.JPG |
 | cycas_revoluta.webp | cycas-revoluta | Public domain | File:Center of sago palm (Cycas revoluta) close-up.jpg |
@@ -82,15 +85,23 @@ _Full source URLs (descriptionurl per file) are recorded in
 
 ## PLANTPOTTING-0011 — botanical-plate → photograph swaps
 
-The 0010 handoff flagged five reference images that were public-domain **botanical plates** rather
-than photographs (peace lily, poinsettia, parlor palm, dracaena, philodendron pink-princess). A
-CC0/PD **photograph** was sourced where one exists; otherwise the plate is retained and the reason
-recorded (CC0/PD-only discipline — `scripts/source-reference-images.ps1` filtering; no CC-BY).
+A review of the whole library found 8 botanical-plate diagrams + 2 unrepresentative photos. With the
+CC-BY relaxation (CC0/PD preferred, CC BY allowed with attribution, no CC BY-SA), **9 were swapped to
+real photographs and 2 plates retained** (no clean non-SA photo exists).
 
-| target | outcome |
-|---|---|
-| philodendron-pink-princess | **SWAPPED** → CC0 photo `File:Pink princess philodendron.jpg` (Cmushore). The old plate depicted *P. erubescens* (the green species), not the pink cultivar — the photo is strictly better. |
-| spathiphyllum-wallisii (peace lily) | **Plate retained** — no CC0/PD photograph among the top 40 Commons results (all CC-BY/CC-BY-SA/GFDL). |
-| euphorbia-pulcherrima (poinsettia) | **Plate retained** — only CC0/PD results are illustrations/line art (PSF, Blanco plate); no photograph. |
-| chamaedorea-elegans (parlor palm) | **Plate retained** — only CC0/PD results are botanical plates (*Flore des serres*, *Historia naturalis palmarum*); no photograph. |
-| dracaena (*D. marginata*) | **Plate retained** — no CC0/PD photograph among the top 40 Commons results. |
+| image | outcome | license |
+|---|---|---|
+| philodendron-pink-princess | **SWAPPED** — old plate was *P. erubescens* (green species), not the pink cultivar | CC0 (Cmushore) |
+| monstera-adansonii | **SWAPPED** (was Curtis's Botanical Mag plate) → fenestrated-leaf photo | CC0 (Jacob Rehage) |
+| saintpaulia-ionantha | **SWAPPED** (was Curtis' 1895 plate) → African-violet photo | CC0 (Daderot) |
+| dionaea-muscipula | **SWAPPED** (was a painting) → potted Venus flytrap | CC0 (Deltapug) |
+| chlorophytum-comosum | **SWAPPED** (was a seed on graph paper) → hanging spider plant | CC0 (W.carter) |
+| chamaedorea-elegans | **SWAPPED** (was an illustration) → parlor-palm photo | Public domain (Biotaman) |
+| dracaena (*D. marginata*) | **SWAPPED** (was Curtis 1808 plate) → dragon-tree photo | CC BY 3.0 (Forest & Kim Starr) |
+| pachira-aquatica | **SWAPPED** (was Aublet 1775 plate) → money-tree photo | CC BY 4.0 (Atlas Þə Biologist) |
+| anthurium-andraeanum | **SWAPPED** (was a spadix macro) → red flamingo-flower plant | CC BY 3.0 (Forest & Kim Starr) |
+| euphorbia-pulcherrima (poinsettia) | **Plate retained** — only non-SA results are illustrations / vintage book scans; real photos are CC BY-SA | Public domain (Blanco plate) |
+| begonia | **Plate retained** — only non-SA results are vintage book illustrations; real photos are CC BY-SA | Public domain (Thornton plate) |
+
+The 3 CC BY swaps (dracaena, pachira, anthurium) are attributed in-app via `image_credits.tsv` on the
+**Image credits** screen (reachable from Home → How it works).

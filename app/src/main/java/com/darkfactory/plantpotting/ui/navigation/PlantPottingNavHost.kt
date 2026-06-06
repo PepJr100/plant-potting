@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.camera.CameraScreen
 import com.darkfactory.plantpotting.camera.NavCommand
+import com.darkfactory.plantpotting.credits.CreditsScreen
 import com.darkfactory.plantpotting.di.AppEntryPoints
 import com.darkfactory.plantpotting.home.HomeScreen
 import com.darkfactory.plantpotting.home.HomeViewModel
@@ -85,6 +86,14 @@ fun PlantPottingNavHost() {
                     confirmButton = {
                         TextButton(onClick = { showAbout = false }) {
                             Text(stringResource(id = R.string.home_about_dismiss))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showAbout = false
+                            navController.navigate(Routes.CREDITS)
+                        }) {
+                            Text(stringResource(id = R.string.home_about_credits))
                         }
                     },
                     title = { Text(stringResource(id = R.string.home_about_title)) },
@@ -196,6 +205,9 @@ fun PlantPottingNavHost() {
                 },
                 onHome = goHome,
             )
+        }
+        composable(Routes.CREDITS) {
+            CreditsScreen(onHome = goHome)
         }
         composable(Routes.MY_PLANTS) {
             MyPlantsScreen(

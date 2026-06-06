@@ -1,5 +1,11 @@
 # PLANTPOTTING-0011 — image inventory (all three folders)
 
+> **RESOLVED (2026-06-06):** the diagrams below were **replaced in place** (overwritten, not deleted —
+> deleting a `.webp` would break the build, since `PlantImageResolver` references each by name).
+> **9 of 11 swapped to real photos** (CC0/PD preferred, CC BY fallback with in-app attribution);
+> **2 retained** (poinsettia, begonia — only CC BY-SA photos exist, which aren't accepted). You do NOT
+> need to delete anything. Final state per image is in `docs/licenses/reference-images.md`.
+
 For your diagram cleanup. Three separate image sets — **the diagrams are all in the reference-image
 folder** (folder 2); the eval fixtures (folder 1) are all real photos. ✅ keep · ❌ diagram/plate
 (delete + replace) · ⚠ real photo but unrepresentative (replace).

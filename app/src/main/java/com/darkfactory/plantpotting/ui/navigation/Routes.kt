@@ -26,6 +26,7 @@ object Routes {
     const val ARCHETYPE_PICKER = "archetype-picker"
     const val ARCHETYPE_RECOMMENDATION = "archetype-recommendation/{archetypeId}"
     const val MY_PLANTS = "my-plants"
+    const val CREDITS = "image-credits"
     const val ADD_THIS_PLANT = "add-this-plant?label={label}&confidencePct={confidencePct}"
 
     const val ARG_SPECIES_ID = "speciesId"
