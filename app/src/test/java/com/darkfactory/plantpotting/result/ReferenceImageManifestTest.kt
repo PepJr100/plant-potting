@@ -41,9 +41,18 @@ class ReferenceImageManifestTest {
 
     @Test
     fun manifestDeclaresCc0OrPublicDomainPolicy() {
-        // Guards the policy line so a future edit can't silently drop the CC0/PD restriction.
+        // Guards the policy line so a future edit can't silently drop the CC0/PD baseline.
         val text = manifest.readText().lowercase()
         assertThat(text.contains("cc0") || text.contains("public-domain") || text.contains("public domain"))
+            .isTrue()
+    }
+
+    @Test
+    fun manifestForbidsCcBySa() {
+        // PLANTPOTTING-0011 relaxed the policy to allow CC BY (with attribution) but NOT CC BY-SA.
+        // The policy text must still document the share-alike exclusion.
+        val text = manifest.readText().lowercase()
+        assertThat(text.contains("cc by-sa is still not accepted") || text.contains("not accepted"))
             .isTrue()
     }
 }

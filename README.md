@@ -68,6 +68,7 @@ Ten sprints landed on `main`:
 | PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + camera-button UX fix | done |
 | PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done |
 | PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh, persistence, My Plants, "Add this plant", +12 KB species (→38 mapped), CC0/PD reference photos | done (v0.4.0) |
+| PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness (41 fixtures/30 species), TTA-6 + margin-abstention (confident-wrong 0.38→0.18), thicker confidence bar, all reference plates → photos + Image-credits screen | done (v0.5.0) |
 
 What you can do today:
 

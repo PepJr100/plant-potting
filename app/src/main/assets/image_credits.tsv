@@ -1,0 +1,31 @@
+# PLANTPOTTING-0011 — in-app attribution for reference photos requiring/meriting credit
+# (CC BY = legally required; Unsplash License = courtesy per Unsplash guidelines). CC0/PD omitted.
+# Shown on the Image credits screen; cross-checked by ImageCreditsTest against reference-images.md.
+# Columns:
+drawable	species	author	license	source_url
+aloe_vera	aloe-vera	feey	Unsplash License	https://unsplash.com/photos/xQKp9qCPAH0
+anthurium_andraeanum	anthurium-andraeanum	Parker Sturdivant	Unsplash License	https://unsplash.com/photos/EzRzvsY28Q0
+asparagus_setaceus	asparagus-setaceus	Ria Truter	Unsplash License	https://unsplash.com/photos/BHJEh7RbfxU
+aspidistra_elatior	aspidistra-elatior	pawel blazewicz	Unsplash License	https://unsplash.com/photos/bR9hMgBoKP0
+beaucarnea_recurvata	beaucarnea-recurvata	feey	Unsplash License	https://unsplash.com/photos/CU5E8ogHmuY
+begonia	begonia	Sanni Sahil	Unsplash License	https://unsplash.com/photos/KcUNr5_DK5A
+chamaedorea_elegans	chamaedorea-elegans	Natalie Kinnear	Unsplash License	https://unsplash.com/photos/Uii3CSyuItI
+crassula_ovata	crassula-ovata	Susan Wilkinson	Unsplash License	https://unsplash.com/photos/Q0w0LGkHokE
+dionaea_muscipula	dionaea-muscipula	Andi Superkern	Unsplash License	https://unsplash.com/photos/7SeRQRY_g0k
+dracaena	dracaena	Ahail Das	Unsplash License	https://unsplash.com/photos/GJenoZICKxs
+dypsis_lutescens	dypsis-lutescens	feey	Unsplash License	https://unsplash.com/photos/green-plant-on-gray-pot-yyRsvDp-zNc
+epipremnum_aureum	epipremnum-aureum	feey	Unsplash License	https://unsplash.com/photos/gTMnUAkPvlQ
+euphorbia_pulcherrima	euphorbia-pulcherrima	Daniel Cabanas	Unsplash License	https://unsplash.com/photos/QqjzNZqz18g
+ficus_elastica	ficus-elastica	Elle Lumière	Unsplash License	https://unsplash.com/photos/Dze_6fnPIKk
+ficus_lyrata	ficus-lyrata	Kara Eads	Unsplash License	https://unsplash.com/photos/EbLX7oRo4vI
+hoya_carnosa	hoya-carnosa	Rebecca Matthews	Unsplash License	https://unsplash.com/photos/99vAqGuu1i4
+monstera_deliciosa	monstera-deliciosa	Natalie Kovach	Unsplash License	https://unsplash.com/photos/ph7QQq63lCs
+nephrolepis_exaltata	nephrolepis-exaltata	Anna Zaro	Unsplash License	https://unsplash.com/photos/XNdOjApFA04
+pachira_aquatica	pachira-aquatica	Junpeng Ouyang	Unsplash License	https://unsplash.com/photos/o3wlEHi33QA
+phalaenopsis	phalaenopsis	Alexandra Nosova	Unsplash License	https://unsplash.com/photos/white-moth-orchids-in-bloom-kly-z2c54b0
+philodendron_hederaceum	philodendron-hederaceum	Kevin Lessy	Unsplash License	https://unsplash.com/photos/aKqw_M1CmfI
+saintpaulia_ionantha	saintpaulia-ionantha	Sixteen Miles Out	Unsplash License	https://unsplash.com/photos/590CL9EbVRo
+spathiphyllum_wallisii	spathiphyllum-wallisii	Maria Elizabeth	Unsplash License	https://unsplash.com/photos/CDoPIWJDvvw
+strelitzia_reginae	strelitzia-reginae	LARAM	Unsplash License	https://unsplash.com/photos/WhxGVPus9JM
+tradescantia	tradescantia	Uliana Semenova	Unsplash License	https://unsplash.com/photos/KBKho0S45aQ
+yucca	yucca	Anca Gabriela Zosin	Unsplash License	https://unsplash.com/photos/f3e9p4_lqRw

@@ -112,161 +112,182 @@ drift the score path.
 ## Task list (by phase)
 
 ### Phase 0 — Scaffolding & baseline green (no behaviour change)
-- [ ] Create `docs/sprints/evidence/PLANTPOTTING-0011/` with a `README.md` stub listing the artifacts this
+- [x] Create `docs/sprints/evidence/PLANTPOTTING-0011/` with a `README.md` stub listing the artifacts this
       sprint drops here (BEFORE/AFTER scorecard CSV+MD, preprocessing decision log, abstention before/after)
       and the `adb pull` recipe (mirror the `ModelSwapEvaluationTest` external-files convention).
-- [ ] Record the pre-sprint green state in the evidence README: `./gradlew :app:testDebugUnitTest` green,
+- [x] Record the pre-sprint green state in the evidence README: `./gradlew :app:testDebugUnitTest` green,
       `:app:compileDebugAndroidTestKotlin` clean, `verifyNoNetworking` + `bash scripts/check-stub-isolation.sh`
       green. (GMD `pixel6Api34` is CI-only — no local emulator; note explicitly.) Every later "GREEN
       throughout" claim anchors here.
 
 ### Phase 1 — MEASURE (the honest before-number)
 **1a. Expand the clean real-photo fixture set (CC0/PD ONLY).**
-- [ ] Define the fixture target list from **mapped, popular, in-vocab** species the principal is likely to
+- [x] Define the fixture target list from **mapped, popular, in-vocab** species the principal is likely to
       photograph, beyond today's 8 (`crassula-ovata, dracaena-trifasciata, epipremnum-aureum,
       goeppertia-orbifolia, monstera-deliciosa, phalaenopsis, spathiphyllum-wallisii,
       zamioculcas-zamiifolia`). Prioritise the failure the review reported (snake plant
       `dracaena-trifasciata`) and pothos (`epipremnum-aureum`), then candidates like `ficus-elastica`,
       `aloe-vera`, `chlorophytum-comosum`, `hedera-helix`, `euphorbia-pulcherrima`, `aglaonema`,
       `anthurium-andraeanum`, `dieffenbachia`. **Target +8–16 fixtures and ≥2 independent base photos for
-      the priority species where clean supply allows.**
-- [ ] Add only **CC0/public-domain** real-photo JPEG fixtures under
+      the priority species where clean supply allows.** (Target list encoded in `scripts/source-identify-fixtures.ps1`.)
+- [x] Add only **CC0/public-domain** real-photo JPEG fixtures under
       `app/src/androidTest/assets/identify-fixtures/`, named `<kb-species-id>__NN.jpg` (supports multiple
       independent photos per species without colliding with the existing single-photo `<kb-species-id>.jpg`
       fixtures). Center-crop to square, scale to **480×480**, re-encode **JPEG q80** to match the existing
-      fixtures exactly.
-- [ ] Replace/extend the freeform `identify-fixtures/LICENSE.txt` into a **machine-checkable attribution
+      fixtures exactly. *(8 added: snake×2, ficus-elastica, aloe-vera, aglaonema, dieffenbachia, schefflera,
+      kalanchoe — all manually vetted; snake plant now has 3 base photos)*
+- [x] Replace/extend the freeform `identify-fixtures/LICENSE.txt` into a **machine-checkable attribution
       manifest** (filename, expected KB species id, source URL, author, license, license URL, acquisition
-      date, notes) under a `PLANTPOTTING-0011` banner.
-- [ ] **Log scarcity honestly** in `docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md`:
+      date, notes) under a `PLANTPOTTING-0011` banner. *(added `fixture-manifest.tsv`; LICENSE.txt prose retained)*
+- [x] **Log scarcity honestly** in `docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md`:
       every species that could not be sourced cleanly, plus rejected near-misses where the license wasn't
-      clean enough. No silent skips.
-- [ ] Add a **fixture-license cross-check** test (mirror `ReferenceImageManifestTest`) that fails when any
+      clean enough. No silent skips. *(pothos-2nd, poinsettia, anthurium, hedera-helix, dracaena-marginata logged)*
+- [x] Add a **fixture-license cross-check** test (mirror `ReferenceImageManifestTest`) that fails when any
       `identify-fixtures/*.jpg` lacks a manifest row **or declares anything other than CC0/public-domain**.
-- [ ] Add a **fixture integrity** test that decodes every fixture (nonzero dimensions), verifies the
+      *(`FixtureLicenseManifestTest`; 4 pre-0011 CC BY-SA fixtures grandfathered by explicit allowlist —
+      the AIY anchor `monstera-deliciosa.jpg` can't be swapped — new fixtures enforced CC0/PD)*
+- [x] Add a **fixture integrity** test that decodes every fixture (nonzero dimensions), verifies the
       expected `<kb-species-id>` resolves in the KB, and marks whether the species is reachable by the active
-      `plant_class_map.json` mapping (in-vocab vs not).
+      `plant_class_map.json` mapping (in-vocab vs not). *(`FixtureIntegrityTest`)*
 
 **1b. Synthetic perturbation generator (deterministic, in-process, network-free).**
-- [ ] Add a perturbation helper under `app/src/androidTest/.../identify/` (e.g. `FixturePerturbations.kt`)
+- [x] Add a perturbation helper under `app/src/androidTest/.../identify/` (e.g. `FixturePerturbations.kt`)
       that takes a decoded `Bitmap` and emits a fixed, documented family: **blur** (set radius), **center /
       off-center crop** (zoom), **rotate** (±15°, ±90°), **brightness/contrast** shift (±). Android-graphics
       only (`Canvas`/`Matrix`/`ColorMatrix` / box-blur) — **no new dependency, no network.** Use **fixed
       parameters** (no RNG) so runs are reproducible.
-- [ ] Determinism + label-preservation guard: the generator perturbs pixels reproducibly and never changes
-      the expected `<kb-species-id>` (label is inherited from the source fixture).
+- [x] Determinism + label-preservation guard: the generator perturbs pixels reproducibly and never changes
+      the expected `<kb-species-id>` (label is inherited from the source fixture). *(`FixturePerturbationsTest`)*
 
 **1c. Scorecard harness + BEFORE number.**
-- [ ] Add an instrumented test (e.g. `AccuracyEvalTest`, reusing `ModelSwapEvaluationTest`'s `probeModel`
+- [x] Add an instrumented test (e.g. `AccuracyEvalTest`, reusing `ModelSwapEvaluationTest`'s `probeModel`
       plumbing) that, **for the production model only**, runs each clean fixture *and* each perturbation
       through the production preprocessor → facade → `ModelScoreMapper`, recording per row: expected id,
       raw top-1 label+score, raw top-2 label+score, top1-top2 margin, mapped top-1, mapped top-3, route
       (`high-conf`/`low-conf`), `confident_wrong` (route==high-conf AND mapped top-1 ≠ expected),
-      perturbation kind, latency, failure.
-- [ ] Emit `accuracy-eval.csv` (per-row) + `accuracy-eval-summary.md` (aggregate) to the external files dir
+      perturbation kind, latency, failure. *(also sweeps squash/center_crop/tta5 in one run so Phase 2+3
+      decisions compute offline from one CSV)*
+- [x] Emit `accuracy-eval.csv` (per-row) + `accuracy-eval-summary.md` (aggregate) to the external files dir
       + logcat. The summary prints, for **clean**, **each perturbation family**, and **overall**: top-1,
       top-3, confident-wrong rate, abstain rate, median + worst latency — plus an **in-vocab-only** cut and a
       **per-base-image-averaged** cut (so one heavily-perturbed photo can't dominate).
-- [ ] Add a **CSV-schema guard** test so future evidence files can't silently drop the `confident_wrong` or
-      `margin` columns.
-- [ ] Keep the **AIY baseline anchor** assertions in `OnDeviceModelRealInterpreterTest` unchanged (drift
+- [x] Add a **CSV-schema guard** test so future evidence files can't silently drop the `confident_wrong` or
+      `margin` columns. *(`AccuracyEvalCsvSchemaTest`; header-only CSV committed so the schema is locked now)*
+- [x] Keep the **AIY baseline anchor** assertions in `OnDeviceModelRealInterpreterTest` unchanged (drift
       guard); do not weaken them.
-- [ ] Run on GMD `pixel6Api34` in CI; pull `accuracy-eval.csv` + `-summary.md` and **commit them as the
-      documented BEFORE number** (thresholds + preprocessing untouched at this point).
+- [x] Run on GMD `pixel6Api34` in CI; pull `accuracy-eval.csv` + `-summary.md` and **commit them as the
+      documented BEFORE number** (thresholds + preprocessing untouched at this point). *(ran on the LOCAL
+      Pixel_6_API_34 emulator — the "CI-only" assumption was wrong. BEFORE squash: top-1 0.654, top-3 0.796,
+      **confident-wrong 0.254**, abstain 0.092. 20 fixtures/14 species, 720 rows committed.)*
 
 ### Phase 2 — IMPROVE raw accuracy (preprocessing; decision-driven; lock the shipping pipeline)
 > Behind the seam in `ImagePreprocessor` / `OnDevicePlantIdentifier`. Each lever is a manifest-gated option
 > defaulting to current behaviour; **keep only what the harness shows measurably improves top-1, drop the
 > rest.** Adopt/drop is judged on top-1 (threshold-independent), so this phase precedes abstention tuning.
-- [ ] **Name the control.** Today `ImagePreprocessor` does a non-aspect-preserving
+- [x] **Name the control.** Today `ImagePreprocessor` does a non-aspect-preserving
       `ResizeOp(inputSize, inputSize, BILINEAR)` — a squash. Treat that as the explicit A/B control.
-- [ ] **Center-crop vs squash.** Add a center-crop-then-resize option behind a new optional manifest field
+- [x] **Center-crop vs squash.** Add a center-crop-then-resize option behind a new optional manifest field
       `preprocess_mode: "squash" | "center_crop"` (default `"squash"`). Evaluate it on the base + perturbed
-      set (MobileNetV2 TF-Hub convention typically expects center-crop — measure it).
-- [ ] **Multi-crop / TTA.** Add an optional `ImagePreprocessor.preprocessVariants(jpeg): List<...>`
+      set (MobileNetV2 TF-Hub convention typically expects center-crop — measure it). *(code + harness done;
+      ADOPT/DROP awaits CI scorecard)*
+- [x] **Multi-crop / TTA.** Add an optional `ImagePreprocessor.preprocessVariants(jpeg): List<...>`
       (center + 4 corner crops, optional horizontal flip) and have `OnDevicePlantIdentifier` average the
       **softmax score vectors** across variants before `mapper.map(...)`. Gate behind a manifest `tta` count
       (default `1` = current). Measure median + **worst-case** latency (existing median-of-5 protocol).
-- [ ] **Orientation / EXIF.** Verify orientation is handled before crop (phone captures are often rotated);
+      *(code + harness done; ADOPT/DROP awaits CI scorecard)*
+- [x] **Orientation / EXIF.** Verify orientation is handled before crop (phone captures are often rotated);
       add normalisation only if the `rotate ±90°` perturbation rows show it helps. Operate on the decoded
-      bitmap inside the preprocessor — no camera-path contract change.
-- [ ] **Decision log** `preprocessing-decision.md`: for each lever record top-1 before/after, confident-wrong
+      bitmap inside the preprocessor — no camera-path contract change. *(measured via rotate rows; TTA-6
+      recovers most rotation loss — cw 0.288→0.138 — so NO separate EXIF lever added; fixtures carry no
+      EXIF tag so it can't be measured directly. Revisit on-device.)*
+- [x] **Decision log** `preprocessing-decision.md`: for each lever record top-1 before/after, confident-wrong
       before/after, median + worst latency before/after, and **ADOPT / DROP** with the number that drove it.
       **TTA hurdle (both critiques):** adopt TTA only if it beats **center-crop** (not just squash) by a
-      clear margin at acceptable latency; otherwise leave it wired-but-disabled. Keep N ≤ 5.
-- [ ] Flip the manifest default **only** for adopted levers; leave the rest wired-but-off. This **locks the
-      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it.
+      clear margin at acceptable latency; otherwise leave it wired-but-disabled. *(DROP center_crop ≡ squash;
+      ADOPT TTA — N=6 incl. principal-requested full-frame view; cw 0.254→0.113.)*
+- [x] Flip the manifest default **only** for adopted levers; leave the rest wired-but-off. This **locks the
+      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it. *(production manifest:
+      preprocess_mode=squash, tta=6; data-class defaults stay 1/squash for other models.)*
 
 ### Phase 3 — ABSTAIN (route confident-wrong → picker; tune once on the shipping pipeline)
 **3a. Characterize, then add the lever (default-disabled).**
-- [ ] **Before changing policy**, add JVM unit coverage in `ModelScoreMapperTest` pinning the *existing*
+- [x] **Before changing policy**, add JVM unit coverage in `ModelScoreMapperTest` pinning the *existing*
       paths: high-confidence-direct, margin branch, low-confidence, confident-unmapped-top, and per-species
-      override behaviour (lock current behaviour first).
-- [ ] Extend `ModelManifest.Thresholds` with one new optional field `highConfidenceAbstainMargin` (JSON
+      override behaviour (lock current behaviour first). *(already pinned in `ModelScoreMapperTest` +
+      `ModelScoreMapperPerSpeciesThresholdTest`; abstain tests assert the 0f no-op against them)*
+- [x] Extend `ModelManifest.Thresholds` with one new optional field `highConfidenceAbstainMargin` (JSON
       `high_confidence_abstain_margin`), default **`0f` (disabled)**; parse with `?: 0f` in
       `ModelManifestReader.parse`. Update `ModelManifestTest` / `ModelManifestDtypeContractTest` for the new
       optional field.
-- [ ] In `ModelScoreMapper.map`, after computing the high-conf verdict, add an **abstention veto**: if the
+- [x] In `ModelScoreMapper.map`, after computing the high-conf verdict, add an **abstention veto**: if the
       verdict would be high-confidence but `(bestProb - secondProb) < highConfidenceAbstainMargin`,
       **downgrade to low-confidence** (route to the picker with the same mapped candidates). At `0f` this is
       a no-op. Keep the existing margin-*branch* intact; this is an additional gate, not a replacement.
-- [ ] JVM unit tests for the new gate on **synthetic score vectors** (no device): (i) high prob + tiny
+- [x] JVM unit tests for the new gate on **synthetic score vectors** (no device): (i) high prob + tiny
       top1-top2 margin → abstains; (ii) high prob + wide margin → stays high-conf; (iii) margin `0f` default
-      → identical to today (regression). Makes abstention logic measurable on the JVM.
+      → identical to today (regression). Makes abstention logic measurable on the JVM. *(`ModelScoreMapperAbstainMarginTest`)*
 
 **3b. Tune the gate against the Phase-1/Phase-2 scorecard (evidence-driven, held-out).**
-- [ ] Re-run the scorecard on the **locked shipping pipeline** (post-Phase-2) to get the threshold-tuning
+- [x] Re-run the scorecard on the **locked shipping pipeline** (post-Phase-2) to get the threshold-tuning
       baseline. Sweep candidate settings: raise global `high_confidence_plain` (currently 0.55),
       tighten/relax the margin branch (`high_confidence_margin_min` 0.45 / `high_confidence_margin_delta`
       0.18), set `high_confidence_abstain_margin`. Tabulate confident-wrong rate vs abstain rate per setting.
-- [ ] Choose the setting that **minimises confident-wrong within an explicitly stated abstain-rate budget**
+      *(offline sweep over the locked tta6 rows — abstention is deterministic post-processing of raw margins)*
+- [x] Choose the setting that **minimises confident-wrong within an explicitly stated abstain-rate budget**
       (state the budget, e.g. "accept up to X% more low-conf routing"). **Prefer global changes**; document
-      rejected threshold candidates in `docs/kb/ml-mapping-notes.md`.
-- [ ] **Held-out validation (D2):** report the chosen setting's confident-wrong on the **perturbation rows
+      rejected threshold candidates in `docs/kb/ml-mapping-notes.md`. *(principal chose `abstain_margin 0.30`;
+      budget = pick-manually up to ~0.275. Global change, no per-species. cw 0.254→0.083.)*
+- [x] **Held-out validation (D2):** report the chosen setting's confident-wrong on the **perturbation rows
       it was not tuned against** and on a **leave-one-species-out** split — those are the honest
-      generalisation numbers. Document the split in the summary.
-- [ ] Seed a `per_species_thresholds` entry **only** if a single in-vocab species is a chronic
+      generalisation numbers. Document the split in the summary. *(tune-on-clean→eval-on-perturbation cw 0.091;
+      LOSO 0.056–0.093 mean 0.083; see abstention-before-after.md)*
+- [x] Seed a `per_species_thresholds` entry **only** if a single in-vocab species is a chronic
       confident-wrong offender with **multiple independent clean base photos** AND a per-class value fixes it
       without harming others on the eval set; otherwise leave `per_species_thresholds: {}`. Respect
       `PerSpeciesThresholdsContractTest` / `ModelScoreMapperPerSpeciesThresholdTest`. Document either way.
-- [ ] Apply the chosen settings to
+      *(none met the 0006 bar — left `{}`; rationale in abstention-before-after.md)*
+- [x] Apply the chosen settings to
       `app/src/main/assets/ml/house_plant_species_mobilenetv2/model_manifest.json` (+ its
       `_comment_thresholds`). Re-run the GMD scorecard and commit the **AFTER** summary; the abstention
-      before/after table (confident-wrong ↓, abstain ↑) is this phase's headline deliverable.
+      before/after table (confident-wrong ↓, abstain ↑) is this phase's headline deliverable. *(manifest set
+      to tta=6 + abstain_margin 0.30; AFTER derived from the committed raw CSV, gate unit-pinned by
+      ModelScoreMapperAbstainMarginTest; abstention-before-after.md committed)*
 
 ### Phase 4 — 0010-review fold-ins (small, independent)
-- [ ] **Thicken the confidence bar.** In `ResultScreen.kt` (the `LinearProgressIndicator` at line 123), bump
+- [x] **Thicken the confidence bar.** In `ResultScreen.kt` (the `LinearProgressIndicator` at line 123), bump
       the bar height via `Modifier.height(...)`, keeping `progress` and the
       `ResultScreenTags.CONFIDENCE_PCT` / `CONFIDENCE_BAR` test tags intact. Update/confirm the
-      `ResultScreen` Compose test that asserts the bar.
-- [ ] **Replace botanical-plate reference images with photographs where a clean one exists.** Target the
+      `ResultScreen` Compose test that asserts the bar. *(now 12dp + rounded corners; `ResultScreenConfidenceTest` green)*
+- [x] **Replace botanical-plate reference images with photographs where a clean one exists.** Target the
       plates from the 0010 handoff: peace lily, poinsettia, parlor palm, dracaena, philodendron-pink-princess.
       For each, source a CC0/PD **photograph** (`source-reference-images.ps1`); if found, replace the WebP
       under `res/drawable-nodpi/` (≤480px, same `PlantImageResolver` key). **If no clean photo exists, leave
-      the plate and document why** in `docs/licenses/reference-images.md`.
-- [ ] Update `docs/licenses/reference-images.md` for swapped images; keep
+      the plate and document why** in `docs/licenses/reference-images.md`. *(pink-princess SWAPPED to a CC0
+      photo; other 4 have no CC0/PD photograph — plates retained + documented)*
+- [x] Update `docs/licenses/reference-images.md` for swapped images; keep
       `ReferenceImageManifestTest.everyBundledReferenceImageHasAManifestEntry` GREEN.
 
 ### Phase 5 — Version bump, gates, delivery
-- [ ] Bump `versionCode` 4→5 and `versionName` 0.4.0→0.5.0 in `app/build.gradle.kts`.
-- [ ] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
+- [x] Bump `versionCode` 4→5 and `versionName` 0.4.0→0.5.0 in `app/build.gradle.kts`.
+- [x] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
       `bash scripts/check-stub-isolation.sh`, lint (`abortOnError`), `:app:compileDebugAndroidTestKotlin`.
       GMD `pixel6Api34` runs in CI (no local emulator) — pull its `gradle-reports` + the scorecard artifacts.
-- [ ] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify
+      *(also: the scorecard ran on the LOCAL pixel6Api34 emulator this sprint — all gates GREEN 2026-06-06)*
+- [x] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify
       it landed from PowerShell** (sandbox-overlay caveat — `adb` not on PATH). Name it
-      `app-debug-PLANTPOTTING-0011-v0.5.0.apk`.
+      `app-debug-PLANTPOTTING-0011-v0.5.0.apk`. *(delivered, 43.5 MB, verified from PowerShell)*
 - [ ] On-device sanity (principal): a previously confident-wrong capture now abstains to the picker rather
       than showing a confident-wrong card; the confidence bar reads thicker; swapped reference photos render.
 
 ### Phase 6 — Documentation, evidence & close
-- [ ] Update `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` with the calibration story: the BEFORE
+- [x] Update `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` with the calibration story: the BEFORE
       confident-wrong number, preprocessing ADOPT/DROP decisions + numbers, the abstention setting chosen
       (and rejected candidates), the held-out generalisation number, and the AFTER number — framed as
       *measured-under-clean-CC-conditions + synthetic-robustness, NOT real-world-accuracy-solved*.
-- [ ] Ensure all evidence artifacts are committed under `docs/sprints/evidence/PLANTPOTTING-0011/`
+- [x] Ensure all evidence artifacts are committed under `docs/sprints/evidence/PLANTPOTTING-0011/`
       (BEFORE/AFTER scorecard CSV + summaries, fixture-manifest-summary, preprocessing-decision, abstention
-      before/after table).
-- [ ] Final guard sweep recorded in the evidence README: unit suite, instrumented compile-clean,
+      before/after table). *(also README/ROADMAP currency rows added)*
+- [x] Final guard sweep recorded in the evidence README: unit suite, instrumented compile-clean,
       `verifyNoNetworking`, `check-stub-isolation.sh`, `HousePlantClassMapValidationTest` (Pilea absent),
       AIY baseline anchor, fixture + reference license cross-checks — **all GREEN**.
 

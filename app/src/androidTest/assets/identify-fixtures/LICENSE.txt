@@ -207,3 +207,130 @@ goeppertia-orbifolia.jpg   (Calathea orbifolia / Goeppertia orbifolia)
                  Attribution: "Mokkie, CC BY-SA 3.0, via Wikimedia Commons".
                  Per share-alike, this fixture and modified copies remain
                  available under the same (or a compatible) license.
+
+
+================================================================================
+PLANTPOTTING-0011 §Phase 1a — CC0 / public-domain ONLY eval-fixture expansion
+================================================================================
+
+Eight additional fixtures grow the accuracy scorecard's clean real-photo set. Per
+the 0011 non-goal, every NEW fixture is CC0 or public-domain (no CC-BY/CC-BY-SA);
+the four pre-existing CC BY-SA fixtures above are grandfathered (one — monstera-
+deliciosa.jpg — is the AIY baseline anchor and cannot be swapped). Each was
+manually vetted, centre-cropped to square, scaled to 480×480 and re-encoded as
+JPEG quality 80 to match the existing fixtures exactly. All are test-only assets
+under app/src/androidTest/ and are NOT bundled into the production APK. Machine-
+readable provenance for every fixture lives in fixture-manifest.tsv; per-species
+scarcity (species with no clean photo) is logged in
+docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md.
+
+dracaena-trifasciata__01.jpg  (snake plant, 2nd base photo — low "hahnii" form)
+  Tangopaso, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Sansevieria_trifasciata_D190512.jpg
+
+dracaena-trifasciata__02.jpg  (snake plant, 3rd base photo — tall green form)
+  Mokkie, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Sansevieria_in_pot.jpg
+
+ficus-elastica__01.jpg  (rubber plant; outdoor/cluttered framing)
+  Al Kordesch, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Ficus_elastica_29761125.jpg
+
+aloe-vera__01.jpg  (potted aloe vera, plain background)
+  Arjun01, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Potted_Aloe_vera_plant.jpg
+
+aglaonema__01.jpg  (Chinese evergreen, red cultivar cluster)
+  Satirdan kahraman, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Konya_Kelebekler_Vadisi_Aglaonema.jpg
+
+dieffenbachia__01.jpg  (dumb cane, variegated white-spotted leaves)
+  Alex Rio Brazil, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Dieffenbachia_seguine_-_Comigo_Ninguem_Pode.jpg
+
+schefflera__01.jpg  (umbrella tree, bonsai form)
+  Cbaile19, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Schefflera_arboricola_(bonsai),_Phipps_Conservatory,_2014-03-01.jpg
+
+kalanchoe__01.jpg  (flowering kalanchoe, orange clusters)
+  Sabalo22, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Kalanchoe_blossfeldiana_(Florist_Kalanchoe).jpg
+
+
+-- PLANTPOTTING-0011 pass 2 (deepen single-photo species to >=2 where CC0/PD supply allows) --
+All CC0; same centre-crop 480x480 q80 processing.
+
+zamioculcas-zamiifolia__01.jpg  (ZZ plant, 2nd base photo — white pot, outdoor)
+  Philsacor, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Zz_plant.jpg
+
+aloe-vera__02.jpg  (aloe vera, 2nd base photo — windowsill)
+  Brainmachine, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Aloe_Vera_Plant.JPG
+
+crassula-ovata__01.jpg  (jade plant, 2nd base photo — trunk/branch close-up)
+  W.carter, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Among_the_branches_of_a_potted_jade_plant.jpg
+
+spathiphyllum-wallisii__01.jpg  (peace lily — CC0 companion to the grandfathered CC BY-SA fixture)
+  CesarAlbertoHerrera, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Maseta.jpg
+
+
+-- PLANTPOTTING-0011 pass 3 (GBIF / iNaturalist CC0; deepen popular species) --
+All CC0 (iNaturalist open-data); same centre-crop 480x480 q80 processing. (A filtered
+Smithsonian NMNH Botany CC0 pass was attempted but returns herbarium specimen sheets, not
+live-plant photos — not usable here.)
+
+epipremnum-aureum__01.jpg  (pothos, 2nd base photo — mature, climbing a trunk)
+  葉子, CC0, via iNaturalist. https://www.inaturalist.org/photos/633495947
+
+monstera-deliciosa__01.jpg  (Monstera, 2nd base photo — fenestrated leaves)
+  Frank Thomas Sautter, CC0, via iNaturalist. https://www.inaturalist.org/photos/610866181
+
+ficus-elastica__02.jpg  (rubber plant, 3rd base photo — foliage + red tip sheath)
+  葉子, CC0, via iNaturalist. https://www.inaturalist.org/photos/612138131
+
+kalanchoe__02.jpg  (kalanchoe, 2nd base photo — wild, in leaf litter)
+  Arne Holgersson, CC0, via iNaturalist. https://www.inaturalist.org/photos/617848144
+
+phalaenopsis__01.jpg  (moth orchid, 2nd base photo — Smithsonian Gardens studio shot, bloomless)
+  Smithsonian Gardens (Orchid Collection, OFEO-SG), photo Creekside Digital, CC0.
+  https://ids.si.edu/ids/deliveryService?id=SG-2015-1940A-101
+
+
+-- PLANTPOTTING-0011 pass 4 (GBIF / iNaturalist research-grade CC0; +16 new eval species) --
+All CC0 (iNaturalist), centre-crop 480x480 q80. Real-world field photos (ideal for an honest eval).
+
+anthurium-andraeanum__01.jpg  (anthurium-andraeanum)
+  kristen_276, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/606694703/original.jpg
+maranta-leuconeura__01.jpg  (maranta-leuconeura)
+  Tiago Lubiana, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/614804276/original.jpg
+nephrolepis-exaltata__01.jpg  (nephrolepis-exaltata)
+  Sterling Herron, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/476778856/original.jpg
+pachira-aquatica__01.jpg  (pachira-aquatica)
+  Stephen Lewis, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/605063107/original.jpg
+dypsis-lutescens__01.jpg  (dypsis-lutescens)
+  naturedom12, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/610551251/original.jpg
+tradescantia__01.jpg  (tradescantia)
+  Lauren Bosch, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/604535003/original.jpg
+hedera-helix__01.jpg  (hedera-helix)
+  Stephen James McWilliam, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/604866759/original.jpg
+euphorbia-pulcherrima__01.jpg  (euphorbia-pulcherrima)
+  Yolanda M. Leon, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/608427884/original.jpg
+dionaea-muscipula__01.jpg  (dionaea-muscipula)
+  JD Flores, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/630760018/original.jpg
+strelitzia-reginae__01.jpg  (strelitzia-reginae)
+  Jordan, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/655864600/original.jpg
+aspidistra-elatior__01.jpg  (aspidistra-elatior)
+  Mason Brock, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/505097158/original.jpg
+asplenium-nidus__01.jpg  (asplenium-nidus)
+  葉子, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/633490005/original.jpg
+asparagus-setaceus__01.jpg  (asparagus-setaceus)
+  Paweł Sadkowski, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/612245786/original.jpg
+hypoestes-phyllostachya__01.jpg  (hypoestes-phyllostachya)
+  citi2024, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/617145474/original.jpg
+cycas-revoluta__01.jpg  (cycas-revoluta)
+  Rosie Bibby, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/471752890/original.jpg
+yucca__01.jpg  (yucca)
+  terrifricker, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/609022027/original.jpg

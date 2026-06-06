@@ -208,6 +208,76 @@ class ModelManifestTest {
         assertThat(placeholder).isAnyOf(true, false)
     }
 
+    // -- PLANTPOTTING-0011 — new optional preprocessing / abstention fields --------------
+    // The parser must default every new field to current behaviour when absent (so an
+    // un-bumped manifest keeps the byte-for-byte shipping pipeline) and read it when present.
+
+    @Test
+    fun newOptionalFieldsDefaultToCurrentBehaviourWhenAbsent() {
+        val parsed =
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithInputDtype("\"float32\""),
+            )
+        assertThat(parsed.preprocessMode)
+            .isEqualTo(com.darkfactory.plantpotting.identify.model.PreprocessMode.SQUASH)
+        assertThat(parsed.ttaCropCount).isEqualTo(1)
+        assertThat(parsed.thresholds.highConfidenceAbstainMargin).isEqualTo(0f)
+    }
+
+    @Test
+    fun preprocessModeCenterCropParses() {
+        val parsed =
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithExtras(preprocessMode = "\"center_crop\"", tta = "5", abstain = "0.12"),
+            )
+        assertThat(parsed.preprocessMode)
+            .isEqualTo(com.darkfactory.plantpotting.identify.model.PreprocessMode.CENTER_CROP)
+        assertThat(parsed.ttaCropCount).isEqualTo(5)
+        assertThat(parsed.thresholds.highConfidenceAbstainMargin).isWithin(1e-6f).of(0.12f)
+    }
+
+    @Test
+    fun invalidPreprocessModeIsRejected() {
+        try {
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithExtras(preprocessMode = "\"crop_to_taste\"", tta = "1", abstain = "0"),
+            )
+            assertThat("did not throw").isEqualTo("threw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message).contains("preprocess_mode")
+        }
+    }
+
+    private fun manifestJsonWithExtras(
+        preprocessMode: String,
+        tta: String,
+        abstain: String,
+    ): String =
+        """
+        {
+          "variant": "V1/3",
+          "sha256": "abc",
+          "placeholder": false,
+          "input_size": 224,
+          "input_dtype": "float32",
+          "color_order": "RGB",
+          "normalization": { "mean": [0,0,0], "std": [255,255,255] },
+          "output_tensor_shape": [1, 47],
+          "label_count": 47,
+          "labels_asset": "ml/x/labels.csv",
+          "mapping_asset": "ml/x/plant_class_map.json",
+          "preprocess_mode": $preprocessMode,
+          "tta": $tta,
+          "thresholds": {
+            "high_confidence_plain": 0.55,
+            "high_confidence_margin_min": 0.45,
+            "high_confidence_margin_delta": 0.18,
+            "top_k_candidates": 3,
+            "high_confidence_abstain_margin": $abstain
+          }
+        }
+        """.trimIndent()
+
     private fun sha256Hex(bytes: ByteArray): String {
         val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
         return digest.joinToString("") { "%02x".format(it) }
