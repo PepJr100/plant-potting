@@ -35,6 +35,12 @@ data class ModelManifest(
     // PLANTPOTTING-0005 §5.2 — optional per-species override of `Thresholds.highConfidencePlain`.
     // Keyed by KB `speciesId`. Empty by default; seed only with probe evidence (§4.6).
     val perSpeciesThresholds: Map<String, Float> = emptyMap(),
+    // PLANTPOTTING-0011 Phase 2 — preprocessing levers, default-disabled so the shipping
+    // pipeline is byte-for-byte unchanged until the eval harness justifies flipping a default.
+    //   preprocessMode = SQUASH   → the current non-aspect-preserving ResizeOp (the A/B control).
+    //   ttaCropCount   = 1        → single crop = current behaviour; >1 enables multi-crop TTA.
+    val preprocessMode: PreprocessMode = PreprocessMode.SQUASH,
+    val ttaCropCount: Int = 1,
 ) {
     data class Normalization(
         val mean: FloatArray,
@@ -54,7 +60,25 @@ data class ModelManifest(
         val highConfidenceMarginMin: Float,
         val highConfidenceMarginDelta: Float,
         val topKCandidates: Int,
+        // PLANTPOTTING-0011 Phase 3 — margin-based abstention *above* the plain gate.
+        // If a verdict would be high-confidence but `(bestProb - secondProb)` is below this
+        // margin, downgrade it to low-confidence (route to the picker). Default `0f` = disabled
+        // (no-op), so AIY and the existing baseline stay byte-for-byte unchanged.
+        val highConfidenceAbstainMargin: Float = 0f,
     )
+}
+
+/**
+ * How [ImagePreprocessor] fits the decoded bitmap to the model's square input.
+ *
+ *  - [SQUASH]: the historical non-aspect-preserving `ResizeOp` — stretches the full frame to
+ *    `inputSize × inputSize`. The PLANTPOTTING-0011 A/B control (current shipping behaviour).
+ *  - [CENTER_CROP]: crop the largest centred square first, then resize — preserves aspect ratio
+ *    at the cost of edge context. The TF-Hub MobileNetV2 feature-vector convention.
+ */
+enum class PreprocessMode {
+    SQUASH,
+    CENTER_CROP,
 }
 
 /**
@@ -133,6 +157,20 @@ class ModelManifestReader(
                     v.jsonPrimitive.float
                 } ?: emptyMap()
 
+            // PLANTPOTTING-0011 — optional preprocessing levers; default to current behaviour
+            // when absent so an un-bumped manifest keeps the byte-for-byte shipping pipeline.
+            val preprocessMode =
+                when (val raw = obj["preprocess_mode"]?.jsonPrimitive?.content) {
+                    null, "squash" -> PreprocessMode.SQUASH
+                    "center_crop" -> PreprocessMode.CENTER_CROP
+                    else ->
+                        error(
+                            "model_manifest.json: invalid preprocess_mode '$raw' " +
+                                "(expected 'squash' or 'center_crop')",
+                        )
+                }
+            val ttaCropCount = obj["tta"]?.jsonPrimitive?.int ?: 1
+
             return ModelManifest(
                 variant = obj["variant"]!!.jsonPrimitive.content,
                 sha256 = obj["sha256"]!!.jsonPrimitive.content,
@@ -151,8 +189,12 @@ class ModelManifestReader(
                         highConfidenceMarginMin = thresholds["high_confidence_margin_min"]!!.jsonPrimitive.float,
                         highConfidenceMarginDelta = thresholds["high_confidence_margin_delta"]!!.jsonPrimitive.float,
                         topKCandidates = thresholds["top_k_candidates"]!!.jsonPrimitive.int,
+                        highConfidenceAbstainMargin =
+                            thresholds["high_confidence_abstain_margin"]?.jsonPrimitive?.float ?: 0f,
                     ),
                 perSpeciesThresholds = perSpeciesThresholds,
+                preprocessMode = preprocessMode,
+                ttaCropCount = ttaCropCount,
             )
         }
     }

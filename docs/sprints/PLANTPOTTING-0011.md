@@ -122,54 +122,57 @@ drift the score path.
 
 ### Phase 1 — MEASURE (the honest before-number)
 **1a. Expand the clean real-photo fixture set (CC0/PD ONLY).**
-- [ ] Define the fixture target list from **mapped, popular, in-vocab** species the principal is likely to
+- [x] Define the fixture target list from **mapped, popular, in-vocab** species the principal is likely to
       photograph, beyond today's 8 (`crassula-ovata, dracaena-trifasciata, epipremnum-aureum,
       goeppertia-orbifolia, monstera-deliciosa, phalaenopsis, spathiphyllum-wallisii,
       zamioculcas-zamiifolia`). Prioritise the failure the review reported (snake plant
       `dracaena-trifasciata`) and pothos (`epipremnum-aureum`), then candidates like `ficus-elastica`,
       `aloe-vera`, `chlorophytum-comosum`, `hedera-helix`, `euphorbia-pulcherrima`, `aglaonema`,
       `anthurium-andraeanum`, `dieffenbachia`. **Target +8–16 fixtures and ≥2 independent base photos for
-      the priority species where clean supply allows.**
+      the priority species where clean supply allows.** (Target list encoded in `scripts/source-identify-fixtures.ps1`.)
 - [ ] Add only **CC0/public-domain** real-photo JPEG fixtures under
       `app/src/androidTest/assets/identify-fixtures/`, named `<kb-species-id>__NN.jpg` (supports multiple
       independent photos per species without colliding with the existing single-photo `<kb-species-id>.jpg`
       fixtures). Center-crop to square, scale to **480×480**, re-encode **JPEG q80** to match the existing
-      fixtures exactly.
-- [ ] Replace/extend the freeform `identify-fixtures/LICENSE.txt` into a **machine-checkable attribution
+      fixtures exactly. *(sourcing script written; awaiting run + manual vetting)*
+- [x] Replace/extend the freeform `identify-fixtures/LICENSE.txt` into a **machine-checkable attribution
       manifest** (filename, expected KB species id, source URL, author, license, license URL, acquisition
-      date, notes) under a `PLANTPOTTING-0011` banner.
+      date, notes) under a `PLANTPOTTING-0011` banner. *(added `fixture-manifest.tsv`; LICENSE.txt prose retained)*
 - [ ] **Log scarcity honestly** in `docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md`:
       every species that could not be sourced cleanly, plus rejected near-misses where the license wasn't
       clean enough. No silent skips.
-- [ ] Add a **fixture-license cross-check** test (mirror `ReferenceImageManifestTest`) that fails when any
+- [x] Add a **fixture-license cross-check** test (mirror `ReferenceImageManifestTest`) that fails when any
       `identify-fixtures/*.jpg` lacks a manifest row **or declares anything other than CC0/public-domain**.
-- [ ] Add a **fixture integrity** test that decodes every fixture (nonzero dimensions), verifies the
+      *(`FixtureLicenseManifestTest`; 4 pre-0011 CC BY-SA fixtures grandfathered by explicit allowlist —
+      the AIY anchor `monstera-deliciosa.jpg` can't be swapped — new fixtures enforced CC0/PD)*
+- [x] Add a **fixture integrity** test that decodes every fixture (nonzero dimensions), verifies the
       expected `<kb-species-id>` resolves in the KB, and marks whether the species is reachable by the active
-      `plant_class_map.json` mapping (in-vocab vs not).
+      `plant_class_map.json` mapping (in-vocab vs not). *(`FixtureIntegrityTest`)*
 
 **1b. Synthetic perturbation generator (deterministic, in-process, network-free).**
-- [ ] Add a perturbation helper under `app/src/androidTest/.../identify/` (e.g. `FixturePerturbations.kt`)
+- [x] Add a perturbation helper under `app/src/androidTest/.../identify/` (e.g. `FixturePerturbations.kt`)
       that takes a decoded `Bitmap` and emits a fixed, documented family: **blur** (set radius), **center /
       off-center crop** (zoom), **rotate** (±15°, ±90°), **brightness/contrast** shift (±). Android-graphics
       only (`Canvas`/`Matrix`/`ColorMatrix` / box-blur) — **no new dependency, no network.** Use **fixed
       parameters** (no RNG) so runs are reproducible.
-- [ ] Determinism + label-preservation guard: the generator perturbs pixels reproducibly and never changes
-      the expected `<kb-species-id>` (label is inherited from the source fixture).
+- [x] Determinism + label-preservation guard: the generator perturbs pixels reproducibly and never changes
+      the expected `<kb-species-id>` (label is inherited from the source fixture). *(`FixturePerturbationsTest`)*
 
 **1c. Scorecard harness + BEFORE number.**
-- [ ] Add an instrumented test (e.g. `AccuracyEvalTest`, reusing `ModelSwapEvaluationTest`'s `probeModel`
+- [x] Add an instrumented test (e.g. `AccuracyEvalTest`, reusing `ModelSwapEvaluationTest`'s `probeModel`
       plumbing) that, **for the production model only**, runs each clean fixture *and* each perturbation
       through the production preprocessor → facade → `ModelScoreMapper`, recording per row: expected id,
       raw top-1 label+score, raw top-2 label+score, top1-top2 margin, mapped top-1, mapped top-3, route
       (`high-conf`/`low-conf`), `confident_wrong` (route==high-conf AND mapped top-1 ≠ expected),
-      perturbation kind, latency, failure.
-- [ ] Emit `accuracy-eval.csv` (per-row) + `accuracy-eval-summary.md` (aggregate) to the external files dir
+      perturbation kind, latency, failure. *(also sweeps squash/center_crop/tta5 in one run so Phase 2+3
+      decisions compute offline from one CSV)*
+- [x] Emit `accuracy-eval.csv` (per-row) + `accuracy-eval-summary.md` (aggregate) to the external files dir
       + logcat. The summary prints, for **clean**, **each perturbation family**, and **overall**: top-1,
       top-3, confident-wrong rate, abstain rate, median + worst latency — plus an **in-vocab-only** cut and a
       **per-base-image-averaged** cut (so one heavily-perturbed photo can't dominate).
-- [ ] Add a **CSV-schema guard** test so future evidence files can't silently drop the `confident_wrong` or
-      `margin` columns.
-- [ ] Keep the **AIY baseline anchor** assertions in `OnDeviceModelRealInterpreterTest` unchanged (drift
+- [x] Add a **CSV-schema guard** test so future evidence files can't silently drop the `confident_wrong` or
+      `margin` columns. *(`AccuracyEvalCsvSchemaTest`; header-only CSV committed so the schema is locked now)*
+- [x] Keep the **AIY baseline anchor** assertions in `OnDeviceModelRealInterpreterTest` unchanged (drift
       guard); do not weaken them.
 - [ ] Run on GMD `pixel6Api34` in CI; pull `accuracy-eval.csv` + `-summary.md` and **commit them as the
       documented BEFORE number** (thresholds + preprocessing untouched at this point).
@@ -178,41 +181,45 @@ drift the score path.
 > Behind the seam in `ImagePreprocessor` / `OnDevicePlantIdentifier`. Each lever is a manifest-gated option
 > defaulting to current behaviour; **keep only what the harness shows measurably improves top-1, drop the
 > rest.** Adopt/drop is judged on top-1 (threshold-independent), so this phase precedes abstention tuning.
-- [ ] **Name the control.** Today `ImagePreprocessor` does a non-aspect-preserving
+- [x] **Name the control.** Today `ImagePreprocessor` does a non-aspect-preserving
       `ResizeOp(inputSize, inputSize, BILINEAR)` — a squash. Treat that as the explicit A/B control.
-- [ ] **Center-crop vs squash.** Add a center-crop-then-resize option behind a new optional manifest field
+- [x] **Center-crop vs squash.** Add a center-crop-then-resize option behind a new optional manifest field
       `preprocess_mode: "squash" | "center_crop"` (default `"squash"`). Evaluate it on the base + perturbed
-      set (MobileNetV2 TF-Hub convention typically expects center-crop — measure it).
-- [ ] **Multi-crop / TTA.** Add an optional `ImagePreprocessor.preprocessVariants(jpeg): List<...>`
+      set (MobileNetV2 TF-Hub convention typically expects center-crop — measure it). *(code + harness done;
+      ADOPT/DROP awaits CI scorecard)*
+- [x] **Multi-crop / TTA.** Add an optional `ImagePreprocessor.preprocessVariants(jpeg): List<...>`
       (center + 4 corner crops, optional horizontal flip) and have `OnDevicePlantIdentifier` average the
       **softmax score vectors** across variants before `mapper.map(...)`. Gate behind a manifest `tta` count
       (default `1` = current). Measure median + **worst-case** latency (existing median-of-5 protocol).
+      *(code + harness done; ADOPT/DROP awaits CI scorecard)*
 - [ ] **Orientation / EXIF.** Verify orientation is handled before crop (phone captures are often rotated);
       add normalisation only if the `rotate ±90°` perturbation rows show it helps. Operate on the decoded
-      bitmap inside the preprocessor — no camera-path contract change.
+      bitmap inside the preprocessor — no camera-path contract change. *(decision-gated on the rotate
+      perturbation rows from the CI scorecard)*
 - [ ] **Decision log** `preprocessing-decision.md`: for each lever record top-1 before/after, confident-wrong
       before/after, median + worst latency before/after, and **ADOPT / DROP** with the number that drove it.
       **TTA hurdle (both critiques):** adopt TTA only if it beats **center-crop** (not just squash) by a
-      clear margin at acceptable latency; otherwise leave it wired-but-disabled. Keep N ≤ 5.
+      clear margin at acceptable latency; otherwise leave it wired-but-disabled. Keep N ≤ 5. *(awaits CI numbers)*
 - [ ] Flip the manifest default **only** for adopted levers; leave the rest wired-but-off. This **locks the
-      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it.
+      shipping preprocessing pipeline** — Phase 3 tunes thresholds against it. *(awaits CI numbers)*
 
 ### Phase 3 — ABSTAIN (route confident-wrong → picker; tune once on the shipping pipeline)
 **3a. Characterize, then add the lever (default-disabled).**
-- [ ] **Before changing policy**, add JVM unit coverage in `ModelScoreMapperTest` pinning the *existing*
+- [x] **Before changing policy**, add JVM unit coverage in `ModelScoreMapperTest` pinning the *existing*
       paths: high-confidence-direct, margin branch, low-confidence, confident-unmapped-top, and per-species
-      override behaviour (lock current behaviour first).
-- [ ] Extend `ModelManifest.Thresholds` with one new optional field `highConfidenceAbstainMargin` (JSON
+      override behaviour (lock current behaviour first). *(already pinned in `ModelScoreMapperTest` +
+      `ModelScoreMapperPerSpeciesThresholdTest`; abstain tests assert the 0f no-op against them)*
+- [x] Extend `ModelManifest.Thresholds` with one new optional field `highConfidenceAbstainMargin` (JSON
       `high_confidence_abstain_margin`), default **`0f` (disabled)**; parse with `?: 0f` in
       `ModelManifestReader.parse`. Update `ModelManifestTest` / `ModelManifestDtypeContractTest` for the new
       optional field.
-- [ ] In `ModelScoreMapper.map`, after computing the high-conf verdict, add an **abstention veto**: if the
+- [x] In `ModelScoreMapper.map`, after computing the high-conf verdict, add an **abstention veto**: if the
       verdict would be high-confidence but `(bestProb - secondProb) < highConfidenceAbstainMargin`,
       **downgrade to low-confidence** (route to the picker with the same mapped candidates). At `0f` this is
       a no-op. Keep the existing margin-*branch* intact; this is an additional gate, not a replacement.
-- [ ] JVM unit tests for the new gate on **synthetic score vectors** (no device): (i) high prob + tiny
+- [x] JVM unit tests for the new gate on **synthetic score vectors** (no device): (i) high prob + tiny
       top1-top2 margin → abstains; (ii) high prob + wide margin → stays high-conf; (iii) margin `0f` default
-      → identical to today (regression). Makes abstention logic measurable on the JVM.
+      → identical to today (regression). Makes abstention logic measurable on the JVM. *(`ModelScoreMapperAbstainMarginTest`)*
 
 **3b. Tune the gate against the Phase-1/Phase-2 scorecard (evidence-driven, held-out).**
 - [ ] Re-run the scorecard on the **locked shipping pipeline** (post-Phase-2) to get the threshold-tuning

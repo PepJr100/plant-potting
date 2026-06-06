@@ -75,7 +75,16 @@ class ModelScoreMapper
                     (bestProb - secondProb) >= thresholds.highConfidenceMarginDelta &&
                     bestEntry != null
 
-            return if (highConfDirect || highConfMargin) {
+            // PLANTPOTTING-0011 Phase 3 — abstention veto. A confident verdict whose top-1/top-2
+            // margin is too narrow is downgraded to low-confidence (routed to the picker with the
+            // same mapped candidates) rather than shown as a confident card. This is an *additional*
+            // gate on top of the existing margin branch, not a replacement. At the default margin of
+            // `0f` the condition `(bestProb - secondProb) < 0f` can never hold (scores are ranked
+            // descending), so this is a no-op and the baseline stays byte-for-byte unchanged.
+            val abstainOnNarrowMargin =
+                (bestProb - secondProb) < thresholds.highConfidenceAbstainMargin
+
+            return if ((highConfDirect || highConfMargin) && !abstainOnNarrowMargin) {
                 val species =
                     kb.findSpecies(bestEntry!!.kbSpeciesId)
                         ?: error("plant_class_map points at unknown KB species '${bestEntry.kbSpeciesId}'")

@@ -53,8 +53,11 @@ class OnDevicePlantIdentifier
         override suspend fun identify(jpeg: ByteArray): IdentificationResult =
             withContext(dispatcher) {
                 try {
-                    val preprocessed = preprocessor.preprocess(jpeg)
-                    val scores = facade.runInference(preprocessed)
+                    // PLANTPOTTING-0011 — multi-crop TTA. `preprocessVariants` returns a single
+                    // tensor when `ttaCropCount == 1` (the default), so the averaged vector equals
+                    // the historical single-crop scores byte-for-byte; >1 averages softmax across crops.
+                    val variants = preprocessor.preprocessVariants(jpeg)
+                    val scores = averageScores(variants.map { facade.runInference(it) })
                     val mapped = mapper.map(scores)
                     lastCandidates = mapped.candidates
                     lastTop =
@@ -77,4 +80,20 @@ class OnDevicePlantIdentifier
                     )
                 }
             }
+
+        /**
+         * Element-wise mean of the per-crop softmax vectors. A single vector is returned
+         * unchanged (the default `ttaCropCount == 1` path), preserving the historical scores
+         * exactly; each input already sums to 1, so the mean does too — no renormalisation.
+         */
+        private fun averageScores(vectors: List<FloatArray>): FloatArray {
+            if (vectors.size == 1) return vectors[0]
+            val acc = FloatArray(vectors[0].size)
+            for (v in vectors) {
+                for (i in acc.indices) acc[i] += v[i]
+            }
+            val n = vectors.size.toFloat()
+            for (i in acc.indices) acc[i] /= n
+            return acc
+        }
     }
