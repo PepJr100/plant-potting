@@ -67,7 +67,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | beaucarnea_recurvata.webp | beaucarnea-recurvata | CC0 | File:Beaucarnea recurvata serrated leaf margin.jpg |
 | schlumbergera_bridgesii.webp | schlumbergera-bridgesii | CC0 | File:Christmas Cactus October 2022.jpg |
 | philodendron_hederaceum.webp | philodendron-hederaceum | CC0 | File:Philodendron sp.jpg |
-| philodendron_pink_princess.webp | philodendron-pink-princess | Public domain | File:Philodendron erubescens Bot. Mag. 84. 5071. 1858.jpg |
+| philodendron_pink_princess.webp | philodendron-pink-princess | CC0 | File:Pink princess philodendron.jpg (Cmushore) |
 | phalaenopsis.webp | phalaenopsis | Public domain | File:Flower of Phalaenopsis mannii.JPG |
 | alocasia.webp | alocasia | CC0 | File:Alocasia macrorrhizos 'Nigra' 02.jpg |
 | dracaena.webp | dracaena | Public domain | File:Dracaena fragrans Curtis 1808 v27.jpg |
@@ -79,3 +79,18 @@ register new files in `PlantImageResolver.images` and add their rows below.
 
 _Full source URLs (descriptionurl per file) are recorded in
 `docs/sprints/feedback/PLANTPOTTING-0010/sourced-images.tsv`._
+
+## PLANTPOTTING-0011 — botanical-plate → photograph swaps
+
+The 0010 handoff flagged five reference images that were public-domain **botanical plates** rather
+than photographs (peace lily, poinsettia, parlor palm, dracaena, philodendron pink-princess). A
+CC0/PD **photograph** was sourced where one exists; otherwise the plate is retained and the reason
+recorded (CC0/PD-only discipline — `scripts/source-reference-images.ps1` filtering; no CC-BY).
+
+| target | outcome |
+|---|---|
+| philodendron-pink-princess | **SWAPPED** → CC0 photo `File:Pink princess philodendron.jpg` (Cmushore). The old plate depicted *P. erubescens* (the green species), not the pink cultivar — the photo is strictly better. |
+| spathiphyllum-wallisii (peace lily) | **Plate retained** — no CC0/PD photograph among the top 40 Commons results (all CC-BY/CC-BY-SA/GFDL). |
+| euphorbia-pulcherrima (poinsettia) | **Plate retained** — only CC0/PD results are illustrations/line art (PSF, Blanco plate); no photograph. |
+| chamaedorea-elegans (parlor palm) | **Plate retained** — only CC0/PD results are botanical plates (*Flore des serres*, *Historia naturalis palmarum*); no photograph. |
+| dracaena (*D. marginata*) | **Plate retained** — no CC0/PD photograph among the top 40 Commons results. |

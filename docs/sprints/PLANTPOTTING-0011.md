@@ -247,12 +247,13 @@ drift the score path.
       the bar height via `Modifier.height(...)`, keeping `progress` and the
       `ResultScreenTags.CONFIDENCE_PCT` / `CONFIDENCE_BAR` test tags intact. Update/confirm the
       `ResultScreen` Compose test that asserts the bar. *(now 12dp + rounded corners; `ResultScreenConfidenceTest` green)*
-- [ ] **Replace botanical-plate reference images with photographs where a clean one exists.** Target the
+- [x] **Replace botanical-plate reference images with photographs where a clean one exists.** Target the
       plates from the 0010 handoff: peace lily, poinsettia, parlor palm, dracaena, philodendron-pink-princess.
       For each, source a CC0/PD **photograph** (`source-reference-images.ps1`); if found, replace the WebP
       under `res/drawable-nodpi/` (≤480px, same `PlantImageResolver` key). **If no clean photo exists, leave
-      the plate and document why** in `docs/licenses/reference-images.md`.
-- [ ] Update `docs/licenses/reference-images.md` for swapped images; keep
+      the plate and document why** in `docs/licenses/reference-images.md`. *(pink-princess SWAPPED to a CC0
+      photo; other 4 have no CC0/PD photograph — plates retained + documented)*
+- [x] Update `docs/licenses/reference-images.md` for swapped images; keep
       `ReferenceImageManifestTest.everyBundledReferenceImageHasAManifestEntry` GREEN.
 
 ### Phase 5 — Version bump, gates, delivery
