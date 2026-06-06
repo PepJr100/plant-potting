@@ -238,8 +238,10 @@ is currently invisible (it collapses into the low-confidence verdict).
       `MainActivity` applies the persisted candidate live.
 - [x] Theme tests: each candidate composes (light+dark) without crashing; **release build excludes the debug
       switcher** (deterministic via `CameraScreen(showDebugAffordances=false)` — `CameraDebugAffordanceTest`).
-- [ ] Capture per-candidate screenshots → `docs/sprints/evidence/PLANTPOTTING-0010/themes/`. *(Requires a debug
-      APK on-device — produced in Phase 8; screenshots captured during the review/on-device test.)*
+- [x] ~~Capture per-candidate screenshots → `docs/sprints/evidence/PLANTPOTTING-0010/themes/`.~~ **OBSOLETE** —
+      during principal review the in-app theme switcher was removed entirely (production default = LEAF); the
+      candidate palettes remain in code but are no longer pickable on-device, so per-candidate screenshots no
+      longer apply. See `docs/sprints/feedback/PLANTPOTTING-0010/HANDOFF.md`.
 
 ### Phase 8 — Version bump, gates, delivery
 - [x] Bump `versionCode` 3→4 and `versionName` 0.3.0→0.4.0 in `app/build.gradle.kts`.
