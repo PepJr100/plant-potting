@@ -1,18 +1,28 @@
 package com.darkfactory.plantpotting.ui.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.camera.CameraScreen
 import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
 import com.darkfactory.plantpotting.home.HomeScreen
+import com.darkfactory.plantpotting.home.HomeViewModel
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
 import com.darkfactory.plantpotting.ui.theme.DebugThemeSwitcherScreen
@@ -42,10 +52,38 @@ fun PlantPottingNavHost() {
         startDestination = Routes.HOME,
     ) {
         composable(Routes.HOME) {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val recent by homeViewModel.recentPlants.collectAsState()
+            var showAbout by remember { mutableStateOf(false) }
             HomeScreen(
+                recentPlants = recent,
                 onIdentify = { navController.navigate(Routes.PERMISSION) },
                 onMyPlants = { navController.navigate(Routes.MY_PLANTS) },
+                onBrowseMixes = { navController.navigate(Routes.ARCHETYPE_PICKER) },
+                onAbout = { showAbout = true },
+                onRecentClick = { row ->
+                    navController.navigate(
+                        Routes.result(
+                            speciesId = row.speciesId,
+                            source = row.source,
+                            lowConfidence = false,
+                            confidencePct = row.confidencePct,
+                        ),
+                    )
+                },
             )
+            if (showAbout) {
+                AlertDialog(
+                    onDismissRequest = { showAbout = false },
+                    confirmButton = {
+                        TextButton(onClick = { showAbout = false }) {
+                            Text(stringResource(id = R.string.home_about_dismiss))
+                        }
+                    },
+                    title = { Text(stringResource(id = R.string.home_about_title)) },
+                    text = { Text(stringResource(id = R.string.home_about_body)) },
+                )
+            }
         }
         composable(Routes.PERMISSION) {
             PermissionScreenHost(

@@ -3,6 +3,7 @@ package com.darkfactory.plantpotting.result
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -58,16 +60,30 @@ fun ResultScreen(
         // click-through plant. The placeholder is tinted with the theme primary; a real CC0/PD WebP
         // (when bundled) renders untinted.
         val hasRealImage = PlantImageResolver.hasRealImage(state.speciesId)
-        Image(
-            painter = painterResource(id = PlantImageResolver.drawableFor(state.speciesId)),
-            contentDescription = stringResource(id = R.string.result_reference_image_description),
-            colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+        // Rounded hero image (Dribbble detail-screen language). Placeholder sits on a tinted card so
+        // the silhouette reads against the background; a real CC0/PD photo fills the hero untinted.
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceVariant,
             modifier =
                 Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(120.dp)
-                    .testTag(ResultScreenTags.REFERENCE_IMAGE),
-        )
+                    .fillMaxWidth()
+                    .height(180.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(id = PlantImageResolver.drawableFor(state.speciesId)),
+                    contentDescription = stringResource(id = R.string.result_reference_image_description),
+                    colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    modifier =
+                        if (hasRealImage) {
+                            Modifier.fillMaxWidth().height(180.dp).testTag(ResultScreenTags.REFERENCE_IMAGE)
+                        } else {
+                            Modifier.size(96.dp).testTag(ResultScreenTags.REFERENCE_IMAGE)
+                        },
+                )
+            }
+        }
         Text(
             text = state.scientificName,
             style = MaterialTheme.typography.headlineMedium.copy(fontStyle = FontStyle.Italic),

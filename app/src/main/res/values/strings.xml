@@ -3,9 +3,17 @@
     <string name="app_name">PlantPotting</string>
 
     <!-- Home / start screen -->
-    <string name="home_tagline">Identify a houseplant and get the right potting mix.</string>
+    <string name="home_greeting">Hello 🌱</string>
+    <string name="home_greeting_sub">Let\'s pot a plant</string>
     <string name="home_identify">Identify new plant</string>
     <string name="home_my_plants">My Plants</string>
+    <string name="home_browse_mixes">Browse mixes</string>
+    <string name="home_about">How it works</string>
+    <string name="home_recent_heading">Your recent plants</string>
+    <string name="home_recent_empty">No plants yet — identify one and save it to see it here.</string>
+    <string name="home_about_title">How it works</string>
+    <string name="home_about_body">Point the camera at a houseplant. PlantPotting identifies it on-device (nothing leaves your phone) and recommends the right potting-mix recipe. Save plants to My Plants, or browse mixes by care type.</string>
+    <string name="home_about_dismiss">Got it</string>
 
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>
