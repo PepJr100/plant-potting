@@ -228,24 +228,30 @@ drift the score path.
       → identical to today (regression). Makes abstention logic measurable on the JVM. *(`ModelScoreMapperAbstainMarginTest`)*
 
 **3b. Tune the gate against the Phase-1/Phase-2 scorecard (evidence-driven, held-out).**
-- [ ] Re-run the scorecard on the **locked shipping pipeline** (post-Phase-2) to get the threshold-tuning
+- [x] Re-run the scorecard on the **locked shipping pipeline** (post-Phase-2) to get the threshold-tuning
       baseline. Sweep candidate settings: raise global `high_confidence_plain` (currently 0.55),
       tighten/relax the margin branch (`high_confidence_margin_min` 0.45 / `high_confidence_margin_delta`
       0.18), set `high_confidence_abstain_margin`. Tabulate confident-wrong rate vs abstain rate per setting.
-- [ ] Choose the setting that **minimises confident-wrong within an explicitly stated abstain-rate budget**
+      *(offline sweep over the locked tta6 rows — abstention is deterministic post-processing of raw margins)*
+- [x] Choose the setting that **minimises confident-wrong within an explicitly stated abstain-rate budget**
       (state the budget, e.g. "accept up to X% more low-conf routing"). **Prefer global changes**; document
-      rejected threshold candidates in `docs/kb/ml-mapping-notes.md`.
-- [ ] **Held-out validation (D2):** report the chosen setting's confident-wrong on the **perturbation rows
+      rejected threshold candidates in `docs/kb/ml-mapping-notes.md`. *(principal chose `abstain_margin 0.30`;
+      budget = pick-manually up to ~0.275. Global change, no per-species. cw 0.254→0.083.)*
+- [x] **Held-out validation (D2):** report the chosen setting's confident-wrong on the **perturbation rows
       it was not tuned against** and on a **leave-one-species-out** split — those are the honest
-      generalisation numbers. Document the split in the summary.
-- [ ] Seed a `per_species_thresholds` entry **only** if a single in-vocab species is a chronic
+      generalisation numbers. Document the split in the summary. *(tune-on-clean→eval-on-perturbation cw 0.091;
+      LOSO 0.056–0.093 mean 0.083; see abstention-before-after.md)*
+- [x] Seed a `per_species_thresholds` entry **only** if a single in-vocab species is a chronic
       confident-wrong offender with **multiple independent clean base photos** AND a per-class value fixes it
       without harming others on the eval set; otherwise leave `per_species_thresholds: {}`. Respect
       `PerSpeciesThresholdsContractTest` / `ModelScoreMapperPerSpeciesThresholdTest`. Document either way.
-- [ ] Apply the chosen settings to
+      *(none met the 0006 bar — left `{}`; rationale in abstention-before-after.md)*
+- [x] Apply the chosen settings to
       `app/src/main/assets/ml/house_plant_species_mobilenetv2/model_manifest.json` (+ its
       `_comment_thresholds`). Re-run the GMD scorecard and commit the **AFTER** summary; the abstention
-      before/after table (confident-wrong ↓, abstain ↑) is this phase's headline deliverable.
+      before/after table (confident-wrong ↓, abstain ↑) is this phase's headline deliverable. *(manifest set
+      to tta=6 + abstain_margin 0.30; AFTER derived from the committed raw CSV, gate unit-pinned by
+      ModelScoreMapperAbstainMarginTest; abstention-before-after.md committed)*
 
 ### Phase 4 — 0010-review fold-ins (small, independent)
 - [x] **Thicken the confidence bar.** In `ResultScreen.kt` (the `LinearProgressIndicator` at line 123), bump

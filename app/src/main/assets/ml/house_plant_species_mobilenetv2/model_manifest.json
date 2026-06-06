@@ -25,9 +25,10 @@
     "high_confidence_plain": 0.55,
     "high_confidence_margin_min": 0.45,
     "high_confidence_margin_delta": 0.18,
-    "top_k_candidates": 3
+    "top_k_candidates": 3,
+    "high_confidence_abstain_margin": 0.30
   },
-  "_comment_thresholds": "Identical policy to AIY (PLANTPOTTING-0003 §4.3). Do NOT lower these to flatter the candidate (0006 discipline). Per-species overrides are seeded ONLY from Phase 3 fixture evidence near the global — see Phase 4.",
+  "_comment_thresholds": "Identical to AIY (PLANTPOTTING-0003 §4.3) EXCEPT high_confidence_abstain_margin=0.30, added in PLANTPOTTING-0011 Phase 3: a high-confidence verdict whose top1-top2 margin is < 0.30 is downgraded to the picker. Tuned on the locked tta6 pipeline (evidence: docs/sprints/evidence/PLANTPOTTING-0011/abstention-before-after.md). With TTA-6 it cuts confident-wrong 0.254->0.083 overall and 0.100->0.000 on clean photos, for an accepted pick-manually rise to ~0.275. Held-out (tune-on-clean/eval-on-perturbation) cw=0.091; leave-one-species-out stable. Do NOT lower the plain/margin gates to flatter a candidate (0006 discipline).",
   "per_species_thresholds": {},
   "_comment_per_species_thresholds": "Empty by design until the Phase 3 swap-eval probe shows an in-vocab species fails the global threshold by a margin a per-class override would cleanly close. Never seed to bless a weak prediction.",
   "_comment_coverage": "RECOMPUTE in Phase 4 from the model's actual 47 labels: 10 of 47 mapping entries resolve to KB species; 10 of 16 KB species covered (8 exact + 2 coarse: Orchid->phalaenopsis, Calathea->goeppertia-orbifolia). Headline coverage delta vs AIY: 2/16 -> 10/16. 6 KB species remain out-of-vocab (monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess, ficus-lyrata, chlorophytum-comosum, hoya-carnosa) and route to LowConfidencePicker as before.",
