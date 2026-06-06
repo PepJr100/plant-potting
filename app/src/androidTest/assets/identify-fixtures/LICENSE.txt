@@ -207,3 +207,51 @@ goeppertia-orbifolia.jpg   (Calathea orbifolia / Goeppertia orbifolia)
                  Attribution: "Mokkie, CC BY-SA 3.0, via Wikimedia Commons".
                  Per share-alike, this fixture and modified copies remain
                  available under the same (or a compatible) license.
+
+
+================================================================================
+PLANTPOTTING-0011 §Phase 1a — CC0 / public-domain ONLY eval-fixture expansion
+================================================================================
+
+Eight additional fixtures grow the accuracy scorecard's clean real-photo set. Per
+the 0011 non-goal, every NEW fixture is CC0 or public-domain (no CC-BY/CC-BY-SA);
+the four pre-existing CC BY-SA fixtures above are grandfathered (one — monstera-
+deliciosa.jpg — is the AIY baseline anchor and cannot be swapped). Each was
+manually vetted, centre-cropped to square, scaled to 480×480 and re-encoded as
+JPEG quality 80 to match the existing fixtures exactly. All are test-only assets
+under app/src/androidTest/ and are NOT bundled into the production APK. Machine-
+readable provenance for every fixture lives in fixture-manifest.tsv; per-species
+scarcity (species with no clean photo) is logged in
+docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md.
+
+dracaena-trifasciata__01.jpg  (snake plant, 2nd base photo — low "hahnii" form)
+  Tangopaso, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Sansevieria_trifasciata_D190512.jpg
+
+dracaena-trifasciata__02.jpg  (snake plant, 3rd base photo — tall green form)
+  Mokkie, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Sansevieria_in_pot.jpg
+
+ficus-elastica__01.jpg  (rubber plant; outdoor/cluttered framing)
+  Al Kordesch, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Ficus_elastica_29761125.jpg
+
+aloe-vera__01.jpg  (potted aloe vera, plain background)
+  Arjun01, Public domain, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Potted_Aloe_vera_plant.jpg
+
+aglaonema__01.jpg  (Chinese evergreen, red cultivar cluster)
+  Satirdan kahraman, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Konya_Kelebekler_Vadisi_Aglaonema.jpg
+
+dieffenbachia__01.jpg  (dumb cane, variegated white-spotted leaves)
+  Alex Rio Brazil, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Dieffenbachia_seguine_-_Comigo_Ninguem_Pode.jpg
+
+schefflera__01.jpg  (umbrella tree, bonsai form)
+  Cbaile19, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Schefflera_arboricola_(bonsai),_Phipps_Conservatory,_2014-03-01.jpg
+
+kalanchoe__01.jpg  (flowering kalanchoe, orange clusters)
+  Sabalo22, CC0, via Wikimedia Commons.
+  https://commons.wikimedia.org/wiki/File:Kalanchoe_blossfeldiana_(Florist_Kalanchoe).jpg

@@ -130,17 +130,18 @@ drift the score path.
       `aloe-vera`, `chlorophytum-comosum`, `hedera-helix`, `euphorbia-pulcherrima`, `aglaonema`,
       `anthurium-andraeanum`, `dieffenbachia`. **Target +8–16 fixtures and ≥2 independent base photos for
       the priority species where clean supply allows.** (Target list encoded in `scripts/source-identify-fixtures.ps1`.)
-- [ ] Add only **CC0/public-domain** real-photo JPEG fixtures under
+- [x] Add only **CC0/public-domain** real-photo JPEG fixtures under
       `app/src/androidTest/assets/identify-fixtures/`, named `<kb-species-id>__NN.jpg` (supports multiple
       independent photos per species without colliding with the existing single-photo `<kb-species-id>.jpg`
       fixtures). Center-crop to square, scale to **480×480**, re-encode **JPEG q80** to match the existing
-      fixtures exactly. *(sourcing script written; awaiting run + manual vetting)*
+      fixtures exactly. *(8 added: snake×2, ficus-elastica, aloe-vera, aglaonema, dieffenbachia, schefflera,
+      kalanchoe — all manually vetted; snake plant now has 3 base photos)*
 - [x] Replace/extend the freeform `identify-fixtures/LICENSE.txt` into a **machine-checkable attribution
       manifest** (filename, expected KB species id, source URL, author, license, license URL, acquisition
       date, notes) under a `PLANTPOTTING-0011` banner. *(added `fixture-manifest.tsv`; LICENSE.txt prose retained)*
-- [ ] **Log scarcity honestly** in `docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md`:
+- [x] **Log scarcity honestly** in `docs/sprints/evidence/PLANTPOTTING-0011/fixture-manifest-summary.md`:
       every species that could not be sourced cleanly, plus rejected near-misses where the license wasn't
-      clean enough. No silent skips.
+      clean enough. No silent skips. *(pothos-2nd, poinsettia, anthurium, hedera-helix, dracaena-marginata logged)*
 - [x] Add a **fixture-license cross-check** test (mirror `ReferenceImageManifestTest`) that fails when any
       `identify-fixtures/*.jpg` lacks a manifest row **or declares anything other than CC0/public-domain**.
       *(`FixtureLicenseManifestTest`; 4 pre-0011 CC BY-SA fixtures grandfathered by explicit allowlist —
