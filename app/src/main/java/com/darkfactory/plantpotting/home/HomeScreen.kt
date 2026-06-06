@@ -30,14 +30,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.darkfactory.plantpotting.R
 import com.darkfactory.plantpotting.result.MyPlantRow
+import com.darkfactory.plantpotting.result.PlantImageResolver
 
 /**
  * PLANTPOTTING-0010 (review feedback) — the landing screen, rebuilt in the Dribbble-concept layout
@@ -212,7 +212,9 @@ private fun RecentPlantCard(
     plant: MyPlantRow,
     onClick: () -> Unit,
 ) {
-    val hasRealImage = com.darkfactory.plantpotting.result.PlantImageResolver.hasRealImage(plant.speciesId)
+    val hasRealImage =
+        PlantImageResolver
+            .hasRealImage(plant.speciesId)
     Card(
         onClick = onClick,
         shape = MaterialTheme.shapes.large,
@@ -220,10 +222,15 @@ private fun RecentPlantCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Image(
-                painter = painterResource(id = com.darkfactory.plantpotting.result.PlantImageResolver.drawableFor(plant.speciesId)),
+                painter =
+                    painterResource(
+                        id =
+                            PlantImageResolver
+                                .drawableFor(plant.speciesId),
+                    ),
                 contentDescription = null,
                 colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                contentScale = if (hasRealImage) androidx.compose.ui.layout.ContentScale.Crop else androidx.compose.ui.layout.ContentScale.Fit,
+                contentScale = if (hasRealImage) ContentScale.Crop else ContentScale.Fit,
                 modifier =
                     Modifier
                         .fillMaxWidth()

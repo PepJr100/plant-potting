@@ -19,14 +19,13 @@ import org.junit.Test
  */
 class DataStorePlantLogStoreTest {
     /** Minimal in-memory [DataStore] for unit tests. */
-    private class InMemoryDataStore(initial: PlantLogDocument = PlantLogDocument()) :
-        DataStore<PlantLogDocument> {
+    private class InMemoryDataStore(
+        initial: PlantLogDocument = PlantLogDocument(),
+    ) : DataStore<PlantLogDocument> {
         private val state = MutableStateFlow(initial)
         override val data: Flow<PlantLogDocument> = state
 
-        override suspend fun updateData(
-            transform: suspend (t: PlantLogDocument) -> PlantLogDocument,
-        ): PlantLogDocument {
+        override suspend fun updateData(transform: suspend (t: PlantLogDocument) -> PlantLogDocument): PlantLogDocument {
             val updated = transform(state.value)
             state.value = updated
             return updated

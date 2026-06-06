@@ -239,8 +239,7 @@ minutes. Subsequent runs are seconds.
 
 ## Daily commands
 
-Run these from the repo root (`D:\DarkFactoryProject\Plant potting` on the
-developer's machine). PowerShell is the assumed shell on Windows. Substitute
+Run these from the repo root. PowerShell is the assumed shell on Windows. Substitute
 `./gradlew` for `./gradlew.bat` if you're using bash.
 
 ### Build the debug APK

@@ -98,6 +98,12 @@ class AddThisPlantTest {
             }
             composeRule.onNodeWithTag(AddThisPlantTags.ADD_BUTTON).performClick()
             composeRule.onNodeWithTag(AddThisPlantTags.ADD_BUTTON).assertDoesNotExist()
-            assertThat(store.snapshot().addPlantRequests.single().count).isEqualTo(1)
+            assertThat(
+                store
+                    .snapshot()
+                    .addPlantRequests
+                    .single()
+                    .count,
+            ).isEqualTo(1)
         }
 }

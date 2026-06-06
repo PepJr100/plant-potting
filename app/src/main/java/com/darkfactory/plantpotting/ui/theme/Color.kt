@@ -35,7 +35,6 @@ enum class ThemeCandidate {
 
     companion object {
         /** Resolve a persisted theme name, falling back to the production default. */
-        fun fromName(name: String?): ThemeCandidate =
-            entries.firstOrNull { it.name == name } ?: LEAF
+        fun fromName(name: String?): ThemeCandidate = entries.firstOrNull { it.name == name } ?: LEAF
     }
 }

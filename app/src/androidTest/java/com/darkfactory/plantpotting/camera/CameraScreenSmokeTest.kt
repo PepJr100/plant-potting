@@ -11,11 +11,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.R
-import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
 import com.darkfactory.plantpotting.permission.FakeGuardStateRule
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule

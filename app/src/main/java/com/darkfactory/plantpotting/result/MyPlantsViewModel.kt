@@ -49,8 +49,7 @@ class MyPlantsViewModel
                     initialValue = MyPlantsUiState(),
                 )
 
-        private fun String.toIdSourceOrDefault(): IdSource =
-            runCatching { IdSource.valueOf(this) }.getOrDefault(IdSource.ON_DEVICE_MODEL)
+        private fun String.toIdSourceOrDefault(): IdSource = runCatching { IdSource.valueOf(this) }.getOrDefault(IdSource.ON_DEVICE_MODEL)
     }
 
 data class MyPlantsUiState(

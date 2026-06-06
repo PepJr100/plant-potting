@@ -12,6 +12,7 @@ import com.darkfactory.plantpotting.kb.model.ArchetypeMapping
 import com.darkfactory.plantpotting.kb.model.KnowledgeBase
 import com.darkfactory.plantpotting.kb.model.RecipeIngredient
 import com.darkfactory.plantpotting.kb.model.Species
+import com.darkfactory.plantpotting.persistence.FakePlantLogStore
 import com.darkfactory.plantpotting.ui.navigation.Routes
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +44,7 @@ class ResultScreenConfidenceTest {
         return ResultViewModel(
             savedStateHandle = SavedStateHandle(args),
             kb = kb,
-            plantLogStore = com.darkfactory.plantpotting.persistence.FakePlantLogStore(),
+            plantLogStore = FakePlantLogStore(),
         )
     }
 

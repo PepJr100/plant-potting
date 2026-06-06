@@ -7,11 +7,11 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import com.darkfactory.plantpotting.MainActivity
-import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.camera.CameraScreenTags
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

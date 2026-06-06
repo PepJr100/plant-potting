@@ -59,7 +59,8 @@ class RecommendationViewModel
                     val rec = engine.recommend(speciesId)
                     val species = kb.findSpecies(speciesId)
                     val plantName =
-                        species?.let { it.commonNames.firstOrNull()?.takeIf(String::isNotBlank) ?: it.scientificName }
+                        species
+                            ?.let { it.commonNames.firstOrNull()?.takeIf(String::isNotBlank) ?: it.scientificName }
                             .orEmpty()
                     RecommendationUiState.Ready(
                         archetypeName = rec.archetypeName,
