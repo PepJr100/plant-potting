@@ -242,10 +242,10 @@ drift the score path.
       before/after table (confident-wrong ↓, abstain ↑) is this phase's headline deliverable.
 
 ### Phase 4 — 0010-review fold-ins (small, independent)
-- [ ] **Thicken the confidence bar.** In `ResultScreen.kt` (the `LinearProgressIndicator` at line 123), bump
+- [x] **Thicken the confidence bar.** In `ResultScreen.kt` (the `LinearProgressIndicator` at line 123), bump
       the bar height via `Modifier.height(...)`, keeping `progress` and the
       `ResultScreenTags.CONFIDENCE_PCT` / `CONFIDENCE_BAR` test tags intact. Update/confirm the
-      `ResultScreen` Compose test that asserts the bar.
+      `ResultScreen` Compose test that asserts the bar. *(now 12dp + rounded corners; `ResultScreenConfidenceTest` green)*
 - [ ] **Replace botanical-plate reference images with photographs where a clean one exists.** Target the
       plates from the 0010 handoff: peace lily, poinsettia, parlor palm, dracaena, philodendron-pink-princess.
       For each, source a CC0/PD **photograph** (`source-reference-images.ps1`); if found, replace the WebP
@@ -255,7 +255,7 @@ drift the score path.
       `ReferenceImageManifestTest.everyBundledReferenceImageHasAManifestEntry` GREEN.
 
 ### Phase 5 — Version bump, gates, delivery
-- [ ] Bump `versionCode` 4→5 and `versionName` 0.4.0→0.5.0 in `app/build.gradle.kts`.
+- [x] Bump `versionCode` 4→5 and `versionName` 0.4.0→0.5.0 in `app/build.gradle.kts`.
 - [ ] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
       `bash scripts/check-stub-isolation.sh`, lint (`abortOnError`), `:app:compileDebugAndroidTestKotlin`.
       GMD `pixel6Api34` runs in CI (no local emulator) — pull its `gradle-reports` + the scorecard artifacts.
