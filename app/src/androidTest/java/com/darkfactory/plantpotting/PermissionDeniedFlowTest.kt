@@ -1,5 +1,7 @@
 package com.darkfactory.plantpotting
 
+import android.app.Activity
+import android.app.Instrumentation
 import android.provider.Settings
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -79,6 +81,15 @@ class PermissionPermanentlyDeniedFlowTest {
     @Before
     fun setUp() {
         Intents.init()
+        // Stub the outgoing ACTION_APPLICATION_DETAILS_SETTINGS so Espresso intercepts it and the
+        // real system Settings app never launches. Without this, Settings opens for real and stays
+        // foregrounded into the NEXT test, pausing/stopping that test's MainActivity — a cross-test
+        // pollution that flaked CameraPreviewLayoutTest on the GMD ("No compose hierarchies" /
+        // waitUntil timeout). The intended() verification below still passes against the recorded
+        // intent. respondWith() also keeps the click from leaving the app.
+        Intents
+            .intending(hasAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS))
+            .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
     }
 
     @After
