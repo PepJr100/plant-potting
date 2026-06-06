@@ -112,10 +112,10 @@ drift the score path.
 ## Task list (by phase)
 
 ### Phase 0 — Scaffolding & baseline green (no behaviour change)
-- [ ] Create `docs/sprints/evidence/PLANTPOTTING-0011/` with a `README.md` stub listing the artifacts this
+- [x] Create `docs/sprints/evidence/PLANTPOTTING-0011/` with a `README.md` stub listing the artifacts this
       sprint drops here (BEFORE/AFTER scorecard CSV+MD, preprocessing decision log, abstention before/after)
       and the `adb pull` recipe (mirror the `ModelSwapEvaluationTest` external-files convention).
-- [ ] Record the pre-sprint green state in the evidence README: `./gradlew :app:testDebugUnitTest` green,
+- [x] Record the pre-sprint green state in the evidence README: `./gradlew :app:testDebugUnitTest` green,
       `:app:compileDebugAndroidTestKotlin` clean, `verifyNoNetworking` + `bash scripts/check-stub-isolation.sh`
       green. (GMD `pixel6Api34` is CI-only — no local emulator; note explicitly.) Every later "GREEN
       throughout" claim anchors here.
