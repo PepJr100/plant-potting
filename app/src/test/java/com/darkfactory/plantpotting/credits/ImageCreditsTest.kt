@@ -50,20 +50,23 @@ class ImageCreditsTest {
         assertWithMessage("CC BY-SA reference images are not accepted: $sa").that(sa).isEmpty()
     }
 
+    /** Licenses that require (CC BY) or merit (Unsplash) an in-app credit. CC0/PD need none. */
+    private fun needsCredit(license: String): Boolean =
+        Regex("^CC BY \\d", RegexOption.IGNORE_CASE).containsMatchIn(license) ||
+            license.equals("Unsplash License", ignoreCase = true)
+
     @Test
-    fun everyCcByImageHasAnInAppCreditRow() {
-        val ccByDrawables =
-            manifestRows()
-                .filter { Regex("^CC BY \\d", RegexOption.IGNORE_CASE).containsMatchIn(it.license) }
-                .map { it.drawable }
-                .toSet()
+    fun everyCreditMeritingImageHasAnInAppCreditRow() {
+        val needing = manifestRows().filter { needsCredit(it.license) }.map { it.drawable }.toSet()
         val credited = credits().map { it.drawable }.toSet()
-        val missing = ccByDrawables - credited
-        assertWithMessage("CC BY images missing an image_credits.tsv attribution row").that(missing).isEmpty()
+        val missing = needing - credited
+        assertWithMessage("CC BY / Unsplash images missing an image_credits.tsv attribution row")
+            .that(missing)
+            .isEmpty()
     }
 
     @Test
-    fun everyCreditRowIsWellFormedAndPointsAtACcByImage() {
+    fun everyCreditRowIsWellFormedAndPointsAtACreditMeritingImage() {
         val byDrawable = manifestRows().associate { it.drawable to it.license }
         val rows = credits()
         assertThat(rows).isNotEmpty()
@@ -71,8 +74,8 @@ class ImageCreditsTest {
             assertWithMessage("credit '${c.drawable}' author").that(c.author).isNotEmpty()
             assertWithMessage("credit '${c.drawable}' license").that(c.license).isNotEmpty()
             assertWithMessage("credit '${c.drawable}' source url").that(c.sourceUrl).startsWith("http")
-            assertWithMessage("credit '${c.drawable}' must correspond to a manifest CC BY row")
-                .that(byDrawable[c.drawable]?.contains("CC BY", ignoreCase = true))
+            assertWithMessage("credit '${c.drawable}' must correspond to a CC BY / Unsplash manifest row")
+                .that(byDrawable[c.drawable]?.let { needsCredit(it) })
                 .isTrue()
         }
     }
