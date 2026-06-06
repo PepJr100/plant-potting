@@ -77,6 +77,43 @@ class DataStorePlantLogStoreTest {
         }
 
     @Test
+    fun savingSameSpeciesTwiceDeDupesAndRefreshesToFront() =
+        runBlocking {
+            // Review feedback: the same plant must not be added multiple times.
+            var now = 10L
+            val s = DataStorePlantLogStore(InMemoryDataStore(), TimeProvider { now }, 100)
+            s.saveIdentifiedPlant("aloe-vera", "Aloe", "ON_DEVICE_MODEL", 30)
+            s.saveIdentifiedPlant("ficus-elastica", "Rubber plant", "ON_DEVICE_MODEL", 40)
+            now = 99L
+            // Save aloe-vera again with new data → one row, refreshed + moved to front.
+            s.saveIdentifiedPlant("aloe-vera", "Aloe vera", "ON_DEVICE_MODEL", 88)
+
+            val plants = s.identifiedPlants.first()
+            assertThat(plants).hasSize(2)
+            assertThat(plants.count { it.speciesId == "aloe-vera" }).isEqualTo(1)
+            assertThat(plants[0].speciesId).isEqualTo("aloe-vera")
+            assertThat(plants[0].displayName).isEqualTo("Aloe vera")
+            assertThat(plants[0].confidencePct).isEqualTo(88)
+            assertThat(plants[0].savedAtEpochMs).isEqualTo(99L)
+        }
+
+    @Test
+    fun removeIdentifiedPlantDeletesBySpeciesId() =
+        runBlocking {
+            val s = store()
+            s.saveIdentifiedPlant("aloe-vera", "Aloe", "ON_DEVICE_MODEL", 30)
+            s.saveIdentifiedPlant("ficus-elastica", "Rubber plant", "ON_DEVICE_MODEL", 40)
+
+            s.removeIdentifiedPlant("aloe-vera")
+            val plants = s.identifiedPlants.first()
+            assertThat(plants.map { it.speciesId }).containsExactly("ficus-elastica")
+
+            // Removing an absent id is a no-op.
+            s.removeIdentifiedPlant("not-present")
+            assertThat(s.identifiedPlants.first()).hasSize(1)
+        }
+
+    @Test
     fun recordAddPlantRequestIncrementsAndTotalsPerClass() =
         runBlocking {
             val s = store(clock = TimeProvider { 7L })

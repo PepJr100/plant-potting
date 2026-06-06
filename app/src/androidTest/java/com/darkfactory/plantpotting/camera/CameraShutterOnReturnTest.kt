@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.ViewModelProbe
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
@@ -76,7 +77,8 @@ class CameraShutterOnReturnTest {
 
     @Test
     fun shutterReEnablesAfterReturningToCameraFromResult() {
-        // 1. Camera screen is the start destination (permission pre-granted).
+        // 1. From Home, tap Identify → permission pre-granted → camera. Back-stack: [Home, Camera].
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsEnabled()
         composeRule.waitUntil(timeoutMillis = 5_000) {

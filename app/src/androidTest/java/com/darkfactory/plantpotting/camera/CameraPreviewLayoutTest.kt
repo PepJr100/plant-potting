@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.ViewModelProbe
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
@@ -57,6 +58,7 @@ class CameraPreviewLayoutTest {
 
     @Test
     fun previewFillsMostOfParentOnFirstEntryAndAfterRetake() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         assertPreviewFillsParent("first entry")
 

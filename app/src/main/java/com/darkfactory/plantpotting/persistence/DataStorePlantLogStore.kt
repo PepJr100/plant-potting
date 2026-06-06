@@ -41,10 +41,18 @@ class DataStorePlantLogStore(
                 savedAtEpochMs = timeProvider.nowEpochMs(),
             )
         dataStore.updateData { doc ->
-            // Most-recent first, then evict beyond the N-cap.
+            // De-dup by speciesId (drop any prior row for this species), then most-recent first,
+            // then evict beyond the N-cap.
+            val deduped = doc.identifiedPlants.filterNot { it.speciesId == entry.speciesId }
             doc.copy(
-                identifiedPlants = (listOf(entry) + doc.identifiedPlants).take(maxIdentifiedPlants),
+                identifiedPlants = (listOf(entry) + deduped).take(maxIdentifiedPlants),
             )
+        }
+    }
+
+    override suspend fun removeIdentifiedPlant(speciesId: String) {
+        dataStore.updateData { doc ->
+            doc.copy(identifiedPlants = doc.identifiedPlants.filterNot { it.speciesId == speciesId })
         }
     }
 

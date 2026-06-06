@@ -92,6 +92,24 @@ class MyPlantsViewModelTest {
             }
         }
 
+    @Test
+    fun removeDeletesThePlantFromState() =
+        runTest {
+            val store = FakePlantLogStore(nowEpochMs = 1L)
+            store.saveIdentifiedPlant("aloe-vera", "Aloe", IdSource.ON_DEVICE_MODEL.name, 30)
+            store.saveIdentifiedPlant("ficus-elastica", "Rubber plant", IdSource.ON_DEVICE_MODEL.name, 40)
+            val vm = MyPlantsViewModel(store)
+            vm.state.test {
+                var rows = awaitItem().rows
+                while (rows.size < 2) rows = awaitItem().rows
+                vm.remove("aloe-vera")
+                var after = awaitItem().rows
+                while (after.any { it.speciesId == "aloe-vera" }) after = awaitItem().rows
+                assertThat(after.map { it.speciesId }).containsExactly("ficus-elastica")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private val kb =
         KnowledgeBase(
             archetypes =

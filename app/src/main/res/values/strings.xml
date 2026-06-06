@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">PlantPotting</string>
 
+    <!-- Home / start screen -->
+    <string name="home_tagline">Identify a houseplant and get the right potting mix.</string>
+    <string name="home_identify">Identify new plant</string>
+    <string name="home_my_plants">My Plants</string>
+
     <!-- Permission screen -->
     <string name="permission_title">Camera access</string>
     <string name="permission_rationale">We use the camera to photograph your plant. We never upload your photos.</string>
@@ -43,6 +48,7 @@
     <string name="my_plants_open_content_description">Open My Plants</string>
     <string name="my_plants_empty">No saved plants yet. Identify a plant and tap \"Save to My Plants\" to add it here.</string>
     <string name="my_plants_saved_at">Saved %1$s</string>
+    <string name="my_plants_remove_content_description">Remove %1$s from My Plants</string>
 
     <!-- Low-confidence picker -->
     <string name="low_conf_subtitle">We\'re best at common houseplants — confirm or pick from the list below.</string>

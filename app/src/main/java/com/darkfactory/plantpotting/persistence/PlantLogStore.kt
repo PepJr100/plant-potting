@@ -20,8 +20,10 @@ interface PlantLogStore {
     val themeCandidate: Flow<String>
 
     /**
-     * Append a user-saved plant to **My Plants** (most-recent first), evicting the oldest beyond
-     * the N-cap. User-initiated only — never auto-append on every scan.
+     * Save a user-chosen plant to **My Plants** (most-recent first), evicting the oldest beyond the
+     * N-cap. User-initiated only — never auto-append on every scan. **De-duplicated by `speciesId`**:
+     * saving a species that's already saved refreshes it (updates confidence/time, moves it to the
+     * front) rather than adding a second row.
      */
     suspend fun saveIdentifiedPlant(
         speciesId: String,
@@ -29,6 +31,9 @@ interface PlantLogStore {
         source: String,
         confidencePct: Int? = null,
     )
+
+    /** Remove a saved plant from **My Plants** by `speciesId` (no-op if absent). */
+    suspend fun removeIdentifiedPlant(speciesId: String)
 
     /**
      * Record one "Add this plant" request for [modelClassLabel]: increment its counter (or create

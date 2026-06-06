@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
@@ -67,6 +68,7 @@ class CameraScreenBindStateTest {
 
     @Test
     fun shutterIsDisabledAndBindProgressVisibleWhileImageCaptureIsNull() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsNotEnabled()
         composeRule.onNodeWithTag(CameraScreenTags.BIND_PROGRESS).assertIsDisplayed()
@@ -111,6 +113,7 @@ class CameraScreenBoundStateTest {
 
     @Test
     fun shutterIsEnabledAndBindProgressGoneWhenImageCaptureIsBound() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsEnabled()
         val bindProgress =

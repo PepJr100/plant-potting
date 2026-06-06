@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -20,8 +21,13 @@ import javax.inject.Inject
 class MyPlantsViewModel
     @Inject
     constructor(
-        store: PlantLogStore,
+        private val store: PlantLogStore,
     ) : ViewModel() {
+        /** Remove a saved plant from My Plants. */
+        fun remove(speciesId: String) {
+            viewModelScope.launch { store.removeIdentifiedPlant(speciesId) }
+        }
+
         val state: StateFlow<MyPlantsUiState> =
             store.identifiedPlants
                 .map { plants ->

@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.darkfactory.plantpotting.MainActivity
 import com.darkfactory.plantpotting.R
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
 import com.darkfactory.plantpotting.identify.PlantIdentifier
@@ -68,6 +69,7 @@ class CameraScreenSmokeTest {
 
     @Test
     fun shutterIsRenderedAndDoesNotShowLiteralCGlyph() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -87,6 +89,7 @@ class CameraScreenSmokeTest {
 
     @Test
     fun shutterIsEnabledWhenIdleAndImageCaptureBound() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsEnabled()
     }

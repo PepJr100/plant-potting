@@ -6,15 +6,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -70,8 +76,13 @@ fun MyPlantsScreen(
             modifier = Modifier.fillMaxWidth().testTag(MyPlantsTags.LIST),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(state.rows, key = { it.speciesId + it.savedAtEpochMs }) { row ->
-                MyPlantRowCard(row = row, onClick = { onPlantClick(row) })
+            // De-dup keeps speciesId unique, so it's a stable list key.
+            items(state.rows, key = { it.speciesId }) { row ->
+                MyPlantRowCard(
+                    row = row,
+                    onClick = { onPlantClick(row) },
+                    onRemove = { viewModel.remove(row.speciesId) },
+                )
             }
         }
     }
@@ -81,6 +92,7 @@ fun MyPlantsScreen(
 private fun MyPlantRowCard(
     row: MyPlantRow,
     onClick: () -> Unit,
+    onRemove: () -> Unit,
 ) {
     OutlinedCard(
         onClick = onClick,
@@ -89,33 +101,49 @@ private fun MyPlantRowCard(
                 .fillMaxWidth()
                 .testTag(MyPlantsTags.rowTag(row.speciesId)),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = row.displayName.ifBlank { row.speciesId },
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                AssistChip(
-                    onClick = {},
-                    label = { Text(stringResource(id = badgeStringRes(row.source, lowConfidence = false))) },
+                Text(
+                    text = row.displayName.ifBlank { row.speciesId },
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 )
-                row.confidencePct?.let { pct ->
-                    Text(
-                        text = stringResource(id = R.string.result_confidence_label, pct),
-                        style = MaterialTheme.typography.bodySmall,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    AssistChip(
+                        onClick = {},
+                        label = { Text(stringResource(id = badgeStringRes(row.source, lowConfidence = false))) },
                     )
+                    row.confidencePct?.let { pct ->
+                        Box(modifier = Modifier.align(Alignment.CenterVertically)) {
+                            Text(
+                                text = stringResource(id = R.string.result_confidence_label, pct),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
                 }
+                Text(
+                    text = stringResource(id = R.string.my_plants_saved_at, formatSavedAt(row.savedAtEpochMs)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-            Text(
-                text = stringResource(id = R.string.my_plants_saved_at, formatSavedAt(row.savedAtEpochMs)),
-                style = MaterialTheme.typography.bodySmall,
-            )
+            IconButton(
+                onClick = onRemove,
+                modifier = Modifier.testTag(MyPlantsTags.removeTag(row.speciesId)),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = stringResource(id = R.string.my_plants_remove_content_description, row.displayName),
+                )
+            }
         }
     }
 }
@@ -129,4 +157,6 @@ object MyPlantsTags {
     const val LIST = "myPlants.list"
 
     fun rowTag(speciesId: String): String = "myPlants.row.$speciesId"
+
+    fun removeTag(speciesId: String): String = "myPlants.remove.$speciesId"
 }

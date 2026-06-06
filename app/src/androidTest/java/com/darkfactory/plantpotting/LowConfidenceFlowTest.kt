@@ -74,6 +74,7 @@ class LowConfidenceFlowTest {
 
     @Test
     fun lowConfidenceChipPathReachesRecommendation() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null
@@ -105,6 +106,7 @@ class LowConfidenceFlowTest {
 
     @Test
     fun lowConfidenceSearchPathReachesRecommendation() {
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null

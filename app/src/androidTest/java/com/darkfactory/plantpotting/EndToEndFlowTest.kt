@@ -49,6 +49,7 @@ class EndToEndFlowTest {
         // immediately to the camera screen. Wait for the camera screen to
         // compose before reaching for the view model, then drive
         // onCaptureReady directly (the GMD AOSP image has no camera sensor).
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(CameraScreenTags.SHUTTER).assertIsDisplayed()
         composeRule.waitUntil(timeoutMillis = 5_000) {
             ViewModelProbe.findCameraViewModel() != null

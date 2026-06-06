@@ -49,6 +49,27 @@ class MyPlantsScreenTest {
     }
 
     @Test
+    fun tappingRemoveDeletesTheRow() {
+        val store = FakePlantLogStore(nowEpochMs = 1_000L)
+        runBlocking {
+            store.saveIdentifiedPlant("aloe-vera", "Aloe", IdSource.ON_DEVICE_MODEL.name, 30)
+            store.saveIdentifiedPlant("ficus-elastica", "Rubber plant", IdSource.ON_DEVICE_MODEL.name, 40)
+        }
+        val vm = MyPlantsViewModel(store)
+        composeRule.setContent {
+            MyPlantsScreen(viewModel = vm, onPlantClick = {})
+        }
+        composeRule.waitUntil(timeoutMillis = 3_000) {
+            composeRule.onAllNodesWithTag(MyPlantsTags.rowTag("aloe-vera")).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag(MyPlantsTags.removeTag("aloe-vera")).performClick()
+        composeRule.waitUntil(timeoutMillis = 3_000) {
+            composeRule.onAllNodesWithTag(MyPlantsTags.rowTag("aloe-vera")).fetchSemanticsNodes().isEmpty()
+        }
+        composeRule.onNodeWithTag(MyPlantsTags.rowTag("ficus-elastica")).assertIsDisplayed()
+    }
+
+    @Test
     fun tappingARowEmitsThatPlant() {
         val store = FakePlantLogStore(nowEpochMs = 1_000L)
         runBlocking {

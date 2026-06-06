@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.darkfactory.plantpotting.camera.CameraScreen
 import com.darkfactory.plantpotting.camera.NavCommand
 import com.darkfactory.plantpotting.di.AppEntryPoints
+import com.darkfactory.plantpotting.home.HomeScreen
 import com.darkfactory.plantpotting.identify.IdSource
 import com.darkfactory.plantpotting.permission.PermissionScreenHost
 import com.darkfactory.plantpotting.ui.theme.DebugThemeSwitcherScreen
@@ -38,8 +39,14 @@ fun PlantPottingNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.PERMISSION,
+        startDestination = Routes.HOME,
     ) {
+        composable(Routes.HOME) {
+            HomeScreen(
+                onIdentify = { navController.navigate(Routes.PERMISSION) },
+                onMyPlants = { navController.navigate(Routes.MY_PLANTS) },
+            )
+        }
         composable(Routes.PERMISSION) {
             PermissionScreenHost(
                 guard = guard,

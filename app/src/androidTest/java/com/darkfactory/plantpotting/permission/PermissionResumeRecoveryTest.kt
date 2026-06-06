@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import com.darkfactory.plantpotting.MainActivity
+import com.darkfactory.plantpotting.startIdentifyFromHome
 import com.darkfactory.plantpotting.camera.CameraScreenTags
 import com.darkfactory.plantpotting.identify.FakeFixedIdentifier
 import com.darkfactory.plantpotting.identify.OnDeviceIdentifyModule
@@ -70,7 +71,8 @@ class PermissionResumeRecoveryTest {
 
     @Test
     fun resumeAfterSystemSettingsGrantNavigatesToCameraWithoutProcessRestart() {
-        // Initially: permission screen shown because the guard reports ungranted.
+        // From Home, tap Identify → permission screen shown because the guard reports ungranted.
+        composeRule.startIdentifyFromHome()
         composeRule.onNodeWithTag(PermissionScreenTags.GRANT_BUTTON).assertIsDisplayed()
 
         // Simulate the Settings round-trip: while the app is paused, the user

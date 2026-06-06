@@ -26,10 +26,16 @@ class FakePlantLogStore(
         confidencePct: Int?,
     ) {
         val entry = IdentifiedPlant(speciesId, displayName, source, confidencePct, nowEpochMs)
+        val deduped = doc.value.identifiedPlants.filterNot { it.speciesId == entry.speciesId }
         doc.value =
             doc.value.copy(
-                identifiedPlants = (listOf(entry) + doc.value.identifiedPlants).take(maxIdentifiedPlants),
+                identifiedPlants = (listOf(entry) + deduped).take(maxIdentifiedPlants),
             )
+    }
+
+    override suspend fun removeIdentifiedPlant(speciesId: String) {
+        doc.value =
+            doc.value.copy(identifiedPlants = doc.value.identifiedPlants.filterNot { it.speciesId == speciesId })
     }
 
     override suspend fun recordAddPlantRequest(modelClassLabel: String) {

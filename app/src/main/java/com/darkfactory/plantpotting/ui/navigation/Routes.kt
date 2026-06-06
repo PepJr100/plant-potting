@@ -16,6 +16,8 @@ object Routes {
     /** Sentinel for an absent `confidencePct` (stub/picker flows carry no probability). */
     const val CONFIDENCE_ABSENT = -1
 
+    /** PLANTPOTTING-0010 (review feedback) — landing screen: My Plants + Identify new plant. */
+    const val HOME = "home"
     const val PERMISSION = "permission"
     const val CAMERA = "camera"
     const val RESULT = "result/{speciesId}?source={source}&lowConfidence={lowConfidence}&confidencePct={confidencePct}"
