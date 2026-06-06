@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -32,9 +35,17 @@ class MainActivity : ComponentActivity() {
             // to LEAF. Production users never change it (switcher is BuildConfig.DEBUG-gated).
             val themeName by plantLogStore.themeCandidate.collectAsState(initial = ThemeCandidate.LEAF.name)
             PlantPottingTheme(candidate = ThemeCandidate.fromName(themeName)) {
-                @OptIn(ExperimentalComposeUiApi::class)
-                Box(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
-                    PlantPottingNavHost()
+                // Surface paints the themed background AND provides onBackground/onSurface as the
+                // default content colour, so text sitting outside a Card (e.g. Home) has correct
+                // contrast in both light and dark mode (fixes light-on-light greeting/headings).
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    @OptIn(ExperimentalComposeUiApi::class)
+                    Box(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
+                        PlantPottingNavHost()
+                    }
                 }
             }
         }

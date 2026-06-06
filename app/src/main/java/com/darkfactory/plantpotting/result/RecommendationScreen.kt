@@ -108,11 +108,17 @@ private fun ColumnScope.ReadyContent(
         }
     }
 
-    Text(
-        text = s.rationale,
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.testTag(RecommendationScreenTags.RATIONALE),
-    )
+    Card(
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = s.rationale,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(20.dp).testTag(RecommendationScreenTags.RATIONALE),
+        )
+    }
 
     Text(
         text = stringResource(id = R.string.recommendation_recipe_heading),

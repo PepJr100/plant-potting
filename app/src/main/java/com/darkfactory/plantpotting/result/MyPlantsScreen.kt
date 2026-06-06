@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +24,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -102,9 +108,21 @@ private fun MyPlantRowCard(
                 .testTag(MyPlantsTags.rowTag(row.speciesId)),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val hasRealImage = PlantImageResolver.hasRealImage(row.speciesId)
+            Image(
+                painter = painterResource(id = PlantImageResolver.drawableFor(row.speciesId)),
+                contentDescription = null,
+                colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                contentScale = if (hasRealImage) ContentScale.Crop else ContentScale.Fit,
+                modifier =
+                    Modifier
+                        .size(56.dp)
+                        .clip(MaterialTheme.shapes.medium),
+            )
+            Spacer(modifier = Modifier.width(12.dp))
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -113,22 +131,11 @@ private fun MyPlantRowCard(
                     text = row.displayName.ifBlank { row.speciesId },
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(stringResource(id = badgeStringRes(row.source, lowConfidence = false))) },
+                row.confidencePct?.let { pct ->
+                    Text(
+                        text = stringResource(id = R.string.result_confidence_label, pct),
+                        style = MaterialTheme.typography.bodySmall,
                     )
-                    row.confidencePct?.let { pct ->
-                        Box(modifier = Modifier.align(Alignment.CenterVertically)) {
-                            Text(
-                                text = stringResource(id = R.string.result_confidence_label, pct),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
                 }
                 Text(
                     text = stringResource(id = R.string.my_plants_saved_at, formatSavedAt(row.savedAtEpochMs)),

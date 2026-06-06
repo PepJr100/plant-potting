@@ -19,14 +19,23 @@ object PlantImageResolver {
 
     /**
      * speciesId → bundled CC0/PD WebP drawable. Sourced from Wikimedia Commons (CC0 photos + PD
-     * botanical plates) by `scripts/source-reference-images.ps1`; every entry has an attribution row
-     * in `docs/licenses/reference-images.md`. Species without a license-clean image fall back to the
-     * placeholder (PD-only filter skipped: philodendron-hederaceum/pink-princess, phalaenopsis,
-     * alocasia, dracaena, hedera-helix, asplenium-nidus, cycas-revoluta, yucca, ctenanthe).
+     * botanical plates) by `scripts/source-reference-images.ps1` + `source-missing-images.ps1`; every
+     * entry has an attribution row in `docs/licenses/reference-images.md`. **All 44 KB species now
+     * have a license-clean image** — the placeholder is the safety net only.
      */
     private val images: Map<String, Int> =
         mapOf(
             "monstera-deliciosa" to R.drawable.monstera_deliciosa,
+            "philodendron-hederaceum" to R.drawable.philodendron_hederaceum,
+            "philodendron-pink-princess" to R.drawable.philodendron_pink_princess,
+            "phalaenopsis" to R.drawable.phalaenopsis,
+            "alocasia" to R.drawable.alocasia,
+            "dracaena" to R.drawable.dracaena,
+            "hedera-helix" to R.drawable.hedera_helix,
+            "asplenium-nidus" to R.drawable.asplenium_nidus,
+            "cycas-revoluta" to R.drawable.cycas_revoluta,
+            "yucca" to R.drawable.yucca,
+            "ctenanthe" to R.drawable.ctenanthe,
             "monstera-adansonii" to R.drawable.monstera_adansonii,
             "epipremnum-aureum" to R.drawable.epipremnum_aureum,
             "spathiphyllum-wallisii" to R.drawable.spathiphyllum_wallisii,

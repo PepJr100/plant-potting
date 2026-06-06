@@ -18,12 +18,10 @@ be **CC0 or public-domain** (PD). CI-enforced by
 
 ## Coverage
 
-**34 of 44 KB species** have a license-clean image; the remaining 10 fall back to the authored
-placeholder vector (`res/drawable/ic_plant_placeholder.xml`): philodendron-hederaceum,
-philodendron-pink-princess, phalaenopsis, alocasia, dracaena, hedera-helix, asplenium-nidus,
-cycas-revoluta, yucca, ctenanthe (no CC0/PD result among the top Commons matches). A mix of CC0
-photographs and public-domain botanical plates (Curtis's, Blanco's, Aublet's, etc.). Re-run the
-script to fill gaps as clean images appear.
+**All 44 KB species** have a license-clean image (a mix of CC0 photographs and public-domain
+botanical plates — Curtis's, Blanco's, Aublet's, etc.). The authored placeholder vector
+(`res/drawable/ic_plant_placeholder.xml`) remains the safety net for any future species. The first
+pass filled 34; `source-missing-images.ps1` (broader Commons search) filled the remaining 10.
 
 ## How to add / refresh
 
@@ -68,6 +66,16 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | hypoestes_phyllostachya.webp | hypoestes-phyllostachya | Public domain | File:2006 08 14 Hypoestes Phyllostachya.jpg |
 | beaucarnea_recurvata.webp | beaucarnea-recurvata | CC0 | File:Beaucarnea recurvata serrated leaf margin.jpg |
 | schlumbergera_bridgesii.webp | schlumbergera-bridgesii | CC0 | File:Christmas Cactus October 2022.jpg |
+| philodendron_hederaceum.webp | philodendron-hederaceum | CC0 | File:Philodendron sp.jpg |
+| philodendron_pink_princess.webp | philodendron-pink-princess | Public domain | File:Philodendron erubescens Bot. Mag. 84. 5071. 1858.jpg |
+| phalaenopsis.webp | phalaenopsis | Public domain | File:Flower of Phalaenopsis mannii.JPG |
+| alocasia.webp | alocasia | CC0 | File:Alocasia macrorrhizos 'Nigra' 02.jpg |
+| dracaena.webp | dracaena | Public domain | File:Dracaena fragrans Curtis 1808 v27.jpg |
+| hedera_helix.webp | hedera-helix | Public domain | File:Hedera helix lombozata.jpg |
+| asplenium_nidus.webp | asplenium-nidus | Public domain | File:Neottopteris nidus - Kunming Botanical Garden - DSC03126.JPG |
+| cycas_revoluta.webp | cycas-revoluta | Public domain | File:Center of sago palm (Cycas revoluta) close-up.jpg |
+| yucca.webp | yucca | Public domain | File:Yucca elephantipes a P. Letamendi.JPG |
+| ctenanthe.webp | ctenanthe | CC0 | File:Ctenanthe oppenheimiana - Shinjuku Gyo-en Greenhouse - DSC05761.jpg |
 
 _Full source URLs (descriptionurl per file) are recorded in
 `docs/sprints/feedback/PLANTPOTTING-0010/sourced-images.tsv`._
