@@ -56,6 +56,18 @@ class LowConfidencePickerScreenTest {
         composeRule.onNodeWithText("Fiddle-leaf fig (18%)").assertIsDisplayed()
     }
 
+    @Test
+    fun eachCandidateOptionRendersAReferenceThumbnail() {
+        // PLANTPOTTING-0011 — the three suggestions carry a small reference-image thumbnail.
+        val v = vm("monstera-deliciosa|72,ficus-lyrata|18")
+        composeRule.setContent {
+            LowConfidencePickerScreen(viewModel = v, onSpeciesPicked = {}, onPickByArchetype = {})
+        }
+        // The clickable card merges child semantics, so query the thumbnail in the unmerged tree.
+        composeRule.onNodeWithTag(LowConfidencePickerTags.candidateImageTag("monstera-deliciosa"), useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(LowConfidencePickerTags.candidateImageTag("ficus-lyrata"), useUnmergedTree = true).assertExists()
+    }
+
     // -- PLANTPOTTING-0010 A4 — search containment -----------------------------
 
     @Test

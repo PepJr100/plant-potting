@@ -1,15 +1,19 @@
 package com.darkfactory.plantpotting.result
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -24,8 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -86,34 +94,46 @@ fun LowConfidencePickerScreen(
             )
             Column(modifier = Modifier.fillMaxWidth().testTag(LowConfidencePickerTags.TOP_ROW)) {
                 viewModel.topCandidates.forEach { c ->
-                    AssistChip(
-                        onClick = { onSpeciesPicked(c.speciesId) },
-                        label = {
+                    // PLANTPOTTING-0011 — each candidate option now carries a small reference-image
+                    // thumbnail (mirrors the My Plants card), so the three suggestions are visual.
+                    OutlinedCard(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onSpeciesPicked(c.speciesId) }
+                                    .padding(8.dp)
+                                    .testTag(LowConfidencePickerTags.candidateTag(c.speciesId)),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            val hasRealImage = PlantImageResolver.hasRealImage(c.speciesId)
+                            Image(
+                                painter = painterResource(id = PlantImageResolver.drawableFor(c.speciesId)),
+                                contentDescription = null,
+                                colorFilter = if (hasRealImage) null else ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                                contentScale = if (hasRealImage) ContentScale.Crop else ContentScale.Fit,
+                                modifier =
+                                    Modifier
+                                        .size(48.dp)
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .testTag(LowConfidencePickerTags.candidateImageTag(c.speciesId)),
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
                             val name = c.commonName.ifBlank { c.scientificName }
                             Text(
-                                // PLANTPOTTING-0006 §5 — a degenerate/black capture can floor a tiny
-                                // score to 0, producing "Jade plant (0%)" which reads as broken. Drop
-                                // the (x%) suffix only when it floors to zero; the percentage was never
-                                // the point of these chips — selection is. Suffix kept for all >= 1%.
+                                // PLANTPOTTING-0006 §5 — drop the (x%) suffix only when it floors to
+                                // zero ("Jade plant (0%)" reads as broken); kept for all >= 1%.
                                 text = if (c.probabilityPct > 0) "$name (${c.probabilityPct}%)" else name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f),
                             )
-                        },
-                        trailingIcon = {
                             Text(
                                 text = "›",
                                 style = MaterialTheme.typography.titleMedium,
-                                modifier =
-                                    Modifier.testTag(
-                                        LowConfidencePickerTags.candidateChevronTag(c.speciesId),
-                                    ),
+                                modifier = Modifier.testTag(LowConfidencePickerTags.candidateChevronTag(c.speciesId)),
                             )
-                        },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp)
-                                .testTag(LowConfidencePickerTags.candidateTag(c.speciesId)),
-                    )
+                        }
+                    }
                 }
             }
         } else {
@@ -225,6 +245,8 @@ object LowConfidencePickerTags {
     fun candidateTag(speciesId: String): String = "lowConf.candidate.$speciesId"
 
     fun candidateChevronTag(speciesId: String): String = "lowConf.candidate.$speciesId.chevron"
+
+    fun candidateImageTag(speciesId: String): String = "lowConf.candidate.$speciesId.image"
 
     fun speciesTag(speciesId: String): String = "lowConf.species.$speciesId"
 }
