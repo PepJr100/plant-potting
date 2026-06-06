@@ -269,24 +269,25 @@ drift the score path.
 
 ### Phase 5 — Version bump, gates, delivery
 - [x] Bump `versionCode` 4→5 and `versionName` 0.4.0→0.5.0 in `app/build.gradle.kts`.
-- [ ] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
+- [x] Full gate set GREEN: `./gradlew :app:testDebugUnitTest`, `verifyNoNetworking`,
       `bash scripts/check-stub-isolation.sh`, lint (`abortOnError`), `:app:compileDebugAndroidTestKotlin`.
       GMD `pixel6Api34` runs in CI (no local emulator) — pull its `gradle-reports` + the scorecard artifacts.
-- [ ] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify
+      *(also: the scorecard ran on the LOCAL pixel6Api34 emulator this sprint — all gates GREEN 2026-06-06)*
+- [x] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify
       it landed from PowerShell** (sandbox-overlay caveat — `adb` not on PATH). Name it
-      `app-debug-PLANTPOTTING-0011-v0.5.0.apk`.
+      `app-debug-PLANTPOTTING-0011-v0.5.0.apk`. *(delivered, 43.5 MB, verified from PowerShell)*
 - [ ] On-device sanity (principal): a previously confident-wrong capture now abstains to the picker rather
       than showing a confident-wrong card; the confidence bar reads thicker; swapped reference photos render.
 
 ### Phase 6 — Documentation, evidence & close
-- [ ] Update `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` with the calibration story: the BEFORE
+- [x] Update `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` with the calibration story: the BEFORE
       confident-wrong number, preprocessing ADOPT/DROP decisions + numbers, the abstention setting chosen
       (and rejected candidates), the held-out generalisation number, and the AFTER number — framed as
       *measured-under-clean-CC-conditions + synthetic-robustness, NOT real-world-accuracy-solved*.
-- [ ] Ensure all evidence artifacts are committed under `docs/sprints/evidence/PLANTPOTTING-0011/`
+- [x] Ensure all evidence artifacts are committed under `docs/sprints/evidence/PLANTPOTTING-0011/`
       (BEFORE/AFTER scorecard CSV + summaries, fixture-manifest-summary, preprocessing-decision, abstention
-      before/after table).
-- [ ] Final guard sweep recorded in the evidence README: unit suite, instrumented compile-clean,
+      before/after table). *(also README/ROADMAP currency rows added)*
+- [x] Final guard sweep recorded in the evidence README: unit suite, instrumented compile-clean,
       `verifyNoNetworking`, `check-stub-isolation.sh`, `HousePlantClassMapValidationTest` (Pilea absent),
       AIY baseline anchor, fixture + reference license cross-checks — **all GREEN**.
 

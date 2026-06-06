@@ -349,3 +349,37 @@ and accepted).
 model-vocabulary coverage only** — NOT calibrated against real first-party photos. Per-class
 confidence behaviour is assumed-from-routing, not measured; the coarse `alias`/care-lane routing +
 existing confidence gating is the mitigation. Closed only when imagery/probing is greenlit.
+
+### PLANTPOTTING-0011 — accuracy & trust calibration (measure → improve → abstain)
+
+The 0010 on-device review found the production classifier (`house_plant_species_mobilenetv2`,
+FLOAT32, 47 classes) **confidently wrong** on real captures. 0011 confronted this behind the frozen
+`PlantIdentifier` seam — **no model swap, no training** — and produced the project's first honest,
+reproducible scorecard. Full evidence: `docs/sprints/evidence/PLANTPOTTING-0011/`.
+
+**Harness & fixtures.** `AccuracyEvalTest` (GMD/local `pixel6Api34`) runs every fixture + 11
+deterministic perturbations × 3 preprocessing modes, emitting a rich per-row CSV. The CC0/PD/CC-BY
+fixture set grew from 8 photos to **41 photos / 30 species** (of the 38 mapped classes), sourced
+license-clean from Wikimedia, GBIF/iNaturalist (CC0), and Smithsonian Gardens (CC0); 8 mapped species
+have no clean CC0 photo and remain untested (logged). These are clean/field photos — they still
+under-represent messy phone captures.
+
+**MEASURE (BEFORE, squash + current thresholds):** top-1 0.528, top-3 0.713, **confident-wrong 0.382**
+(0.268 even on clean) — a 38% confidently-wrong rate, close to the principal's real-world perception.
+
+**IMPROVE (Phase 2).** `center_crop` measured **identical** to squash → dropped. **TTA-6** (centre +
+4 corners + full-frame, softmax-averaged) **adopted**: confident-wrong 0.382 → 0.226 at ~6× latency
+(20 → 125 ms median on a one-shot identify). Pipeline locked to `preprocess_mode: squash`, `tta: 6`.
+
+**ABSTAIN (Phase 3).** New `high_confidence_abstain_margin` (default `0f` = no-op) downgrades a
+high-confidence verdict to the picker when top1−top2 margin < the margin. Tuned on the locked tta6
+pipeline; principal chose **0.30** (abstain-rate budget ~0.32). **AFTER: confident-wrong 0.179**
+(0.098 on clean) — **0.382 → 0.179, a 53% reduction**; top-1 held ~flat. Held-out validated
+(tune-on-clean/eval-on-perturbation 0.186; leave-one-species-out 0.167–0.188). `per_species_thresholds`
+stays `{}` (no species met the 0006 bar).
+
+**Framing (load-bearing).** These are **measured-under-clean-conditions + synthetic-robustness**
+numbers — NOT "real-world accuracy solved." The win is **confident-wrong driven down ~53% (to ~10% on
+clean) with raw top-1 held flat and the cost (more "pick manually") quantified.** The AIY baseline
+anchor, the frozen `PlantIdentifier`/`IdentificationResult`/`IdSource` seam, and the Pilea-absence
+guard were unchanged throughout.

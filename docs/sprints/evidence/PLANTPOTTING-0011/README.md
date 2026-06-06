@@ -44,5 +44,27 @@ dev box (Windows) before the first 0011 commit:
 | Stub isolation | `bash scripts/check-stub-isolation.sh` | **GREEN** (`stub isolation OK`) |
 | Instrumented compile | `./gradlew :app:compileDebugAndroidTestKotlin` | **GREEN** (`BUILD SUCCESSFUL`) |
 
-GMD `pixel6Api34` is **CI-only** — not run locally on the dev box (no emulator).
-The scorecard BEFORE/AFTER numbers come from the CI instrumented-test job.
+Correction: a **local `Pixel_6_API_34` emulator IS available** on the dev box (the earlier
+"CI-only / no local emulator" assumption was wrong). The scorecard BEFORE/AFTER numbers this sprint
+were produced on that local emulator (boots ~30 s, `connectedDebugAndroidTest` / `adb am instrument`);
+CI runs the same GMD task as a backstop.
+
+## Final guard sweep (close — 2026-06-06)
+
+All GREEN at sprint close:
+
+| Gate | Result |
+|---|---|
+| `./gradlew :app:testDebugUnitTest` (incl. new abstain/manifest/fixture/credits tests) | **GREEN** |
+| `verifyNoNetworking` | **GREEN** |
+| `bash scripts/check-stub-isolation.sh` | **GREEN** (`stub isolation OK`) |
+| `:app:lintDebug` (`abortOnError`) | **GREEN** |
+| `:app:compileDebugAndroidTestKotlin` | **GREEN** |
+| `AccuracyEvalTest` on local `pixel6Api34` | **GREEN** (scorecard emitted) |
+| AIY baseline anchor (`OnDeviceModelRealInterpreterTest`) | **unchanged** |
+| Pilea absence (`HousePlantClassMapValidationTest`) | **GREEN** (Pilea unmapped) |
+| Fixture + reference license cross-checks | **GREEN** (CC0/PD/CC-BY; no CC-BY-SA) |
+
+Frozen seams (`PlantIdentifier` / `IdentificationResult` / `IdSource`) byte-for-byte unchanged.
+v0.5.0 debug APK delivered to the Dropbox APK folder (43.5 MB, verified). On-device principal
+spot-check is the only open item.
