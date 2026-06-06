@@ -59,22 +59,33 @@ class EndToEndFlowTest {
             ViewModelProbe.findCameraViewModel()?.onCaptureReady(byteArrayOf(0, 1, 2, 3))
         }
 
-        // Result screen: source-driven badge visible. Production wiring is now the
-        // on-device model (PLANTPOTTING-0003 §5.6), so the badge reads "On-device match"
-        // — not the legacy "Stub identifier" copy.
-        composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).assertIsDisplayed()
-        composeRule.onNodeWithText("On-device match").assertIsDisplayed()
-        composeRule.onNodeWithText("Monstera deliciosa").assertIsDisplayed()
+        // Result screen: wait for it to compose (navigation is async), then verify the source badge.
+        // The screen is scrollable (hero image), so scroll the badge into view before asserting.
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule
+                .onAllNodesWithTag(ResultScreenTags.SOURCE_BADGE)
+                .fetchSemanticsNodes(atLeastOneRootRequired = false)
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithTag(ResultScreenTags.SOURCE_BADGE).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("On-device match").assertExists()
+        composeRule.onNodeWithText("Monstera deliciosa").assertExists()
 
-        // Navigate to the recommendation screen (Result is scrollable; the CTA may be below the fold).
+        // Navigate to the recommendation screen (the CTA may be below the fold).
         composeRule.onNodeWithTag(ResultScreenTags.SEE_POTTING_MIX).performScrollTo().performClick()
 
         // Recommendation screen: archetype name + recipe rows whose proportions sum to 100.
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule
+                .onAllNodesWithTag(RecommendationScreenTags.ARCHETYPE_NAME)
+                .fetchSemanticsNodes(atLeastOneRootRequired = false)
+                .isNotEmpty()
+        }
         composeRule.onNodeWithTag(RecommendationScreenTags.ARCHETYPE_NAME).performScrollTo().assertIsDisplayed()
         composeRule
             .onAllNodesWithTag(RecommendationScreenTags.RECIPE_LIST)
             .onFirst()
-            .assertIsDisplayed()
+            .assertExists()
 
         // The Home button (replaces Retake) returns to the landing screen.
         composeRule.onNodeWithTag(RecommendationScreenTags.HOME_BUTTON).performScrollTo().performClick()

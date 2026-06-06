@@ -18,6 +18,17 @@ The app opens on a **Home** screen with four tiles — **Identify new plant**, *
 **Browse mixes**, **How it works** — plus a **recent plants** carousel of what you've saved.
 A green **Home** button sits at the bottom of every screen to bring you back here.
 
+<p align="center">
+  <img src="images/home.jpg" alt="Home screen" width="220">
+  <img src="images/camera.jpg" alt="Camera screen" width="220">
+  <img src="images/result.jpg" alt="Result screen with reference photo + confidence" width="220">
+</p>
+<p align="center">
+  <img src="images/potting-mix.jpg" alt="Potting-mix recommendation" width="220">
+  <img src="images/my-plants.jpg" alt="My Plants" width="220">
+  <img src="images/browse-mixes.jpg" alt="Browse mixes" width="220">
+</p>
+
 ## The flow, step by step
 
 1. **Identify a new plant.** From Home, tap **Identify new plant**. On first launch you'll see

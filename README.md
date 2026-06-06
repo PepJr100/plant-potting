@@ -33,11 +33,20 @@ Validation was personal and deliberate, not user-driven. The real question I was
 
 ## How to use
 
-Point the in-app camera at a houseplant; an on-device TensorFlow Lite model
-identifies the species; the app surfaces a recipe-driven potting-mix
-recommendation drawn from a bundled knowledge base. 
+Open the app on its Home screen; tap **Identify new plant** and point the camera at a
+houseplant; an on-device TensorFlow Lite model identifies the species; the app shows a
+reference photo, a confidence reading, and a recipe-driven potting-mix recommendation drawn
+from a bundled knowledge base. Save plants to **My Plants**, or **Browse mixes** by care type.
 
-<p align="center"><img src="docs/images/result-screen.png" alt="ResultScreen showing a Monstera deliciosa identification and potting-mix recipe" width="320"></p>
+### Screenshots (v0.4.0)
+
+| Home | Camera | Result |
+| --- | --- | --- |
+| <img src="docs/images/home.jpg" alt="Home screen with Identify / My Plants / Browse mixes / How it works tiles and a recent-plants carousel" width="240"> | <img src="docs/images/camera.jpg" alt="Camera screen with live preview, shutter button, and a Home button" width="240"> | <img src="docs/images/result.jpg" alt="Result screen showing a snake plant reference photo, On-device match badge, and confidence bar" width="240"> |
+
+| Potting mix | My Plants | Browse mixes |
+| --- | --- | --- |
+| <img src="docs/images/potting-mix.jpg" alt="Recommendation screen: plant photo, description, recommended mix, and recipe with proportions" width="240"> | <img src="docs/images/my-plants.jpg" alt="My Plants list with photo thumbnails, confidence, saved time, and delete buttons" width="240"> | <img src="docs/images/browse-mixes.jpg" alt="Browse mixes: substrate archetypes as cards" width="240"> |
 
 ## Current state (post PLANTPOTTING-0010, 2026-06-06)
 
