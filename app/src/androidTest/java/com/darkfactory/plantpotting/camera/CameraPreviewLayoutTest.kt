@@ -66,30 +66,15 @@ class CameraPreviewLayoutTest {
     }
 
     private fun assertPreviewFillsParent(label: String) {
-        // The PreviewView's AndroidView can report stale/zero bounds for a frame or two after the
-        // camera view model first appears — its surface + layout settle asynchronously on the GMD
-        // AOSP image. Poll until it has been laid out to (near-)full size before asserting, so the
-        // invariant isn't raced against an un-measured first frame. This only removes the timing
-        // race: a genuinely undersized preview still fails (the waitUntil times out → final assert).
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            val ratios = previewToRootRatios() ?: return@waitUntil false
-            ratios.first >= 0.8f && ratios.second >= 0.8f
-        }
-        val (widthRatio, heightRatio) =
-            previewToRootRatios() ?: throw AssertionError("$label preview was never laid out")
-        assertWithMessage("$label preview width ratio").that(widthRatio).isAtLeast(0.8f)
-        assertWithMessage("$label preview height ratio").that(heightRatio).isAtLeast(0.8f)
-    }
-
-    /** Preview width/height as a fraction of the root, or null while either is not yet measured. */
-    private fun previewToRootRatios(): Pair<Float, Float>? {
         val rootBounds = composeRule.onRoot().fetchSemanticsNode().boundsInRoot
-        if (rootBounds.width <= 0f || rootBounds.height <= 0f) return null
         val previewBounds =
             composeRule
                 .onNodeWithTag(CameraScreenTags.PREVIEW)
                 .fetchSemanticsNode()
                 .boundsInRoot
-        return (previewBounds.width / rootBounds.width) to (previewBounds.height / rootBounds.height)
+        val widthRatio: Float = previewBounds.width / rootBounds.width
+        val heightRatio: Float = previewBounds.height / rootBounds.height
+        assertWithMessage("$label preview width ratio").that(widthRatio).isAtLeast(0.8f)
+        assertWithMessage("$label preview height ratio").that(heightRatio).isAtLeast(0.8f)
     }
 }
