@@ -13,9 +13,9 @@ The goal here was simple: explore the factors that build the best-quality produc
 
 ```mermaid
 flowchart LR
-    R["roadmap<br/>(the long narrative)"] --> P["sprint-planner<br/>(3 models draft, critique, merge)"]
-    P --> E["sprint-execute<br/>(1 model builds it, TDD-gated)"]
-    E --> V["sprint-review<br/>(I exercise the real app, log)"]
+    R["roadmap (the long narrative)"] --> P["sprint-planner (3 models draft, critique, merge)"]
+    P --> E["sprint-execute (1 model builds it, TDD-gated)"]
+    E --> V["sprint-review (I exercise the real app, log)"]
     V --> B["roadmap bump"]
     B --> R
 ```
@@ -109,20 +109,17 @@ Architecture sketch:
 ```mermaid
 flowchart TD
     CAM["camera capture (JPEG bytes)"] --> PI["PlantIdentifier (interface)"]
-    PI -.->|"test default"| STUB["StubPlantIdentifier<br/>(deterministic)"]
+    PI -.->|"test default"| STUB["StubPlantIdentifier (deterministic)"]
     PI ==>|"production"| OD["OnDevicePlantIdentifier"]
-    OD --> PIPE["ImagePreprocessor → TfLiteInterpreterFacade → ModelScoreMapper<br/>(House Plant Species MobileNetV2, FLOAT32;<br/>AIY V1/3 baseline also bundled)"]
+    OD --> PIPE["ImagePreprocessor to TfLiteInterpreterFacade to ModelScoreMapper (MobileNetV2 FLOAT32; AIY V1/3 baseline also bundled)"]
     STUB --> IR
-    PIPE --> IR["IdentificationResult<br/>speciesId, displayName, source, lowConfidence"]
+    PIPE --> IR["IdentificationResult: speciesId, displayName, source, lowConfidence"]
     IR --> RT{"top-1 vs threshold"}
-    RT -->|"high-conf, mapped"| RES["ResultScreen<br/>(reference photo + confidence + Save)"]
-    RT -->|"high-conf, unmapped"| ADD["Add this plant wireframe<br/>(local request tally)"]
+    RT -->|"high-conf, mapped"| RES["ResultScreen (reference photo + confidence + Save)"]
+    RT -->|"high-conf, unmapped"| ADD["Add this plant wireframe (local request tally)"]
     RT -->|"low-conf"| LCP["LowConfidencePicker"]
     LCP --> RES
-    RES --> REC["RecommendationScreen<br/>(name + photo + KB archetype + recipe)"]
-
-    subgraph NAV ["Home navigation"]
-    end
+    RES --> REC["RecommendationScreen (name + photo + KB archetype + recipe)"]
 ```
 
 KB: `app/src/main/assets/kb/species.json` (44 species) and `archetypes.json`
