@@ -20,7 +20,7 @@
   "mapping_asset": "ml/house_plant_species_mobilenetv2/plant_class_map.json",
   "preprocess_mode": "squash",
   "tta": 6,
-  "_comment_preprocessing": "PLANTPOTTING-0011 Phase 2 (evidence: docs/sprints/evidence/PLANTPOTTING-0011/preprocessing-decision.md). center_crop measured IDENTICAL to squash on the eval set (no benefit) -> DROPPED, mode stays 'squash'. Multi-crop TTA ADOPTED at 6 views (centre + 4 corners + full-frame): halves the confident-wrong rate (0.254 -> 0.121) at ~5x latency on a one-shot identify. Default tta=1 (off) for any other model; only this production model is locked to 6.",
+  "_comment_preprocessing": "PLANTPOTTING-0011 Phase 2 (evidence: docs/sprints/evidence/PLANTPOTTING-0011/preprocessing-decision.md; 25-fixture eval set). center_crop measured IDENTICAL to squash (no benefit) -> DROPPED, mode stays 'squash'. Multi-crop TTA ADOPTED at 6 views (centre + 4 corners + full-frame): confident-wrong 0.357 -> 0.197 at ~6x latency (23->144ms median) on a one-shot identify. Default tta=1 (off) for any other model; only this production model is locked to 6.",
   "thresholds": {
     "high_confidence_plain": 0.55,
     "high_confidence_margin_min": 0.45,
@@ -28,7 +28,7 @@
     "top_k_candidates": 3,
     "high_confidence_abstain_margin": 0.30
   },
-  "_comment_thresholds": "Identical to AIY (PLANTPOTTING-0003 §4.3) EXCEPT high_confidence_abstain_margin=0.30, added in PLANTPOTTING-0011 Phase 3: a high-confidence verdict whose top1-top2 margin is < 0.30 is downgraded to the picker. Tuned on the locked tta6 pipeline (evidence: docs/sprints/evidence/PLANTPOTTING-0011/abstention-before-after.md). With TTA-6 it cuts confident-wrong 0.254->0.083 overall and 0.100->0.000 on clean photos, for an accepted pick-manually rise to ~0.275. Held-out (tune-on-clean/eval-on-perturbation) cw=0.091; leave-one-species-out stable. Do NOT lower the plain/margin gates to flatter a candidate (0006 discipline).",
+  "_comment_thresholds": "Identical to AIY (PLANTPOTTING-0003 §4.3) EXCEPT high_confidence_abstain_margin=0.30, added in PLANTPOTTING-0011 Phase 3: a high-confidence verdict whose top1-top2 margin is < 0.30 is downgraded to the picker. Tuned on the locked tta6 pipeline (evidence: docs/sprints/evidence/PLANTPOTTING-0011/abstention-before-after.md). With TTA-6 it cuts confident-wrong 0.357->0.160 overall and 0.240->0.080 on clean photos, for an accepted pick-manually rise to ~0.293. Held-out (tune-on-clean/eval-on-perturbation) cw=0.167; leave-one-species-out 0.138-0.174 stable. Do NOT lower the plain/margin gates to flatter a candidate (0006 discipline).",
   "per_species_thresholds": {},
   "_comment_per_species_thresholds": "Empty by design until the Phase 3 swap-eval probe shows an in-vocab species fails the global threshold by a margin a per-class override would cleanly close. Never seed to bless a weak prediction.",
   "_comment_coverage": "RECOMPUTE in Phase 4 from the model's actual 47 labels: 10 of 47 mapping entries resolve to KB species; 10 of 16 KB species covered (8 exact + 2 coarse: Orchid->phalaenopsis, Calathea->goeppertia-orbifolia). Headline coverage delta vs AIY: 2/16 -> 10/16. 6 KB species remain out-of-vocab (monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess, ficus-lyrata, chlorophytum-comosum, hoya-carnosa) and route to LowConfidencePicker as before.",

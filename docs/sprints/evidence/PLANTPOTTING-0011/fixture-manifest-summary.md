@@ -44,11 +44,30 @@ snake plant (3), aloe vera (2), jade (2), ZZ plant (2), peace lily (2, incl. the
 | `crassula-ovata__01.jpg` | jade plant | CC0 | W.carter |
 | `spathiphyllum-wallisii__01.jpg` | peace lily | CC0 | CesarAlbertoHerrera |
 
-**Hit the supply wall (no 2nd distinct CC0/PD photo in Commons top results) — stay at 1 photo:**
-`epipremnum-aureum` (pothos), `monstera-deliciosa`, `phalaenopsis`, `ficus-elastica`, `aglaonema`,
-`dieffenbachia`, `schefflera`, `kalanchoe`, `goeppertia-orbifolia`. This is the honest ceiling under
-the CC0/PD-only + no-self-shot constraints — deepening further would require relaxing the licence rule
-or first-party photos (both sprint non-goals). **Net fixture set: 20 photos across 14 species.**
+Wikimedia hit a supply wall for several species; resolved in pass 3 below via GBIF + Smithsonian.
+
+## Third sourcing pass (GBIF/iNaturalist + Smithsonian Gardens, CC0)
+
+Wikimedia Commons isn't the only CC0 source. **GBIF** (federates iNaturalist) and **Smithsonian Open
+Access** (api.data.gov key) were searched, **filtered per-media to CC0**, and manually vetted (many GBIF
+"botany" CC0 images are herbarium specimen sheets — rejected on sight).
+
+| added | species | source | author |
+|---|---|---|---|
+| `epipremnum-aureum__01.jpg` | pothos (2nd) | GBIF/iNaturalist | 葉子 |
+| `monstera-deliciosa__01.jpg` | Monstera (2nd) | GBIF/iNaturalist | Frank Thomas Sautter |
+| `ficus-elastica__02.jpg` | rubber plant (3rd) | GBIF/iNaturalist | 葉子 |
+| `kalanchoe__02.jpg` | kalanchoe (2nd) | GBIF/iNaturalist | Arne Holgersson |
+| `phalaenopsis__01.jpg` | moth orchid (2nd) | **Smithsonian Gardens** (Orchid Collection, OFEO-SG) | Creekside Digital |
+
+Key finding: **Smithsonian NMNH _Botany_ = herbarium specimen sheets** (not usable), but **Smithsonian
+_Gardens_ (unit OFEO-SG) = live-plant studio photos** (CC0) — that's where the Phalaenopsis came from
+(GBIF had no CC0 phalaenopsis). The Gardens collection is orchid-heavy, so it yielded only phalaenopsis.
+
+**Still at 1 photo (no clean CC0 live-plant photo found anywhere):** `aglaonema`, `dieffenbachia`,
+`schefflera`, `goeppertia-orbifolia`. **Net fixture set: 25 photos across 14 species** — 10 of 14 species
+now have ≥2 independent base photos (snake ×3, ficus ×3; aloe/jade/ZZ/peace-lily/monstera/pothos/
+kalanchoe/phalaenopsis ×2).
 
 ## Method notes
 
