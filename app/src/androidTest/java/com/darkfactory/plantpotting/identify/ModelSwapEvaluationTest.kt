@@ -147,14 +147,13 @@ class ModelSwapEvaluationTest {
         if (cand.isNotEmpty()) {
             fun row(fixture: String) = cand.single { it.fixtureId == fixture }
 
-            // Preferred form: correct top-1 at high confidence for these 6 covered species.
+            // Preferred form: correct top-1 at high confidence for these 5 covered species.
             for (f in listOf(
                 "monstera-deliciosa",
                 "dracaena-trifasciata",
                 "goeppertia-orbifolia",
                 "phalaenopsis",
                 "zamioculcas-zamiifolia",
-                "crassula-ovata",
             )) {
                 assertThat(row(f).route).isEqualTo("high-conf")
                 assertThat(row(f).mappedTop1).isEqualTo(f)
@@ -167,6 +166,13 @@ class ModelSwapEvaluationTest {
             assertThat(row("spathiphyllum-wallisii").mappedTop1).isEqualTo("spathiphyllum-wallisii")
             // pothos is confidently confused with Pilea (unmapped) → routes low-conf, honest.
             assertThat(row("epipremnum-aureum").route).isEqualTo("low-conf")
+            // jade is the correct top-1 (crassula-ovata) but the model splits it with money-tree
+            // (Pachira) ~0.58/0.42; that <0.30 top1-top2 gap trips the high_confidence_abstain_margin
+            // added in PLANTPOTTING-0011 Phase 3, so it honestly routes low-conf. (Pre-0011, with no
+            // margin gate, 0.58 > 0.55 made it high-conf — this assertion now tracks the shipped
+            // abstention policy, not the stale pre-margin behaviour. NOT seeded — 0006 discipline.)
+            assertThat(row("crassula-ovata").route).isEqualTo("low-conf")
+            assertThat(row("crassula-ovata").mappedTop1).isEqualTo("crassula-ovata")
 
             // The candidate must beat AIY on high-confidence correct identifications.
             val aiyHighConf = rows.count { it.modelId == "aiy_plants_v1" && it.route == "high-conf" && it.mappedTop1 == it.expectedId }
