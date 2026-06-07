@@ -412,11 +412,19 @@ direct card and appears as a candidate instead (the 6 CC0 Pilea fixtures all raw
 @ ~0.99–1.00, so they route to the picker with Pilea visible). A direct Pilea card would require
 author-separated / held-out evidence not granted this sprint.
 
-**Measured numbers: filled in Phase 8** (placeholder — see `post-pilea-gated-summary.md` +
-`tta-sweep-decision.md`). The binding bar: adding Pilea must NOT increase confident-wrong vs. the
-pre-Pilea baseline on clean fixtures, all perturbations, or the pothos/Pilea subset; and must not
-raise the correct-pothos low-confidence route-rate (expected Δ = 0, since the gate never fires on
-top-1 = pothos).
+**Measured result (Phase 6, `post-pilea-gated-summary.md`).** Adding Pilea behind the gate is
+**confident-wrong-neutral**: Δ vs. the pre-Pilea baseline = **+0** on clean fixtures, all
+perturbations, AND the pothos/Pilea subset (all three modes) — vs. **+2 / +9 / +6** for a naive
+gateless mapping. Correct-pothos low-confidence route-rate delta = **+0** (the gate never fires on
+top-1 = pothos). **0** pothos fixtures surface a direct Pilea card; all 6 true-Pilea fixtures route
+to the picker with Pilea visible & first. Pilea ships **strict-picker** (no direct card this sprint;
+a direct card would need author-separated / held-out evidence).
+
+**TTA (Phase 7, `tta-sweep-decision.md`): `tta` stays 6.** A grid-tiling sweep (base 6 vs +2×2 vs
++2×2+3×3, gated) found no real win: 2×2 left clean confident-wrong flat with slightly worse top-1;
+2×2+3×3 cut confident-wrong only by crashing top-1 (0.417→0.317) + abstaining 63%, and busted the
+~2 s latency cap. Grid tiles are out-of-distribution for this whole-image classifier, so they dilute
+confidence rather than add signal. The gate (not TTA) fixes the boundary.
 
 **AIY coverage row.** A dormant `Pilea peperomioides` row was added to the AIY map to keep
 `mappingCoversEveryBundledKbSpecies` green (AIY is not the active model; the gate governs production).

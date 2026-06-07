@@ -184,7 +184,9 @@ class HousePlantClassMapValidationTest {
         // exists to close) turns this red.
         val pileaMapped =
             mappingRows()["Chinese Money Plant (Pilea peperomioides)"]
-                ?.get("kbSpeciesId")?.jsonPrimitive?.content == "pilea-peperomioides"
+                ?.get("kbSpeciesId")
+                ?.jsonPrimitive
+                ?.content == "pilea-peperomioides"
         if (!pileaMapped) return // vacuously satisfied if Pilea is ever un-mapped again
 
         val manifestRaw = String(readAsset("model_manifest.json"), Charsets.UTF_8)

@@ -58,6 +58,7 @@ data class ModelManifest(
         val top1KbSpeciesId: String,
         val surfaceKbSpeciesIds: List<String>,
     )
+
     data class Normalization(
         val mean: FloatArray,
         val std: FloatArray,

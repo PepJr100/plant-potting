@@ -182,14 +182,109 @@ class AccuracyEvalTest {
             facade.close()
         }
 
-        writeCsv(rows)
-        writeSummary(rows)
+        writeCsv(rows, "accuracy-eval.csv")
+        writeSummary(rows, "accuracy-eval-summary.md")
 
         // Sanity guards (not accuracy assertions — those live in the committed scorecard):
         // every row scored cleanly, and the schema includes the load-bearing columns.
         assertThat(rows).isNotEmpty()
         assertThat(rows.none { it.failure.isNotEmpty() }).isTrue()
         assertThat(rows.map { it.mode }.toSet()).containsExactly("squash", "center_crop", "tta6")
+    }
+
+    /**
+     * PLANTPOTTING-0012 Phase 7 — TTA level sweep (×6/×8/×10/×20) on the GATED production pipeline.
+     * Experiment-only: it does NOT change the shipped `model_manifest.json` `tta`; it runs the real
+     * preprocessor at higher crop counts via `manifest.copy(ttaCropCount = …)` and emits
+     * `tta-sweep.csv` (+ summary) for the adopt/keep decision. Gated behind `-e ttaSweep true` so the
+     * default CI `androidTest` run (and the scorecard test above) never pays the ×20 cost.
+     */
+    @Test
+    fun sweepTtaLevelsEmitCsv() {
+        val args = InstrumentationRegistry.getArguments()
+        org.junit.Assume.assumeTrue(
+            "TTA sweep runs only with -e ttaSweep true",
+            args.getString("ttaSweep") == "true",
+        )
+        val root = "ml/$PRODUCTION_MODEL"
+        val manifest = ModelManifestReader(appAssets, root).read()
+        val labels = ModelLabelsReader(appAssets, "$root/labels.csv").read()
+        val mapping = ModelLabelMapReader(appAssets, root).read()
+        val facade =
+            TfLiteInterpreterFacade(
+                assets = appAssets,
+                modelPath = "$root/model.tflite",
+                labelCount = manifest.labelCount,
+                inputSize = manifest.inputSize,
+                expectedInputDtype = manifest.inputDtype,
+            )
+        val mapper =
+            ModelScoreMapper(
+                labels = labels,
+                mapping = mapping,
+                kb = kb,
+                thresholds = manifest.thresholds,
+                perSpeciesThresholds = manifest.perSpeciesThresholds,
+                boundaryPairs = manifest.boundaryPairs, // gated pipeline
+            )
+
+        fun inVocab(kbId: String): Boolean = labels.any { mapping.lookup(it)?.kbSpeciesId == kbId }
+
+        // PLANTPOTTING-0012 Phase 7 — grid-tiling sweep: base 6 (control), +2×2 grid (10), +2×2+3×3 grid (19).
+        val sweepModes =
+            listOf(
+                Mode("tta6", PreprocessMode.SQUASH, 6),
+                Mode("grid2x2", PreprocessMode.SQUASH, 10),
+                Mode("grid2x2_3x3", PreprocessMode.SQUASH, 19),
+            )
+        val preprocessors =
+            sweepModes.associateWith { m ->
+                ImagePreprocessor(manifest.copy(preprocessMode = m.preprocessMode, ttaCropCount = m.tta))
+            }
+
+        val rows = mutableListOf<Row>()
+        try {
+            val fixtures = fixtureFiles()
+            val warmBytes = testAssets.open("identify-fixtures/${fixtures.first()}").use { it.readBytes() }
+            val warmPre = preprocessors.values.first().preprocessVariants(warmBytes)
+            repeat(3) { warmPre.forEach { facade.runInference(it) } }
+            for (fixture in fixtures) {
+                val baseImage = fixture.removeSuffix(".jpg").removeSuffix(".JPG")
+                val expectedId = baseImage.substringBefore("__")
+                val cleanBytes = testAssets.open("identify-fixtures/$fixture").use { it.readBytes() }
+                val cleanBitmap = BitmapFactory.decodeByteArray(cleanBytes, 0, cleanBytes.size)
+                val inputs =
+                    buildList {
+                        add(Triple("clean", "clean", cleanBytes))
+                        FixturePerturbations.all(cleanBitmap).forEach { add(Triple(it.kind, it.family, encodeJpeg(it.bitmap))) }
+                    }
+                for ((perturbation, family, jpeg) in inputs) {
+                    for ((mode, preprocessor) in preprocessors) {
+                        rows +=
+                            scoreRow(
+                                baseImage = baseImage,
+                                expectedId = expectedId,
+                                modeName = mode.name,
+                                perturbation = perturbation,
+                                family = family,
+                                jpeg = jpeg,
+                                preprocessor = preprocessor,
+                                facade = facade,
+                                mapper = mapper,
+                                labels = labels,
+                                inVocab = inVocab(expectedId),
+                            )
+                    }
+                }
+            }
+        } finally {
+            facade.close()
+        }
+        writeCsv(rows, "tta-sweep.csv")
+        writeSummary(rows, "tta-sweep-summary.md")
+        assertThat(rows).isNotEmpty()
+        assertThat(rows.none { it.failure.isNotEmpty() }).isTrue()
+        assertThat(rows.map { it.mode }.toSet()).containsExactly("tta6", "grid2x2", "grid2x2_3x3")
     }
 
     private fun scoreRow(
@@ -276,7 +371,10 @@ class AccuracyEvalTest {
         return out.toByteArray()
     }
 
-    private fun writeCsv(rows: List<Row>) {
+    private fun writeCsv(
+        rows: List<Row>,
+        fileName: String,
+    ) {
         val sb = StringBuilder()
         sb.append(
             "base_image,expected_species_id,mode,perturbation,family,raw_top1_label,raw_top1_score," +
@@ -307,17 +405,20 @@ class AccuracyEvalTest {
             )
             sb.append("\n")
         }
-        val out = File(targetFilesDir(), "accuracy-eval.csv")
+        val out = File(targetFilesDir(), fileName)
         out.writeText(sb.toString())
         Log.i(TAG, "Wrote ${rows.size} rows to ${out.absolutePath}")
         sb.toString().lineSequence().forEach { Log.i(TAG, it) }
     }
 
-    private fun writeSummary(rows: List<Row>) {
+    private fun writeSummary(
+        rows: List<Row>,
+        fileName: String,
+    ) {
         val sb = StringBuilder()
         sb.append("# accuracy-eval summary (raw — polish into accuracy-eval-summary.md)\n\n")
         sb.append("Production model: `$PRODUCTION_MODEL`. Perturbation rows are *synthetic-robustness*.\n\n")
-        for (mode in modes.map { it.name }) {
+        for (mode in rows.map { it.mode }.distinct()) {
             sb.append("## mode: $mode\n\n")
             val modeRows = rows.filter { it.mode == mode && it.failure.isEmpty() }
             // Overall + each family (clean is its own "family").
@@ -342,7 +443,7 @@ class AccuracyEvalTest {
             val perBaseTop1 = if (perBaseClean.isEmpty()) 0.0 else perBaseClean.average()
             sb.append("\nPer-base-image-averaged clean top-1 (high-conf correct): ${"%.3f".format(perBaseTop1)}\n\n")
         }
-        File(targetFilesDir(), "accuracy-eval-summary.md").writeText(sb.toString())
+        File(targetFilesDir(), fileName).writeText(sb.toString())
         sb.toString().lineSequence().forEach { Log.i(TAG, it) }
     }
 

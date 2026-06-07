@@ -20,6 +20,7 @@
   "mapping_asset": "ml/house_plant_species_mobilenetv2/plant_class_map.json",
   "preprocess_mode": "squash",
   "tta": 6,
+  "_comment_tta_0012": "PLANTPOTTING-0012 Phase 7 — grid-tiling TTA sweep (base 6 vs +2x2 grid vs +2x2+3x3 grid; gated pipeline; evidence: docs/sprints/evidence/PLANTPOTTING-0012/tta-sweep-decision.md). 2x2 left clean confident-wrong flat (0.117) with slightly worse top-1; 2x2+3x3 cut confident-wrong to 0.050 only by crashing top-1 (0.417->0.317) + abstaining 63%, and busted the ~2s worst-case cap (2686ms). Grid tiles are out-of-distribution for this whole-image classifier (a 3x3 tile is ~one leaf) so they dilute confidence rather than add signal. tta stays 6; the pothos<->Pilea gate (not TTA) fixes the boundary.",
   "_comment_preprocessing": "PLANTPOTTING-0011 Phase 2 (evidence: docs/sprints/evidence/PLANTPOTTING-0011/preprocessing-decision.md; 41-fixture/30-species eval set). center_crop measured IDENTICAL to squash (no benefit) -> DROPPED, mode stays 'squash'. Multi-crop TTA ADOPTED at 6 views (centre + 4 corners + full-frame): confident-wrong 0.382 -> 0.226 at ~6x latency (20->125ms median) on a one-shot identify. Default tta=1 (off) for any other model; only this production model is locked to 6.",
   "thresholds": {
     "high_confidence_plain": 0.55,
