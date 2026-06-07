@@ -227,6 +227,7 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 | PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done (opus) | **Pure content/config, zero ML.** `species.json` **16 → 32**; house-plant `plant_class_map.json` **10 → 26 of 47** classes; **+1 archetype** (`carnivorous-peat-sand`, Venus Flytrap). New `HousePlantClassMapValidationTest` (verbatim-key guard, 26-count, Pilea-absence, existing-10 regression); count asserts bumped (32/9). Pilea left unmapped (CI-enforced) for the boundary-fix sprint. Free win: AIY now resolves 5 of 32 (Aloe vera / Hedera helix / Euphorbia pulcherrima are in its vocab). **Known gap:** the 16 new mappings are unprobed (editorial coverage, not real-photo calibrated). Full suite + `verifyNoNetworking` + stub-isolation GREEN. |
 | PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh + add-this-plant wireframe + KB expansion | done (opus) | **"Make it feel like an app" — behind the frozen seam.** First local-persistence layer (**DataStore**, one store / two collections); **Home/landing** screen (2×2 tiles + recent carousel, app starts here); **My Plants** (explicit Save, de-dup, remove, thumbnails, survives restart); **confidence %+bar** on `ResultScreen` (nav-arg side-channel, seam untouched); **contained search** in the picker; **"Add this plant"** wireframe for confident-but-unmapped classes (logs a local tally; Pilea fixture); **44 CC0/PD reference photos** (one per species); shared bottom **Home button**; KB **32 → 44 species / 26 → 38-of-47 mapped**. Theme candidates built then switcher removed (default LEAF). v0.4.0; 7 on-device feedback rounds folded into execution. **Review clean — no bugs.** Headline finding (not a 0010 regression): real-world ID accuracy is poor (snake plant ~1/3 correct, confidently wrong otherwise) → calibration is the next move. |
 | PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness + confidence abstention + no-training accuracy levers | done (opus) | **Confronted the 0010 confident-wrong finding behind the frozen seam — no model swap, no training.** `AccuracyEvalTest` scorecard (run on the **local `pixel6Api34`** — the "CI-only" assumption was wrong); CC0/PD/CC-BY fixtures **8 → 41 photos / 30 species** (Wikimedia + GBIF/iNaturalist + Smithsonian Gardens). **MEASURE** BEFORE confident-wrong **0.382**. **IMPROVE**: center-crop ≡ squash (dropped); **TTA-6** (centre+4 corners+full-frame) adopted (→0.226). **ABSTAIN**: new `high_confidence_abstain_margin=0.30` (default 0f = no-op) → **AFTER confident-wrong 0.179** (0.098 clean), top-1 ~flat, held-out validated; cost = pick-manually ~0.32. Plus thicker confidence bar, **all 11 botanical-plate reference images → real photos** (CC-BY + Unsplash relaxation) + in-app **Image-credits** screen. v0.5.0. Frozen seam + AIY anchor + Pilea-absence unchanged. |
+| PLANTPOTTING-0012 | Pothos↔Pilea boundary fix: ship Pilea KB entry behind disambiguation gating + fixture/TTA support | done (opus) | **The 0009 Pilea deferral LIFTED — Pilea mapped, but only in lockstep with a pothos↔Pilea gate.** +19 CC0 fixtures (6 Pilea, 5 pothos, all 8 untested species) → **60 photos / 39 species**; class-map **38 → 39**. Gate in `ModelScoreMapper`: when raw top-1 resolves to `pilea-peperomioides` → force `LowConfidencePicker` with Pilea + pothos both surfaced (scoped to top-1=Pilea, so correct pothos cards stay direct). CI-bound by `pileaMappingRequiresBoundaryGate` (Pilea-without-gate turns CI red); `pileaIsNotMapped` → `pileaMapsToPileaPeperomioides`. **Result: adding Pilea adds +0 confident-wrong on every surface vs +2/+9/+6 for a naive gateless map; correct-pothos picker delta +0; 0 pothos→direct-Pilea violations.** Pilea ships **strict-picker (no direct card)** this sprint. TTA stays ×6 (grid tiling dilutes the whole-image classifier; 3×3 busted the ~2s cap at 2686 ms). v0.6.0. Frozen seam + AIY anchor unchanged. **Review (clean gates) surfaced the next move:** at-home test ID'd real Pilea correctly @ 98% (no pothos competing) but it lands in the picker → next sprint = a **direct Pilea card** under an elevated bar + held-out eval. |
 
 ## Known gaps
 
@@ -253,11 +254,18 @@ ship/review:
    card. **Closing it needs imagery/probing** — out of scope until imagery work is greenlit. Coarse rows
    route through existing confidence gating in the meantime. **21 model classes remain unmapped**; a
    further text-only expansion over the remaining popular slice is still cheap and available.
-2. **Pilea deferred + pothos→Pilea confusion (boundary-fix sprint, the likely next move).** `Chinese
-   Money Plant (Pilea peperomioides)` is deliberately left unmapped (CI-enforced) because the model
-   confidently confuses **pothos with Pilea** (pothos top-1 = Pilea @ 0.9661). Adding a Pilea KB entry
-   without a boundary fix turns today's silent misread into a *confidently wrong* care card — so the
-   Pilea entry must ship **paired with** the boundary fix or strict pothos/Pilea confidence gating.
+2. **★ Pilea now mapped behind the gate (0012 shipped) — direct Pilea card is the open piece.** The 0009
+   deferral is **lifted**: `Chinese Money Plant (Pilea peperomioides)` is mapped (class-map 38→39) but
+   **only in lockstep with the pothos↔Pilea boundary gate** (top-1=Pilea → `LowConfidencePicker` with
+   both Pilea + pothos surfaced; CI-bound by `pileaMappingRequiresBoundaryGate`). Adding Pilea added
+   **+0 confident-wrong** on every surface (vs +2/+9/+6 naive). Pilea shipped **strict-picker (no direct
+   card)** this sprint. **What's still open:** the principal's at-home v0.6.0 test ID'd a real Pilea
+   **correctly @ 98%** with **no pothos competing** (runners-up: English Ivy 1%, ZZ plant) — so a
+   confident, *correct* Pilea is being conservatively demoted to the picker. The boundary error is
+   **asymmetric** (dangerous only pothos→Pilea). **Candidate close:** permit a **direct Pilea card** under
+   an elevated Pilea-specific bar (Candidate C `per_species_thresholds`) composed with the existing gate,
+   gated by **author-separated / held-out** Pilea eval (overfit risk on the thin ~6-photo set). Captured
+   in `feedback/PLANTPOTTING-0012/feedback.md`.
 3. **6 KB species remain out-of-vocab + pothos→Pilea confusion (training-bound, now DEFERRED).** The
    0008 spike answered the data question: **PARTIAL-GO** — 5 OOV species (chlorophytum, hederaceum,
    hoya, adansonii, ficus-lyrata) have sufficient CC imagery to fine-tune; pothos/Pilea boundary is
@@ -316,18 +324,31 @@ Accepted as-is (recorded, **not** an open gap):
   botanical plates to real photos** (+ in-app Image-credits). v0.5.0. Review clean — no bugs. *Win framed
   as measured-under-clean + synthetic-robustness, NOT real-world solved.*
 
+#### Shipped: PLANTPOTTING-0012 — pothos↔Pilea boundary fix + Pilea mapped behind a gate — *done, reviewed (clean gates)*
+- Lifted the 0009 Pilea deferral **safely**: +19 CC0 fixtures (→ 60 photos / 39 species), class-map
+  38→39, and a `ModelScoreMapper` gate that forces any top-1=Pilea result to the picker (Pilea + pothos
+  both surfaced), CI-bound so Pilea can never map without the gate. **+0 confident-wrong on every surface**
+  vs +2/+9/+6 for a naive gateless map; correct-pothos picker delta +0. TTA stayed ×6 (grid tiling gave
+  no real win, 3×3 blew the ~2s cap). Pilea shipped **strict-picker (no direct card)**. v0.6.0. **Review
+  finding → next:** at-home test ID'd real Pilea correctly @ 98% (no pothos competing) yet it lands in the
+  picker — a confident *correct* Pilea is conservatively demoted. See `feedback/PLANTPOTTING-0012/feedback.md`.
+
 #### Next (open — to be firmed up in planning): pick one of two threads
-- **Entry conditions:** PLANTPOTTING-0011 merged to `origin/main` (`status: done`) and its review PR merged.
-- **Thread A — push real-world accuracy further (continues gap #0).**
-  1. **Expand the real fixture set.** The honest number is bounded by the small clean set (8 mapped
-     species still untested; license-clean supply is the ceiling, 0008's 1–6.8%). More independent base
-     photos per species is the only honest way to grow effective sample count under the no-self-shot ban.
-  2. **Sweep higher TTA (principal request).** Once the set is larger, map confident-wrong / confidence
-     vs latency for **TTA ×8/×10/×20** up to a **~2 s worst-case budget** (0011 capped at 6 ≈ 125 ms).
+- **Entry conditions:** PLANTPOTTING-0012 merged to `origin/main` (`status: done`) and its review PR merged.
+- **Thread A — direct Pilea card (sharpest new lever, from the 0012 at-home finding).** The boundary error
+  is **asymmetric** (dangerous only pothos→Pilea); a real Pilea is confident + correct (@ 98%, no pothos
+  competing). Permit a **direct Pilea care card** under an elevated Pilea-specific `per_species_thresholds`
+  bar **composed with** the existing top-1=Pilea gate (so pothos→Pilea still routes to the picker), gated
+  by **author-separated / held-out** Pilea eval. Mind overfit on the thin ~6-photo Pilea set. Tidy up the
+  stale 0009-deferral prose in `docs/kb/ml-mapping-notes.md` while in there.
+- **Thread B — push real-world accuracy further (continues gap #0).**
+  1. **Expand the real fixture set.** The honest number is bounded by the small clean set (the 8 newly
+     untested species now have 1 CC0 photo each; license-clean supply is the ceiling, 0008's 1–6.8%). More
+     independent base photos per species is the only honest way to grow effective sample count under the
+     no-self-shot ban.
+  2. **Higher TTA already swept (0012) — leave ×6.** ×8/×10/×20 / grid tiling bought nothing within the
+     ~2 s budget for this whole-image classifier; don't re-litigate unless the fixture set changes character.
   3. Fine-tuning stays **deferred** (0008 PARTIAL-GO; license-clean / no-self-shot data is the blocker).
-- **Thread B — pothos↔Pilea boundary fix (the sharpest standing confident-wrong case).** Pothos top-1 =
-  Pilea @ 0.9661; pair the long-deferred Pilea KB entry with strict boundary gating so adding it can't
-  surface a confidently-wrong card. General 0011 abstention helps incidentally but isn't targeted at it.
 - **Notes:**
   - **No self-shot / first-party imagery** anywhere (hard user constraint) and **no model training** —
     behind the frozen `PlantIdentifier` seam.
@@ -373,6 +394,19 @@ for the bundled species set.
 
 ## Changelog
 
+- 2026-06-07 — bumped through PLANTPOTTING-0012 (review close-out): reconciled the pothos↔Pilea
+  boundary-fix sprint (gates clean — JVM acceptance suite + `verifyNoNetworking` + `ktlintCheck` +
+  stub-isolation re-run GREEN; frozen seam untouched; v0.6.0 APK verified in Dropbox). **Lifted the 0009
+  Pilea deferral safely:** Pilea mapped (38→39) **only behind a `ModelScoreMapper` gate** (top-1=Pilea →
+  picker with Pilea + pothos surfaced; CI-bound by `pileaMappingRequiresBoundaryGate`), +19 CC0 fixtures
+  (→ 60 photos / 39 species). **+0 confident-wrong on every surface** vs +2/+9/+6 naive; correct-pothos
+  picker delta +0. TTA stayed ×6 (grid tiling no win; 3×3 blew the ~2 s cap). Pilea shipped **strict-picker
+  (no direct card)**. **Review surfaced the next move:** at-home v0.6.0 test ID'd a real Pilea **correctly
+  @ 98%** with **no pothos competing** — a confident *correct* Pilea is conservatively demoted to the
+  picker, and the boundary error is **asymmetric**. Re-pointed the next horizon: **Thread A = direct Pilea
+  card** (elevated Pilea-specific threshold composed with the gate, held-out eval) over the further-accuracy
+  thread; logged a doc-cleanup of stale 0009-deferral prose in `ml-mapping-notes.md`. Captured in
+  `feedback/PLANTPOTTING-0012/feedback.md`.
 - 2026-06-07 — bumped through PLANTPOTTING-0011 (review close-out): reconciled the accuracy & trust
   sprint (clean review — no bugs, no UX issues; all gates re-run GREEN; on-device sanity confirmed).
   Recorded the project's first honest **`AccuracyEvalTest` scorecard** (local `pixel6Api34`), the fixture

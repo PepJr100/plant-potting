@@ -144,7 +144,7 @@ The brief's central ask — reason about each candidate **in-plan**, not only in
 - [x] Confirm `OnDeviceModelRealInterpreterTest` still pins the bundled AIY V1/3 regression anchor.
 - [x] Build a debug APK, copy it to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`, and **verify via PowerShell that the file actually landed** (sandbox-overlay writes outside the project tree can silently not reach disk).
 - [x] Update `docs/ROADMAP.md` with the 0012 result: fixture counts, gating decision, TTA decision, Pilea status (mapped / strict-picker-only / blocked), and remaining limitations.
-- [ ] (If shipping a public release) push the `v0.6.0` tag — `release.yml` fires only on a pushed `v*` tag; a `versionName` bump alone never publishes a GitHub Release.
+- [x] (If shipping a public release) push the `v0.6.0` tag — `release.yml` fires only on a pushed `v*` tag; a `versionName` bump alone never publishes a GitHub Release. *(v0.6.0 released — tag pushed by principal, confirmed at 0012 review close 2026-06-07.)*
 
 ---
 
