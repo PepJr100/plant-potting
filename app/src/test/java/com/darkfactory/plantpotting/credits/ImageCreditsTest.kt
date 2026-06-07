@@ -50,10 +50,11 @@ class ImageCreditsTest {
         assertWithMessage("CC BY-SA reference images are not accepted: $sa").that(sa).isEmpty()
     }
 
-    /** Licenses that require (CC BY) or merit (Unsplash) an in-app credit. CC0/PD need none. */
+    /** Licenses that require (CC BY) or merit (Unsplash, Pexels) an in-app credit. CC0/PD need none. */
     private fun needsCredit(license: String): Boolean =
         Regex("^CC BY \\d", RegexOption.IGNORE_CASE).containsMatchIn(license) ||
-            license.equals("Unsplash License", ignoreCase = true)
+            license.equals("Unsplash License", ignoreCase = true) ||
+            license.equals("Pexels License", ignoreCase = true)
 
     @Test
     fun everyCreditMeritingImageHasAnInAppCreditRow() {

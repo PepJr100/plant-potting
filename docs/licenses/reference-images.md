@@ -7,15 +7,17 @@ PLANTPOTTING-0010 Phase 6 / D4. Every bundled reference image under
 
 ## License policy (D4; relaxed in PLANTPOTTING-0011)
 
-- **CC0 / public-domain preferred; CC BY and the Unsplash License also allowed.** Originally CC0/PD-only;
-  the principal authorised **CC BY** (attribution required) and the **Unsplash License** (permissive;
-  commercial + modify OK; no attribution required; only restriction is "don't build a competing stock-photo
-  service", which we don't) for reference images in PLANTPOTTING-0011, so botanical-plate diagrams could be
-  replaced with real photographs. **CC BY-SA is still NOT accepted** (share-alike). Sourced from **Wikimedia
-  Commons** (CC0/PD first, CC BY fallback) and **Unsplash** (for the two species with no clean Commons photo).
+- **CC0 / public-domain preferred; CC BY, the Unsplash License, and the Pexels License also allowed.**
+  Originally CC0/PD-only; the principal authorised **CC BY** (attribution required), the **Unsplash License**
+  and the **Pexels License** (both permissive; commercial + modify OK; no attribution legally required; only
+  restriction is "don't build a competing stock-photo service", which we don't) for reference images in
+  PLANTPOTTING-0011, so botanical-plate diagrams could be replaced with real photographs. **CC BY-SA is still
+  NOT accepted** (share-alike). Sourced mainly from **Unsplash** and **Pexels**, with some **Wikimedia
+  Commons** CC0/PD/CC-BY.
 - **Attribution:** every CC BY image MUST have a row in the bundled `app/src/main/assets/image_credits.tsv`
-  and is shown in-app on the **Image credits** screen (legal requirement of CC BY). CC0/PD images need no
-  attribution. Enforced by `ImageCreditsTest` + `ReferenceImageManifestTest`.
+  (legal requirement of CC BY); Unsplash and Pexels photos also get a row as courtesy. All credited images are
+  shown in-app on the **Image credits** screen. CC0/PD images need no attribution. Enforced by
+  `ImageCreditsTest` + `ReferenceImageManifestTest`.
 - **No self-shot / first-party imagery** (sprint non-goal).
 - **Format/budget:** downscaled **WebP** (≤480 px, ~quality 60), rendered with `painterResource` (no
   image library / Coil — network-free). Total ≈ **1.09 MiB** over the Phase-0 baseline — well inside
@@ -35,10 +37,10 @@ register new files in `PlantImageResolver.images` and add their rows below.
 
 ## Manifest
 
-| Image file (`drawable-nodpi/`) | KB speciesId | License | Source (Unsplash / Wikimedia Commons / GBIF) |
+| Image file (`drawable-nodpi/`) | KB speciesId | License | Source (Unsplash / Pexels / Wikimedia Commons) |
 |---|---|---|---|
 | monstera_deliciosa.webp | monstera-deliciosa | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-white-ceramic-pot-bwsTJMnhcwE) |
-| monstera_adansonii.webp | monstera-adansonii | Unsplash License | Unsplash — Inna Safa (https://unsplash.com/photos/a-potted-plant-is-sitting-on-the-sidewalk-leuYRvpWVU0) |
+| monstera_adansonii.webp | monstera-adansonii | Pexels License | Pexels — Danna Putra (https://www.pexels.com/photo/monstera-adansonii-plant-with-coco-pole-32139542/) |
 | epipremnum_aureum.webp | epipremnum-aureum | Unsplash License | Unsplash — feey (https://unsplash.com/photos/gTMnUAkPvlQ) |
 | spathiphyllum_wallisii.webp | spathiphyllum-wallisii | Unsplash License | Unsplash — feey (https://unsplash.com/photos/person-holding-white-ceramic-mug-with-green-plant-lmczPemWjQQ) |
 | ficus_elastica.webp | ficus-elastica | Unsplash License | Unsplash — Elle Lumière (https://unsplash.com/photos/Dze_6fnPIKk) |
@@ -49,10 +51,10 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | chlorophytum_comosum.webp | chlorophytum-comosum | Unsplash License | Unsplash — feey (https://unsplash.com/photos/a-hand-holding-a-potted-plant-on-a-white-wall-RtH6rY9k738) |
 | saintpaulia_ionantha.webp | saintpaulia-ionantha | Unsplash License | Unsplash — Sixteen Miles Out (https://unsplash.com/photos/590CL9EbVRo) |
 | goeppertia_orbifolia.webp | goeppertia-orbifolia | Unsplash License | Unsplash — Gigi Visacri (https://unsplash.com/photos/a-green-plant-in-a-white-pot-on-a-table-rNjEk8d2vmQ) |
-| hoya_carnosa.webp | hoya-carnosa | Unsplash License | Unsplash — Rebecca Matthews (https://unsplash.com/photos/variegated-hoya-plant-with-green-and-cream-leaves-74DjBL9SBGw) |
+| hoya_carnosa.webp | hoya-carnosa | Pexels License | Pexels — Nina Pintar (https://www.pexels.com/photo/a-potted-plant-7289270/) |
 | aglaonema.webp | aglaonema | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-and-red-plant-on-brown-clay-pot-tSWTSzwSz6M) |
 | anthurium_andraeanum.webp | anthurium-andraeanum | Unsplash License | Unsplash — Parker Sturdivant (https://unsplash.com/photos/EzRzvsY28Q0) |
-| dieffenbachia.webp | dieffenbachia | Unsplash License | Unsplash — Eugene Bushueva (https://unsplash.com/photos/a-table-topped-with-a-potted-plant-next-to-a-keyboard-47bRaWc__Rc) |
+| dieffenbachia.webp | dieffenbachia | Pexels License | Pexels — Nadiye Odabaşı (https://www.pexels.com/photo/indoor-plants-in-a-pot-11374763/) |
 | aloe_vera.webp | aloe-vera | Unsplash License | Unsplash — feey (https://unsplash.com/photos/xQKp9qCPAH0) |
 | kalanchoe.webp | kalanchoe | Unsplash License | Unsplash — Mirella Callage (https://unsplash.com/photos/a-potted-plant-with-red-flowers-and-green-leaves-fDAUrBswpgM) |
 | maranta_leuconeura.webp | maranta-leuconeura | Unsplash License | Unsplash — feey (https://unsplash.com/photos/a-person-holding-a-potted-plant-with-green-leaves-J-nfuMjUEH0) |
@@ -61,7 +63,7 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | dypsis_lutescens.webp | dypsis-lutescens | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-gray-pot-yyRsvDp-zNc) |
 | tradescantia.webp | tradescantia | Unsplash License | Unsplash — Christine Androsova (https://unsplash.com/photos/close-up-of-a-pink-and-green-striped-plant-3VvBizg7ThA) |
 | schefflera.webp | schefflera | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-black-pot-F98esQWF6uI) |
-| euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Unsplash License | Unsplash — Daniel Cabanas (https://unsplash.com/photos/QqjzNZqz18g) |
+| euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Pexels License | Pexels (https://www.pexels.com/photo/vibrant-poinsettia-plant-by-sunlit-window-29575902/) |
 | dionaea_muscipula.webp | dionaea-muscipula | Unsplash License | Unsplash — Sebastian Schuster (https://unsplash.com/photos/several-venus-flytrap-plants-with-open-traps-2SH2GmbZoJw) |
 | chamaedorea_elegans.webp | chamaedorea-elegans | Unsplash License | Unsplash — Natalie Kinnear (https://unsplash.com/photos/Uii3CSyuItI) |
 | strelitzia_reginae.webp | strelitzia-reginae | Unsplash License | Unsplash — Thimo van Leeuwen (https://unsplash.com/photos/yellow-and-blue-birds-of-paradise-flower-in-bloom-during-daytime-a4PRSLVQpEc) |
@@ -126,5 +128,7 @@ All replacements are licensed under the **Unsplash License**, attributed in-app 
 re-sourced six more (`tradescantia, ctenanthe, cycas_revoluta, dieffenbachia, philodendron_pink_princess` to
 whole-plant Unsplash shots; `hoya_carnosa` reviewed and kept). `maranta_leuconeura` and `ctenanthe` were
 swapped partly to fix likely mis-IDs (the old maranta public-domain plate read as a *Calathea*; ctenanthe moved
-from a garden CC BY plate to a clean potted "Never Never" plant). As a result **every bundled reference image is
-now an Unsplash-licensed photograph**, each with an `image_credits.tsv` attribution row.
+from a garden CC BY plate to a clean potted "Never Never" plant). A final pass took four photos from **Pexels**
+(`monstera_adansonii`, `hoya_carnosa`, `dieffenbachia`, `euphorbia_pulcherrima` — Pexels License, credited
+in-app as courtesy). As a result **every bundled reference image is now an Unsplash- or Pexels-licensed
+photograph**, each with an `image_credits.tsv` attribution row.
