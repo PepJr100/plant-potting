@@ -28,7 +28,8 @@ class ImageCreditsTest {
 
     /** Parse the `| file.webp | species | License | Source |` table rows. */
     private fun manifestRows(): List<Row> =
-        manifest.readLines()
+        manifest
+            .readLines()
             .filter { it.trimStart().startsWith("|") && it.contains(".webp") }
             .mapNotNull { line ->
                 val cols = line.split("|").map { it.trim() }
