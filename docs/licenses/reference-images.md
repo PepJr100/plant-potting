@@ -52,14 +52,14 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | hoya_carnosa.webp | hoya-carnosa | Unsplash License | Unsplash — Rebecca Matthews (https://unsplash.com/photos/variegated-hoya-plant-with-green-and-cream-leaves-74DjBL9SBGw) |
 | aglaonema.webp | aglaonema | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-and-red-plant-on-brown-clay-pot-tSWTSzwSz6M) |
 | anthurium_andraeanum.webp | anthurium-andraeanum | Unsplash License | Unsplash — Parker Sturdivant (https://unsplash.com/photos/EzRzvsY28Q0) |
-| dieffenbachia.webp | dieffenbachia | Unsplash License | Unsplash — Vinicius Feiten (https://unsplash.com/photos/a-close-up-of-a-leaf-GVA-ckykAQM) |
+| dieffenbachia.webp | dieffenbachia | Unsplash License | Unsplash — Eugene Bushueva (https://unsplash.com/photos/a-table-topped-with-a-potted-plant-next-to-a-keyboard-47bRaWc__Rc) |
 | aloe_vera.webp | aloe-vera | Unsplash License | Unsplash — feey (https://unsplash.com/photos/xQKp9qCPAH0) |
 | kalanchoe.webp | kalanchoe | Unsplash License | Unsplash — Mirella Callage (https://unsplash.com/photos/a-potted-plant-with-red-flowers-and-green-leaves-fDAUrBswpgM) |
 | maranta_leuconeura.webp | maranta-leuconeura | Unsplash License | Unsplash — feey (https://unsplash.com/photos/a-person-holding-a-potted-plant-with-green-leaves-J-nfuMjUEH0) |
 | nephrolepis_exaltata.webp | nephrolepis-exaltata | Unsplash License | Unsplash — Annie Knitter (https://unsplash.com/photos/a-potted-plant-hanging-on-a-wall-24N1YVZrUDk) |
 | pachira_aquatica.webp | pachira-aquatica | Unsplash License | Unsplash — Jason Leung (https://unsplash.com/photos/a-potted-money-tree-against-an-orange-wall-BrbUdECo_5M) |
 | dypsis_lutescens.webp | dypsis-lutescens | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-gray-pot-yyRsvDp-zNc) |
-| tradescantia.webp | tradescantia | Unsplash License | Unsplash — Adil Murshed (https://unsplash.com/photos/a-hanging-plant-with-deep-purple-leaves-indoors-g2qzCWhgYKE) |
+| tradescantia.webp | tradescantia | Unsplash License | Unsplash — Christine Androsova (https://unsplash.com/photos/close-up-of-a-pink-and-green-striped-plant-3VvBizg7ThA) |
 | schefflera.webp | schefflera | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-black-pot-F98esQWF6uI) |
 | euphorbia_pulcherrima.webp | euphorbia-pulcherrima | Unsplash License | Unsplash — Daniel Cabanas (https://unsplash.com/photos/QqjzNZqz18g) |
 | dionaea_muscipula.webp | dionaea-muscipula | Unsplash License | Unsplash — Sebastian Schuster (https://unsplash.com/photos/several-venus-flytrap-plants-with-open-traps-2SH2GmbZoJw) |
@@ -72,15 +72,15 @@ register new files in `PlantImageResolver.images` and add their rows below.
 | beaucarnea_recurvata.webp | beaucarnea-recurvata | Unsplash License | Unsplash — feey (https://unsplash.com/photos/CU5E8ogHmuY) |
 | schlumbergera_bridgesii.webp | schlumbergera-bridgesii | Unsplash License | Unsplash — Yoksel 🌿 Zok (https://unsplash.com/photos/bright-pink-christmas-cactus-flowers-bloom-beautifully-BT0m_0BwUkg) |
 | philodendron_hederaceum.webp | philodendron-hederaceum | Unsplash License | Unsplash — Kevin Lessy (https://unsplash.com/photos/aKqw_M1CmfI) |
-| philodendron_pink_princess.webp | philodendron-pink-princess | Unsplash License | Unsplash — feey (https://unsplash.com/photos/a-close-up-of-a-green-mountain-_FUKzwH1uo4) |
+| philodendron_pink_princess.webp | philodendron-pink-princess | Unsplash License | Unsplash — feey (https://unsplash.com/photos/a-person-holding-a-potted-plant-with-green-leaves-hmuQt8rgCCg) |
 | phalaenopsis.webp | phalaenopsis | Unsplash License | Unsplash — Alexandra Nosova (https://unsplash.com/photos/white-moth-orchids-in-bloom-kly-z2c54b0) |
 | alocasia.webp | alocasia | Unsplash License | Unsplash — Louis Hansel (https://unsplash.com/photos/shallow-focus-photo-of-green-indoor-plants-HGkn-eLCyOM) |
 | dracaena.webp | dracaena | Unsplash License | Unsplash — François Giestas (https://unsplash.com/photos/a-close-up-of-a-plant-on-a-white-background-ZdIr7rpkr4k) |
 | hedera_helix.webp | hedera-helix | Unsplash License | Unsplash — Ivana Djudic (https://unsplash.com/photos/shallow-focus-of-leaves-2rDC_qGWWM4) |
 | asplenium_nidus.webp | asplenium-nidus | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-brown-clay-pot-lxb3Azfrpqc) |
-| cycas_revoluta.webp | cycas-revoluta | CC0 | GBIF/iNaturalist — Rosie Bibby (https://www.inaturalist.org/photos/471752890) |
+| cycas_revoluta.webp | cycas-revoluta | Unsplash License | Unsplash — SOHAM BANERJEE (https://unsplash.com/photos/courtyard-with-potted-plant-and-columns-Q5wiZY6z5bI) |
 | yucca.webp | yucca | Unsplash License | Unsplash — Anca Gabriela Zosin (https://unsplash.com/photos/f3e9p4_lqRw) |
-| ctenanthe.webp | ctenanthe | CC BY 3.0 | File:Ctenanthe oppenheimiana.JPG (Oeropium) |
+| ctenanthe.webp | ctenanthe | Unsplash License | Unsplash — feey (https://unsplash.com/photos/green-plant-on-white-ceramic-pot-rGdSwVibhiQ) |
 
 _Full source URLs (descriptionurl per file) are recorded in
 `docs/sprints/feedback/PLANTPOTTING-0010/sourced-images.tsv`._
@@ -121,7 +121,10 @@ cycas_revoluta, dieffenbachia, dionaea_muscipula, dracaena, dracaena_trifasciata
 goeppertia_orbifolia, hedera_helix, hoya_carnosa, hypoestes_phyllostachya, kalanchoe,
 maranta_leuconeura, monstera_adansonii, monstera_deliciosa, nephrolepis_exaltata, pachira_aquatica`.
 
-Most came from **Unsplash** (Unsplash License); `ctenanthe` is **CC BY 3.0** (Wikimedia Commons, attributed
-in-app) and `cycas_revoluta` is **CC0** (GBIF/iNaturalist). Licenses + sources are reflected in the manifest
-table above and `image_credits.tsv`; **no CC BY-SA** was used. `maranta_leuconeura` was additionally swapped
-to fix a likely mis-ID (the old public-domain plate read as a *Calathea*, not a prayer plant).
+All replacements are licensed under the **Unsplash License**, attributed in-app via `image_credits.tsv`;
+**no CC BY-SA** was used. Licenses + sources are reflected in the manifest table above. A later follow-up pass
+re-sourced six more (`tradescantia, ctenanthe, cycas_revoluta, dieffenbachia, philodendron_pink_princess` to
+whole-plant Unsplash shots; `hoya_carnosa` reviewed and kept). `maranta_leuconeura` and `ctenanthe` were
+swapped partly to fix likely mis-IDs (the old maranta public-domain plate read as a *Calathea*; ctenanthe moved
+from a garden CC BY plate to a clean potted "Never Never" plant). As a result **every bundled reference image is
+now an Unsplash-licensed photograph**, each with an `image_credits.tsv` attribution row.
