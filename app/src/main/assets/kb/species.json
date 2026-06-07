@@ -573,5 +573,18 @@
       "Drafter-sourced toxicity reference (ASPCA: Christmas cactus non-toxic to pets)",
       "PLANTPOTTING-0010 §Phase 2 — popular-slice KB expansion"
     ]
+  },
+  {
+    "id": "pilea-peperomioides",
+    "scientificName": "Pilea peperomioides",
+    "commonNames": ["Chinese money plant", "Pancake plant", "Missionary plant"],
+    "aliases": ["UFO plant"],
+    "mapping": { "kind": "single", "archetypeId": "standard-houseplant" },
+    "speciesRationale": "Pilea peperomioides (Chinese money plant) is a Urticaceae rosette with round, fleshy peltate leaves on long petioles. It wants bright indirect light and a free-draining but moisture-retentive all-purpose mix: the peat/coir-led standard-houseplant blend with added perlite holds light, even moisture while draining fast enough to avoid the root rot it is prone to when left soggy. Let the top of the mix dry between waterings. Non-toxic to cats and dogs. Added under PLANTPOTTING-0012; its model class is mapped only in lockstep with the pothos<->Pilea boundary gate so a confident pothos misread can never surface a Pilea care card.",
+    "citations": [
+      "Drafter-sourced horticulture (Pilea peperomioides Urticaceae; bright indirect light, free-draining moisture-retentive mix, rot-prone if soggy)",
+      "Drafter-sourced toxicity reference (ASPCA: Pilea peperomioides non-toxic to pets)",
+      "PLANTPOTTING-0012 §Phase 5 — pothos<->Pilea boundary fix + Pilea KB entry"
+    ]
   }
 ]
