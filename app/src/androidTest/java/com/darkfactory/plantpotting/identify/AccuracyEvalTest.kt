@@ -121,6 +121,8 @@ class AccuracyEvalTest {
                 kb = kb,
                 thresholds = manifest.thresholds,
                 perSpeciesThresholds = manifest.perSpeciesThresholds,
+                // PLANTPOTTING-0012 — exercise the production pothos↔Pilea boundary gate in the eval.
+                boundaryPairs = manifest.boundaryPairs,
             )
 
         fun inVocab(kbId: String): Boolean = labels.any { mapping.lookup(it)?.kbSpeciesId == kbId }

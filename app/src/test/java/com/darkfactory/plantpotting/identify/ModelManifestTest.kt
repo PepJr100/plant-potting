@@ -248,6 +248,75 @@ class ModelManifestTest {
         }
     }
 
+    // -- PLANTPOTTING-0012 — optional boundary_pairs gate ----------------------------------
+
+    @Test
+    fun boundaryPairsDefaultEmptyWhenAbsent() {
+        val parsed =
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithInputDtype("\"float32\""),
+            )
+        assertThat(parsed.boundaryPairs).isEmpty()
+    }
+
+    @Test
+    fun boundaryPairsParseWhenPresent() {
+        val parsed =
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithBoundaryPairs(
+                    """
+                    [{ "top1_kb_species_id": "pilea-peperomioides", "route": "low_confidence",
+                       "surface_kb_species_ids": ["pilea-peperomioides", "epipremnum-aureum"] }]
+                    """.trimIndent(),
+                ),
+            )
+        assertThat(parsed.boundaryPairs).hasSize(1)
+        val pair = parsed.boundaryPairs.single()
+        assertThat(pair.top1KbSpeciesId).isEqualTo("pilea-peperomioides")
+        assertThat(pair.surfaceKbSpeciesIds)
+            .containsExactly("pilea-peperomioides", "epipremnum-aureum")
+            .inOrder()
+    }
+
+    @Test
+    fun invalidBoundaryRouteIsRejected() {
+        try {
+            com.darkfactory.plantpotting.identify.model.ModelManifestReader.parse(
+                manifestJsonWithBoundaryPairs(
+                    """[{ "top1_kb_species_id": "x", "route": "explode", "surface_kb_species_ids": ["x"] }]""",
+                ),
+            )
+            assertThat("did not throw").isEqualTo("threw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message).contains("boundary_pairs")
+        }
+    }
+
+    private fun manifestJsonWithBoundaryPairs(boundaryPairsJson: String): String =
+        """
+        {
+          "variant": "V1/3",
+          "sha256": "abc",
+          "placeholder": false,
+          "input_size": 224,
+          "input_dtype": "float32",
+          "color_order": "RGB",
+          "normalization": { "mean": [0,0,0], "std": [255,255,255] },
+          "output_tensor_shape": [1, 47],
+          "label_count": 47,
+          "labels_asset": "ml/x/labels.csv",
+          "mapping_asset": "ml/x/plant_class_map.json",
+          "boundary_pairs": $boundaryPairsJson,
+          "thresholds": {
+            "high_confidence_plain": 0.55,
+            "high_confidence_margin_min": 0.45,
+            "high_confidence_margin_delta": 0.18,
+            "top_k_candidates": 3,
+            "high_confidence_abstain_margin": 0.30
+          }
+        }
+        """.trimIndent()
+
     private fun manifestJsonWithExtras(
         preprocessMode: String,
         tta: String,

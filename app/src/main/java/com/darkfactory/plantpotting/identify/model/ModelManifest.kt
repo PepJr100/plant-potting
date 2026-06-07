@@ -41,7 +41,23 @@ data class ModelManifest(
     //   ttaCropCount   = 1        → single crop = current behaviour; >1 enables multi-crop TTA.
     val preprocessMode: PreprocessMode = PreprocessMode.SQUASH,
     val ttaCropCount: Int = 1,
+    // PLANTPOTTING-0012 Phase 4 — targeted disambiguation gate, default-empty so any other model
+    // is unaffected. When a result's raw top-1 label resolves to a pair's `top1KbSpeciesId`, the
+    // verdict is forced to low-confidence (routed to the picker) and every `surfaceKbSpeciesIds`
+    // member is guaranteed visible as a candidate. Composes WITH the abstain margin, never replaces
+    // it. See docs/sprints/evidence/PLANTPOTTING-0012/boundary-gating-decision.md (Candidate B).
+    val boundaryPairs: List<BoundaryPair> = emptyList(),
 ) {
+    /**
+     * A pothos↔Pilea-style boundary rule. If the raw top-1 label resolves to [top1KbSpeciesId], the
+     * mapper forces the low-confidence route and surfaces all [surfaceKbSpeciesIds] as candidates so
+     * a confident single-class misread (e.g. pothos→Pilea @ 0.9661, no second-place mass) can never
+     * become a confidently-wrong direct care card.
+     */
+    data class BoundaryPair(
+        val top1KbSpeciesId: String,
+        val surfaceKbSpeciesIds: List<String>,
+    )
     data class Normalization(
         val mean: FloatArray,
         val std: FloatArray,
@@ -171,6 +187,23 @@ class ModelManifestReader(
                 }
             val ttaCropCount = obj["tta"]?.jsonPrimitive?.int ?: 1
 
+            // PLANTPOTTING-0012 — optional boundary-pair gate; absent → empty (no-op for any model
+            // without it). Each entry requires a `route` of "low_confidence" (the only behaviour);
+            // an unknown route is a hard error so a typo can't silently disable the gate.
+            val boundaryPairs: List<ModelManifest.BoundaryPair> =
+                obj["boundary_pairs"]?.jsonArray?.map { el ->
+                    val o = el.jsonObject
+                    val route = o["route"]?.jsonPrimitive?.content ?: "low_confidence"
+                    if (route != "low_confidence") {
+                        error("model_manifest.json: boundary_pairs route '$route' (expected 'low_confidence')")
+                    }
+                    ModelManifest.BoundaryPair(
+                        top1KbSpeciesId = o["top1_kb_species_id"]!!.jsonPrimitive.content,
+                        surfaceKbSpeciesIds =
+                            (o["surface_kb_species_ids"] as JsonArray).map { it.jsonPrimitive.content },
+                    )
+                } ?: emptyList()
+
             return ModelManifest(
                 variant = obj["variant"]!!.jsonPrimitive.content,
                 sha256 = obj["sha256"]!!.jsonPrimitive.content,
@@ -195,6 +228,7 @@ class ModelManifestReader(
                 perSpeciesThresholds = perSpeciesThresholds,
                 preprocessMode = preprocessMode,
                 ttaCropCount = ttaCropCount,
+                boundaryPairs = boundaryPairs,
             )
         }
     }
