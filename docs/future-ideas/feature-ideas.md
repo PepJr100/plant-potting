@@ -13,11 +13,22 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none open — both raw ideas folded into PLANTPOTTING-0010)_
+- would like a spike on monetisation ideas. Obvious idea are 1. Targeted ads in app 2. small cost on play store (for pro / no adds version) 3. subscription (for pro / no adds version) 4. link-up with substrate supplier (vereral revenue) 5 . vertical intergration (sell substrate myself) 6. Horizontal partnerships. e.g. plantpots / plant supplies through referal links
+  - would like to idea other ideas (think of 40 refine to top 5 "Easiest to implement" top 5 "Biggest potential profit return")
+  - score the two "top 5" and my ideas on ease to impliment / potential revenue 2x2 
 
 ## developed idea
 
-_(none yet — raw ideas that have been fleshed out into a paragraph go here)_
+- **Draft a codex `config.toml` OpenRouter profile (DeepSeek V4 Pro / Qwen 3.7 Max) so Pattern-B is ready
+  to test once the $10 credit lands.** Add a `[model_providers.openrouter]` block to `~/.codex/config.toml`
+  (`base_url = "https://openrouter.ai/api/v1"`, `wire_api = "chat"`, `env_key`, `requires_openai_auth = false`)
+  and a documented invocation (`codex --config model_provider=openrouter --config model=deepseek/deepseek-v4-pro …`
+  / `…=qwen/qwen3.7-max …`). Goal: a repo-grounded **agentic** drafter/critiquer (Pattern B) backed by a paid
+  OpenRouter model — the agy-quota fallback that does *not* hallucinate file paths. Spend belongs on Pattern-B
+  drafting only, not Pattern-A. Full rationale, pricing, reliability findings, and the config snippet are in
+  [`alt-drafter-models-eval.md`](alt-drafter-models-eval.md) §7B (agentic CLI backend) + §7C (paid-tier option).
+  Not yet wired into the `sprint-*` skills — `.claude/skills/` is gitignored, so this is a manual config on the
+  principal's machine + a future skill update. _Awaiting the OpenRouter credit before testing._
 
 ## idea decisions
 
