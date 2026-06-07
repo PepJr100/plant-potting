@@ -92,10 +92,26 @@ object FixturePerturbations {
     private fun brightnessMatrix(delta: Float): ColorMatrix =
         ColorMatrix(
             floatArrayOf(
-                1f, 0f, 0f, 0f, delta,
-                0f, 1f, 0f, 0f, delta,
-                0f, 0f, 1f, 0f, delta,
-                0f, 0f, 0f, 1f, 0f,
+                1f,
+                0f,
+                0f,
+                0f,
+                delta,
+                0f,
+                1f,
+                0f,
+                0f,
+                delta,
+                0f,
+                0f,
+                1f,
+                0f,
+                delta,
+                0f,
+                0f,
+                0f,
+                1f,
+                0f,
             ),
         )
 
@@ -103,10 +119,26 @@ object FixturePerturbations {
         val translate = (-0.5f * scale + 0.5f) * 255f
         return ColorMatrix(
             floatArrayOf(
-                scale, 0f, 0f, 0f, translate,
-                0f, scale, 0f, 0f, translate,
-                0f, 0f, scale, 0f, translate,
-                0f, 0f, 0f, 1f, 0f,
+                scale,
+                0f,
+                0f,
+                0f,
+                translate,
+                0f,
+                scale,
+                0f,
+                0f,
+                translate,
+                0f,
+                0f,
+                scale,
+                0f,
+                translate,
+                0f,
+                0f,
+                0f,
+                1f,
+                0f,
             ),
         )
     }

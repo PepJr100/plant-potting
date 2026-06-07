@@ -36,7 +36,10 @@ class FixtureIntegrityTest {
             ?: emptyList()
 
     private fun expectedId(file: File): String =
-        file.name.removeSuffix(".jpg").removeSuffix(".JPG").substringBefore("__")
+        file.name
+            .removeSuffix(".jpg")
+            .removeSuffix(".JPG")
+            .substringBefore("__")
 
     private fun reachableKbIds(context: Context): Set<String> {
         val raw = context.assets.open(productionMappingPath).use { String(it.readBytes(), Charsets.UTF_8) }
@@ -100,7 +103,12 @@ class FixtureIntegrityTest {
     fun everyExpectedSpeciesIdResolvesInKb() =
         runBlocking {
             val context = ApplicationProvider.getApplicationContext<Context>()
-            val kbIds = KbLoader(context.assets).load().species.map { it.id }.toSet()
+            val kbIds =
+                KbLoader(context.assets)
+                    .load()
+                    .species
+                    .map { it.id }
+                    .toSet()
             for (file in jpgFixtures()) {
                 val id = expectedId(file)
                 assertWithMessage("fixture '${file.name}' expected id '$id' must resolve in KB")

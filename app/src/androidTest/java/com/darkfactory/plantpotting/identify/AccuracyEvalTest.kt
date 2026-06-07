@@ -8,7 +8,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.darkfactory.plantpotting.identify.model.ImagePreprocessor
 import com.darkfactory.plantpotting.identify.model.ModelLabelMapReader
 import com.darkfactory.plantpotting.identify.model.ModelLabelsReader
-import com.darkfactory.plantpotting.identify.model.ModelManifest
 import com.darkfactory.plantpotting.identify.model.ModelManifestReader
 import com.darkfactory.plantpotting.identify.model.ModelScoreMapper
 import com.darkfactory.plantpotting.identify.model.PreprocessMode
@@ -123,6 +122,7 @@ class AccuracyEvalTest {
                 thresholds = manifest.thresholds,
                 perSpeciesThresholds = manifest.perSpeciesThresholds,
             )
+
         fun inVocab(kbId: String): Boolean = labels.any { mapping.lookup(it)?.kbSpeciesId == kbId }
 
         // One preprocessor per mode (the manifest copy carries the lever settings).
@@ -239,8 +239,22 @@ class AccuracyEvalTest {
             )
         } catch (e: Throwable) {
             Row(
-                baseImage, expectedId, modeName, perturbation, family,
-                "", 0f, "", 0f, 0f, "", emptyList(), inVocab, "error", false, -1,
+                baseImage,
+                expectedId,
+                modeName,
+                perturbation,
+                family,
+                "",
+                0f,
+                "",
+                0f,
+                0f,
+                "",
+                emptyList(),
+                inVocab,
+                "error",
+                false,
+                -1,
                 e.message ?: e.javaClass.simpleName,
             )
         }
@@ -305,7 +319,13 @@ class AccuracyEvalTest {
             sb.append("## mode: $mode\n\n")
             val modeRows = rows.filter { it.mode == mode && it.failure.isEmpty() }
             // Overall + each family (clean is its own "family").
-            val families = listOf("clean") + rows.map { it.family }.filter { it != "clean" }.distinct().sorted()
+            val families =
+                listOf("clean") +
+                    rows
+                        .map { it.family }
+                        .filter { it != "clean" }
+                        .distinct()
+                        .sorted()
             sb.append("| cut | n | top1 | top3 | confident-wrong | abstain | med-lat | worst-lat |\n")
             sb.append("|---|---|---|---|---|---|---|---|\n")
             sb.append(metricLine("ALL", modeRows))
@@ -313,7 +333,9 @@ class AccuracyEvalTest {
             sb.append(metricLine("IN-VOCAB (all)", modeRows.filter { it.inVocab }))
             // Per-base-image-averaged top-1 (clean rows only) so one heavily-perturbed photo can't dominate.
             val perBaseClean =
-                modeRows.filter { it.perturbation == "clean" }.groupBy { it.baseImage }
+                modeRows
+                    .filter { it.perturbation == "clean" }
+                    .groupBy { it.baseImage }
                     .map { (_, rs) -> if (rs.any { it.mappedTop1 == it.expectedId && it.route == "high-conf" }) 1.0 else 0.0 }
             val perBaseTop1 = if (perBaseClean.isEmpty()) 0.0 else perBaseClean.average()
             sb.append("\nPer-base-image-averaged clean top-1 (high-conf correct): ${"%.3f".format(perBaseTop1)}\n\n")
