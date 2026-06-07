@@ -164,7 +164,9 @@ class ModelSwapEvaluationTest {
             // (NOT seeded — 0006 anti-overfit discipline).
             assertThat(row("spathiphyllum-wallisii").route).isEqualTo("low-conf")
             assertThat(row("spathiphyllum-wallisii").mappedTop1).isEqualTo("spathiphyllum-wallisii")
-            // pothos is confidently confused with Pilea (unmapped) → routes low-conf, honest.
+            // pothos is confidently confused with Pilea (raw top-1 = Pilea @ 0.9661). PLANTPOTTING-0012
+            // mapped Pilea, so without a gate this would now be a confidently-WRONG Pilea card; the
+            // pothos↔Pilea boundary gate forces it back to low-conf (picker) — the whole point of 0012.
             assertThat(row("epipremnum-aureum").route).isEqualTo("low-conf")
             // jade is the correct top-1 (crassula-ovata) but the model splits it with money-tree
             // (Pachira) ~0.58/0.42; that <0.30 top1-top2 gap trips the high_confidence_abstain_margin
@@ -204,6 +206,9 @@ class ModelSwapEvaluationTest {
                 kb = kb,
                 thresholds = manifest.thresholds,
                 perSpeciesThresholds = manifest.perSpeciesThresholds,
+                // PLANTPOTTING-0012 — probe the real production mapper config per model (the house-plant
+                // model carries the pothos↔Pilea boundary gate; AIY's manifest has none → empty).
+                boundaryPairs = manifest.boundaryPairs,
             )
 
         // Which KB ids are reachable in this model's vocabulary (for the in-vocab flag).
