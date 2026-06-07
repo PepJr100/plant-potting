@@ -69,6 +69,7 @@ Ten sprints landed on `main`:
 | PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done |
 | PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh, persistence, My Plants, "Add this plant", +12 KB species (→38 mapped), CC0/PD reference photos | done (v0.4.0) |
 | PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness (41 fixtures/30 species), TTA-6 + margin-abstention (confident-wrong 0.38→0.18), thicker confidence bar, all reference plates → photos + Image-credits screen | done (v0.5.0) |
+| PLANTPOTTING-0012 | Pothos↔Pilea boundary fix: ship Pilea behind a disambiguation gate (mapped 38→39, +19 CC0 fixtures → 60/39); proven confident-wrong-neutral; TTA grid sweep (tta stays 6) | done (v0.6.0) |
 
 What you can do today:
 
@@ -79,9 +80,10 @@ What you can do today:
 - **Identify a plant on-device.** Camera capture → JPEG → House Plant Species
   MobileNetV2 TensorFlow Lite model (~10.9 MB, float16, 47 houseplant classes,
   bundled in `app/src/main/assets/ml/house_plant_species_mobilenetv2/` —
-  PLANTPOTTING-0007). It maps **38 of its 47** model classes to KB care cards
+  PLANTPOTTING-0007). It maps **39 of its 47** model classes to KB care cards
   (PLANTPOTTING-0009 took it 10→26; PLANTPOTTING-0010 added 12 more popular-slice
-  species; Pilea deferred), vs the AIY Plants V1/3 baseline's 5 — which stays bundled
+  species; PLANTPOTTING-0012 added Pilea behind the pothos↔Pilea boundary gate),
+  vs the AIY Plants V1/3 baseline's 5 — which stays bundled
   in `app/src/main/assets/ml/aiy_plants_v1/` as the regression anchor; the active model
   is selected by the `ACTIVE_MODEL_ROOT` `BuildConfig` switch. Inference runs entirely
   on-device; the network policy is enforced at build time by `verifyNoNetworking`.
