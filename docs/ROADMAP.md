@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-06-06
-through_sid: PLANTPOTTING-0010
+last_updated: 2026-06-07
+through_sid: PLANTPOTTING-0011
 ---
 
 # ROADMAP
@@ -11,7 +11,34 @@ in [`docs/sprints/`](sprints/); this file is the current view.
 > Maintained by the `/roadmap` skill (INIT / REFRESH / BUMP). The frontmatter above is
 > parsed by routing — `last_updated` and `through_sid` drive when a REFRESH is due.
 
-## Current state (post-PLANTPOTTING-0010)
+## Current state (post-PLANTPOTTING-0011)
+
+**The confident-wrong failure mode is now measured and tamed under clean conditions.**
+PLANTPOTTING-0011 confronted the 0010-review headline — the production classifier being *confidently
+wrong* on real captures — behind the frozen `PlantIdentifier` seam, **no model swap, no training**,
+sequenced **MEASURE → IMPROVE → ABSTAIN**. It built the project's first honest, reproducible
+**`AccuracyEvalTest` scorecard** (run on the **local `pixel6Api34`** — the "CI-only" assumption was
+wrong), grew the CC0/PD/CC-BY fixture set **8 → 41 photos / 30 species**, and added a deterministic
+synthetic-perturbation generator. **MEASURE:** BEFORE confident-wrong **0.382** (0.268 even on clean).
+**IMPROVE:** center-crop measured identical to squash (dropped); **TTA-6** (centre + 4 corners +
+full-frame, softmax-averaged) adopted → 0.226 at ~125 ms median. **ABSTAIN:** a new default-disabled
+`high_confidence_abstain_margin` (production **0.30**) downgrades low-margin high-confidence verdicts to
+the picker → **AFTER confident-wrong 0.179** (0.098 on clean) — a **53% reduction**, top-1 held ~flat,
+**held-out validated** (tune-on-clean/eval-on-perturbation 0.186; leave-one-species-out 0.167–0.188), at
+an accepted pick-manually cost of 0.089 → 0.323. Plus the two 0010 fold-ins: a thicker confidence bar,
+and **all 11 botanical-plate reference images swapped to real photos** (the strict CC0/PD fold-in did
+pink-princess; a follow-on pass relaxed to CC-BY/Unsplash/Pexels with an in-app Image-credits screen for
+the rest). Version **v0.5.0**; frozen seam + AIY anchor + Pilea-absence unchanged; all gates GREEN.
+
+**Review verdict: clean — no bugs, no UX issues.** Every acceptance criterion passed; on-device sanity
+confirmed (previously confident-wrong captures now route to the picker; bar reads thicker; swapped photos
+render). **Honesty framing (load-bearing):** these are *measured-under-clean-conditions +
+synthetic-robustness* numbers on a set that still under-represents messy phone captures — **not
+"real-world accuracy solved."** The harness is now in place to measure any future lever honestly.
+Forward note (principal): once the real fixture set is larger, sweep higher **TTA ×8/×10/×20** and map
+confident-wrong vs latency up to a **~2 s worst-case budget**. See `feedback/PLANTPOTTING-0011/feedback.md`.
+
+---
 
 **It now feels like an app — and on-device review surfaced the real headline: model accuracy.**
 PLANTPOTTING-0010 was a deliberately mixed "make it feel like an app" sprint behind the frozen
@@ -117,8 +144,8 @@ whether a fine-tuning sprint is even viable.
 > photos. Full narrative reconciliation (Layer Status, Species/Model Coverage, Known Gaps, Proposed
 > Path) is deferred to the next `/roadmap refresh`.
 
-_Derived stats: ~12,641 Kotlin LOC (app/src, incl. tests); 52 unit + 19 instrumentation test
-files; acceptance checkboxes 682/725 ticked (~94%) across `docs/sprints/*.md` (the open boxes are
+_Derived stats: ~14,252 Kotlin LOC (app/src, incl. tests); 58 unit + 22 instrumentation test
+files; acceptance checkboxes ~753/805 ticked (~94%) across `docs/sprints/*.md` (the open boxes are
 the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in lieu of)._
 
 ## Layer status
@@ -129,10 +156,11 @@ the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in l
 | Persistence (DataStore) | ✓ shipped (0010) | App's first local-persistence layer. One DataStore document, two collections (`identifiedPlants` N-capped + `addPlantRequests` tally) via `PlantLogStore`; injectable `TimeProvider`. Local-only (`verifyNoNetworking` GREEN). **Does not survive uninstall** (principal request logged for next sprint). |
 | Home / My Plants / Add-this-plant UI | ✓ shipped (0010) | Home/landing (2×2 tiles + recent carousel) is now the start destination; My Plants (Save, de-dup, remove, thumbnails, restart-persistent); Add-this-plant wireframe routes confident-but-unmapped classes and logs a tally. Shared bottom Home button on every screen. |
 | Confidence display | ✓ shipped (0010) | Numeric %+`LinearProgressIndicator` on `ResultScreen` via an optional `confidencePct` nav arg off `CandidateProvider` (seam untouched); degrades gracefully (no %/bar) on stub flows. |
-| Reference images | ✓ shipped (0010) | 44 CC0/PD images (one per species, Wikimedia Commons) under `res/drawable-nodpi/` via `PlantImageResolver` + placeholder fallback; manifest + cross-check test. **Note:** a few are vintage botanical *plates* (drawings), not photos — flagged as a refinement. |
+| Reference images | ✓ all-photo (0011) | 44 images (one per species) under `res/drawable-nodpi/` via `PlantImageResolver` + placeholder fallback; manifest + cross-check test. **All 11 botanical plates now swapped to real photos** (0011: pink-princess under strict CC0; the rest under CC-BY/Unsplash/Pexels with an in-app Image-credits screen). No plates remain. |
+| Accuracy eval harness | ✓ shipped (0011) | `AccuracyEvalTest` (GMD/local `pixel6Api34`) runs every fixture + 11 deterministic synthetic perturbations × 3 preprocessing modes → rich per-row `accuracy-eval.csv` + summary; CC0/PD/CC-BY fixture set **41 photos / 30 species** with license + integrity + CSV-schema guard tests. The project's first reproducible scorecard. |
 | Model bundle (active / baseline) | ✓ swapped (0007) | **Active default: `house_plant_species_mobilenetv2`** (MobileNetV2, 47 classes, Apache-2.0, float16, 10.42 MiB). AIY V1/3 retained as the bundled regression anchor. One `ACTIVE_MODEL_ROOT` switch selects between them. |
 | Identifier (interface + on-device impl + stub) | ✓ shipped | `OnDevicePlantIdentifier` is production. Seam **unchanged** through the 0007 swap (candidate `[1,47]` FLOAT32 fits existing mapper + preprocessor). |
-| Confidence calibration | ✓ probe-backed (post-swap) | Mechanism shipped (`perSpeciesThresholds` in manifest, reader, mapper). Re-probed against the new model over 8 fixtures: 6 hits clear the global 0.55 outright. `per_species_thresholds` stays **empty by design** — peace lily @ 0.4468 not seeded (sub-50%), pothos confidently wrong (not a threshold case). Routing honesty preserved (0006 discipline). |
+| Confidence calibration | ✓ abstention-backed (0011) | Mechanism shipped (`perSpeciesThresholds` + new `high_confidence_abstain_margin`, default `0f`). **0011 set the production margin to 0.30** on the locked TTA-6 pipeline: confident-wrong **0.382 → 0.179** (0.098 clean), top-1 ~flat, held-out validated; pick-manually cost 0.089 → 0.323. `per_species_thresholds` still **empty by design** (no species met the 0006 bar). Routing honesty preserved. |
 | Camera UI | ✓ shipped | Shutter, bind-pending overlay, Failure banner with `Try again`. |
 | Result + Recommendation UI | ✓ shipped | Source-driven badge; archetype + recipe; sum-to-100 enforced. |
 | LowConfidencePicker | ✓ shipped | Subtitle (de-jargoned in 0006) + chevron chips (drop `(0%)` suffix on floored-zero candidates, still selectable) + empty-state cards + outlined archetype CTA + small-screen viewport assertion. |
@@ -155,8 +183,9 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 | KB species OOV in active model | 6 | monstera-adansonii, both Philodendrons, ficus-lyrata, chlorophytum-comosum, hoya-carnosa — route to `LowConfidencePicker`. 0008 confirmed CC fine-tune data for 5 of 6 (pink-princess NO-GO); fine-tune **deferred**. |
 | Probe results (8 fixtures) | 6 high-conf correct | monstera 1.0000, snake 1.0000, calathea 1.0000, orchid 1.0000, ZZ 0.9350, jade 0.5825. Weak: peace lily 0.4468 (correct, sub-threshold); pothos confidently confused with Pilea. |
 | Routing | threshold-gated | Top-1 score vs per-class threshold (`perSpeciesThresholds`) falling back to the 0.55 global → `ResultScreen` (high-conf) or `LowConfidencePicker` (low-conf / out-of-vocab). |
-| Latency | 33 ms median | Down from AIY's 43 ms despite the larger, more capable model. |
-| Calibration | ✓ probe-backed (re-baselined to new model) | `per_species_thresholds` empty **by design** — 6 hits clear the global outright; peace lily not seeded (sub-50%); pothos a confidently-wrong case, not a threshold case. 0006 anti-overfit discipline holds. |
+| Real-photo accuracy (0011) | top-1 ~0.53, confident-wrong **0.179** | First broad honest scorecard: 41 fixtures / 30 species (of 38 mapped), clean + 11 perturbations. BEFORE confident-wrong 0.382 → AFTER 0.179 (0.098 clean) via TTA-6 + 0.30 abstain margin. *Measured-under-clean + synthetic-robustness, NOT real-world-solved.* |
+| Latency | 125 ms median (TTA-6) | Single-crop is ~20 ms; production now runs 6 TTA views (centre + 4 corners + full-frame), 125 ms median / 539 ms worst on a one-shot identify — accepted for the confident-wrong reduction. |
+| Calibration | ✓ abstention-backed (0011) | `high_confidence_abstain_margin = 0.30` on the locked TTA-6 pipeline downgrades low-margin verdicts to the picker; `per_species_thresholds` still empty **by design** (none met the 0006 bar). Held-out validated (LOSO 0.167–0.188). 0006 anti-overfit discipline holds. |
 
 ## Sprint history
 
@@ -180,18 +209,17 @@ How much of the bundled KB the on-device model identifies verbatim, and the cali
 unprobed-calibration / Pilea-boundary / deferred-fine-tune gaps.** Re-prioritized after the 0010
 ship/review:
 
-0. **★ Real-world identification accuracy is poor (the 0010-review headline).** On-device, the
-   principal reports a snake plant is correctly identified only **~1 in 3 captures**; the other ~2/3 it
-   *confidently* predicts a different plant. This is **not a 0010 regression** (0010 was app-experience;
-   the model/labels were untouched) — it is the production `house_plant_species_mobilenetv2` default
-   plus the uncalibrated 0009/0010 delta mappings meeting real-world photos for the first time at scale,
-   now that the app surfaces a confident %+card. **Why it matters:** confident-but-wrong is the worst
-   failure mode for trust, and the new confidence bar makes it louder. **Candidate closes:** a
-   calibration-probe sweep over the common species to quantify real top-1 accuracy and a sane high-conf
-   threshold; confidence-threshold / abstention tuning so confident-wrong becomes "not sure → pick
-   manually"; fine-tuning stays **deferred** (0008 PARTIAL-GO; license-clean / no-self-shot data is the
-   blocker). This is the likely next-sprint headline and probably supersedes the pothos↔Pilea fix in
-   priority. Captured in `feedback/PLANTPOTTING-0010/feedback.md`.
+0. **★ Real-world accuracy: measured & reduced under clean conditions (0011); messy-capture accuracy
+   still open.** 0011 confronted the 0010-review headline behind the frozen seam (no model swap, no
+   training): it built the first honest scorecard and drove **confident-wrong 0.382 → 0.179** (0.098 on
+   clean) via TTA-6 + a 0.30 abstain margin, held-out validated, top-1 flat. **What's still open:** the
+   eval set (41 CC0/PD/CC-BY photos, 30 species, clean/field shots) **under-represents the principal's
+   messy phone captures** — the win is *measured-under-clean + synthetic-robustness, NOT real-world
+   solved*. 8 mapped species still have no clean CC0 photo (untested). **Candidate closes:** expand the
+   real fixture set (the license-clean ceiling is the blocker, per 0008's 1–6.8% figure), then sweep
+   higher **TTA ×8/×10/×20** mapping confident-wrong vs latency up to a **~2 s worst-case budget**
+   (principal request; 0011 capped TTA at 6 ≈ 125 ms); fine-tuning stays **deferred** (0008 PARTIAL-GO;
+   license-clean / no-self-shot data is the blocker). Captured in `feedback/PLANTPOTTING-0011/feedback.md`.
 
 1. **The 28 new delta mappings are unprobed (editorial coverage, not calibrated).** *(0009's 16 + 0010's 12.)* 0009 closed the cheap
    slice of the delta — coverage **10 → 26 of 47** — but the new rows' per-class confidence behaviour is
@@ -254,29 +282,32 @@ Accepted as-is (recorded, **not** an open gap):
   clean (no bugs/UX issues); all gates GREEN; content vetted; on-device spot-check via a v0.3.0 debug
   build. Pilea left unmapped (CI-enforced). The 16 new mappings are **unprobed** (editorial coverage).
 
-#### Next (re-pointed by the 0010 review): real-world accuracy / calibration
-- **Intent:** the app now *feels* finished, but the 0010 on-device review exposed that identification is
-  **confidently wrong ~2 of 3 times** on a real snake plant. Trust now hinges on accuracy, not features.
-  The next sprint should **measure and tame real-world accuracy** before adding more coverage.
-- **Entry conditions:** PLANTPOTTING-0010 merged to `origin/main` (`status: done`) and its review PR
-  merged.
-- **Scope hints (to be firmed up in planning):**
-  1. **Quantify it.** A calibration-probe sweep over the common species (extend the 0006-style in-vocab
-     probes against real photos) to get an honest top-1 accuracy number and a defensible high-confidence
-     threshold — the 28 new 0009/0010 mappings are entirely unprobed.
-  2. **Abstain instead of lying.** Confidence-threshold / abstention tuning (raise the global gate or add
-     per-class gates) so a confident-wrong prediction routes to "not sure → pick manually" rather than a
-     confident wrong card. The 0010 confidence bar makes this both more urgent and more measurable.
-  3. **Pothos↔Pilea boundary fix** folds in here (it is the sharpest known confident-wrong case — pothos
-     top-1 = Pilea @ 0.9661) — pair the deferred Pilea KB entry with the gating fix.
-  4. Fine-tuning stays **deferred** (0008 PARTIAL-GO; license-clean / no-self-shot data is the blocker);
-     revisit only if a data path opens.
+#### Shipped: PLANTPOTTING-0011 — accuracy & trust (measure → improve → abstain) — *done, reviewed clean*
+- Confronted the 0010 confident-wrong headline behind the frozen seam (no model swap, no training):
+  first honest `AccuracyEvalTest` scorecard; fixtures **8 → 41 photos / 30 species** + synthetic
+  perturbations; **TTA-6 adopted** (center-crop dropped); new `high_confidence_abstain_margin = 0.30`.
+  **Confident-wrong 0.382 → 0.179** (0.098 clean), top-1 flat, held-out validated; pick-manually cost
+  0.089 → 0.323; latency 20 → 125 ms median. Folded in a thicker confidence bar and swapped **all 11
+  botanical plates to real photos** (+ in-app Image-credits). v0.5.0. Review clean — no bugs. *Win framed
+  as measured-under-clean + synthetic-robustness, NOT real-world solved.*
+
+#### Next (open — to be firmed up in planning): pick one of two threads
+- **Entry conditions:** PLANTPOTTING-0011 merged to `origin/main` (`status: done`) and its review PR merged.
+- **Thread A — push real-world accuracy further (continues gap #0).**
+  1. **Expand the real fixture set.** The honest number is bounded by the small clean set (8 mapped
+     species still untested; license-clean supply is the ceiling, 0008's 1–6.8%). More independent base
+     photos per species is the only honest way to grow effective sample count under the no-self-shot ban.
+  2. **Sweep higher TTA (principal request).** Once the set is larger, map confident-wrong / confidence
+     vs latency for **TTA ×8/×10/×20** up to a **~2 s worst-case budget** (0011 capped at 6 ≈ 125 ms).
+  3. Fine-tuning stays **deferred** (0008 PARTIAL-GO; license-clean / no-self-shot data is the blocker).
+- **Thread B — pothos↔Pilea boundary fix (the sharpest standing confident-wrong case).** Pothos top-1 =
+  Pilea @ 0.9661; pair the long-deferred Pilea KB entry with strict boundary gating so adding it can't
+  surface a confidently-wrong card. General 0011 abstention helps incidentally but isn't targeted at it.
 - **Notes:**
   - **No self-shot / first-party imagery** anywhere (hard user constraint) and **no model training** —
     behind the frozen `PlantIdentifier` seam.
-  - **Minor 0010-review refinements** to fold in opportunistically: swap the botanical-*plate* reference
-    images for CC0/PD photos (or open the "free-to-use" bucket); slightly thicken the confidence bar;
-    consider My-Plants-survives-uninstall (Android Auto Backup or local export — note the standing
+  - **Remaining 0010-review refinement** (the plate + confidence-bar items shipped in 0011): consider
+    **My-Plants-survives-uninstall** (Android Auto Backup or local export — note the standing
     no-cloud-sync non-goal).
 
 ### Milestone ladder (skeleton — sprints become detailed as they approach)
@@ -317,6 +348,20 @@ for the bundled species set.
 
 ## Changelog
 
+- 2026-06-07 — bumped through PLANTPOTTING-0011 (review close-out): reconciled the accuracy & trust
+  sprint (clean review — no bugs, no UX issues; all gates re-run GREEN; on-device sanity confirmed).
+  Recorded the project's first honest **`AccuracyEvalTest` scorecard** (local `pixel6Api34`), the fixture
+  set growing **8 → 41 photos / 30 species** + synthetic perturbations, **TTA-6 adopted** (center-crop
+  dropped), and the new default-disabled **`high_confidence_abstain_margin` (production 0.30)** →
+  **confident-wrong 0.382 → 0.179** (0.098 clean), top-1 flat, **held-out validated**, pick-manually cost
+  0.089 → 0.323, latency 20 → 125 ms median. Folded in a thicker confidence bar and **all 11 botanical
+  plates → real photos** (pink-princess under strict CC0; the rest CC-BY/Unsplash/Pexels + in-app
+  Image-credits). v0.5.0. Frozen seam + AIY anchor + Pilea-absence unchanged. **Reframed gap #0:**
+  real-world accuracy is now *measured & reduced under clean conditions* but messy-capture accuracy
+  remains open (win is measured-under-clean + synthetic-robustness, NOT real-world solved). **Set the next
+  horizon** to two candidate threads — push real-world accuracy further (expand fixtures → sweep TTA
+  ×8/×10/×20 to a ~2 s budget, principal request) or the pothos↔Pilea boundary fix. Captured in
+  `feedback/PLANTPOTTING-0011/feedback.md`.
 - 2026-06-06 — bumped through PLANTPOTTING-0010 (review close-out): reconciled the app-experience
   sprint (clean review — no bugs). Recorded the first **local-persistence layer** (DataStore, one store /
   two collections), the **Home/landing** screen, **My Plants**, **confidence %+bar**, **contained

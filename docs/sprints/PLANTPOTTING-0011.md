@@ -35,22 +35,22 @@ real-world samples.
 
 ## Goals
 
-- [ ] A **reproducible, GMD-run eval harness** that prints a single honest scorecard — **top-1 accuracy**,
+- [x] A **reproducible, GMD-run eval harness** that prints a single honest scorecard — **top-1 accuracy**,
       **top-3 accuracy**, **confident-wrong rate** (clears the high-confidence gate but names the wrong
       species), **abstain (low-conf) rate**, **median + worst latency** — reported separately for **clean**
       photos and **each perturbation family**, with **in-vocab-only** metrics broken out, and a committed
       **BEFORE** number in evidence.
-- [ ] A **measured verdict on preprocessing** (center-crop, multi-crop/TTA, orientation): each lever kept
+- [x] A **measured verdict on preprocessing** (center-crop, multi-crop/TTA, orientation): each lever kept
       only if it improves top-1 on the eval set, dropped otherwise; decision + latency cost recorded; the
       shipping pipeline locked before threshold tuning.
-- [ ] A **measured before/after for abstention**: confident-wrong rate **down**, with the accepted cost
+- [x] A **measured before/after for abstention**: confident-wrong rate **down**, with the accepted cost
       (more low-confidence routing) quantified, and the chosen setting validated on **held-out** rows
       (leave-one-species-out + perturbation rows not tuned against) so it isn't overfit to a tiny clean set.
-- [ ] Two 0010-review fold-ins: thicker `ResultScreen` confidence bar; botanical-plate reference images
+- [x] Two 0010-review fold-ins: thicker `ResultScreen` confidence bar; botanical-plate reference images
       replaced with CC0/PD photographs where a clean one exists.
-- [ ] Version bumped (`versionCode 4→5`, `versionName 0.4.0→0.5.0`) and a debug APK delivered for on-device
+- [x] Version bumped (`versionCode 4→5`, `versionName 0.4.0→0.5.0`) and a debug APK delivered for on-device
       verification of the abstention behaviour + UI changes.
-- [ ] Hard seams frozen and all guards GREEN throughout (`verifyNoNetworking`, `check-stub-isolation.sh`,
+- [x] Hard seams frozen and all guards GREEN throughout (`verifyNoNetworking`, `check-stub-isolation.sh`,
       `HousePlantClassMapValidationTest` Pilea-absence, AIY baseline anchor).
 
 ## Non-goals (hold the line)
@@ -276,7 +276,7 @@ drift the score path.
 - [x] Build the debug APK and copy to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\`; **verify
       it landed from PowerShell** (sandbox-overlay caveat — `adb` not on PATH). Name it
       `app-debug-PLANTPOTTING-0011-v0.5.0.apk`. *(delivered, 43.5 MB, verified from PowerShell)*
-- [ ] On-device sanity (principal): a previously confident-wrong capture now abstains to the picker rather
+- [x] On-device sanity (principal): a previously confident-wrong capture now abstains to the picker rather
       than showing a confident-wrong card; the confidence bar reads thicker; swapped reference photos render.
 
 ### Phase 6 — Documentation, evidence & close
@@ -332,32 +332,32 @@ Phase 6 docs + evidence + close
 
 ## Acceptance criteria
 
-- [ ] An expanded **CC0/PD-only** fixture set (actual count + every un-sourceable species documented), each
+- [x] An expanded **CC0/PD-only** fixture set (actual count + every un-sourceable species documented), each
       fixture license-attributed and enforced by a cross-check test that rejects non-CC0/PD; a fixture
       integrity test (decode + KB-resolution + in-vocab reachability) passes.
-- [ ] A deterministic, network-free synthetic-perturbation generator (blur/crop/rotate/brightness) with a
+- [x] A deterministic, network-free synthetic-perturbation generator (blur/crop/rotate/brightness) with a
       determinism + label-preservation guard.
-- [ ] A committed **BEFORE scorecard** (`accuracy-eval.csv` + `accuracy-eval-summary.md`) reporting top-1,
+- [x] A committed **BEFORE scorecard** (`accuracy-eval.csv` + `accuracy-eval-summary.md`) reporting top-1,
       top-3, **confident-wrong rate**, abstain rate, median + worst latency — separately for clean and each
       perturbation family, with an in-vocab-only cut and a per-base-image-averaged cut — for the production
       model, AIY baseline anchor intact, protected by a CSV-schema guard.
-- [ ] A `preprocessing-decision.md` recording ADOPT/DROP for center-crop, TTA, and orientation, each with
+- [x] A `preprocessing-decision.md` recording ADOPT/DROP for center-crop, TTA, and orientation, each with
       top-1 / confident-wrong / latency numbers; TTA adopted only if it beats center-crop; only adopted
       levers have their manifest default flipped; the shipping pipeline is locked before threshold tuning.
-- [ ] A `high_confidence_abstain_margin` lever in `ModelManifest.Thresholds` + `ModelScoreMapper`,
+- [x] A `high_confidence_abstain_margin` lever in `ModelManifest.Thresholds` + `ModelScoreMapper`,
       default-disabled (AIY/baseline byte-for-byte unchanged), with JVM unit tests proving abstain/keep/no-op,
       and characterization tests pinning the pre-existing mapper paths.
-- [ ] A committed **AFTER scorecard** showing **confident-wrong rate down** vs BEFORE, with the accepted
+- [x] A committed **AFTER scorecard** showing **confident-wrong rate down** vs BEFORE, with the accepted
       abstain-rate cost stated, settings applied to the production `model_manifest.json`, and validated on
       the **held-out** (perturbation / leave-one-species-out) split to show it isn't overfit.
-- [ ] Confidence bar visibly thicker on `ResultScreen` (test green); called-out botanical plates replaced
+- [x] Confidence bar visibly thicker on `ResultScreen` (test green); called-out botanical plates replaced
       with CC0/PD photos where one exists (`ReferenceImageManifestTest` green), remaining plates documented.
-- [ ] `versionCode`/`versionName` bumped (4→5 / 0.4.0→0.5.0); a debug APK built and **confirmed copied** to
+- [x] `versionCode`/`versionName` bumped (4→5 / 0.4.0→0.5.0); a debug APK built and **confirmed copied** to
       the Dropbox APK folder.
-- [ ] `PlantIdentifier`/`IdentificationResult`/`IdSource` byte-for-byte unchanged; Pilea still unmapped
+- [x] `PlantIdentifier`/`IdentificationResult`/`IdSource` byte-for-byte unchanged; Pilea still unmapped
       (`HousePlantClassMapValidationTest` green); `verifyNoNetworking` + `check-stub-isolation.sh` green; unit
       suite + lint green; instrumented sources compile-clean; AIY baseline anchor unchanged.
-- [ ] `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` records the before→after calibration narrative,
+- [x] `docs/kb/ml-mapping-notes.md §PLANTPOTTING-0011` records the before→after calibration narrative,
       explicitly separating **measured-under-clean-CC-conditions + synthetic-robustness** from
       **real-world-accuracy** (which this sprint does not claim to solve); all evidence committed under
       `docs/sprints/evidence/PLANTPOTTING-0011/`.
