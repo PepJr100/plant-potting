@@ -67,7 +67,7 @@ sprints:
     updated: "2026-06-07T02:38:33+00:00"
   - id: PLANTPOTTING-0012
     title: "Pothos<->Pilea boundary fix: ship Pilea KB entry behind disambiguation gating + fixture/TTA support"
-    status: in-progress
+    status: done
     executor: opus (claude-opus-4-8)
     created: "2026-06-07T09:55:19+00:00"
-    updated: "2026-06-07T14:50:23+00:00"
+    updated: "2026-06-07T22:41:49+00:00"
