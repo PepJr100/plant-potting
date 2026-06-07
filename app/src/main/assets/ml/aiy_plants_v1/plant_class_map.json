@@ -47,6 +47,7 @@
     "Cycas revoluta":          { "kbSpeciesId": "cycas-revoluta", "_note": "PLANTPOTTING-0010 dormant coverage row." },
     "Yucca (spp.)":            { "kbSpeciesId": "yucca", "_note": "PLANTPOTTING-0010 dormant coverage row." },
     "Ctenanthe (spp.)":        { "kbSpeciesId": "ctenanthe", "_note": "PLANTPOTTING-0010 dormant coverage row." },
-    "Schlumbergera bridgesii": { "kbSpeciesId": "schlumbergera-bridgesii", "_note": "PLANTPOTTING-0010 dormant coverage row." }
+    "Schlumbergera bridgesii": { "kbSpeciesId": "schlumbergera-bridgesii", "_note": "PLANTPOTTING-0010 dormant coverage row." },
+    "Pilea peperomioides":     { "kbSpeciesId": "pilea-peperomioides", "_note": "PLANTPOTTING-0012 dormant coverage row (keeps the every-KB-species-reachable invariant). AIY is not the active model; the pothos<->Pilea boundary gate governs the production house_plant model." }
   }
 }

@@ -383,3 +383,48 @@ numbers — NOT "real-world accuracy solved." The win is **confident-wrong drive
 clean) with raw top-1 held flat and the cost (more "pick manually") quantified.** The AIY baseline
 anchor, the frozen `PlantIdentifier`/`IdentificationResult`/`IdSource` seam, and the Pilea-absence
 guard were unchanged throughout.
+
+---
+
+## PLANTPOTTING-0012 — pothos↔Pilea boundary fix + Pilea now mapped (behind a gate)
+
+**The 0009 Pilea deferral is LIFTED.** `Chinese Money Plant (Pilea peperomioides)` is now mapped to
+`pilea-peperomioides` (class-map count 38→39), but **only in lockstep with a pothos↔Pilea
+disambiguation gate** — never on its own. `HousePlantClassMapValidationTest.pileaIsNotMapped` is
+replaced by `pileaMapsToPileaPeperomioides` **and** `pileaMappingRequiresBoundaryGate` (a tree that
+maps Pilea without the gate turns CI red — that transient state is exactly the confidently-wrong
+window this sprint exists to close).
+
+**The gate (Candidate B, fail-safe).** Config lives as `boundary_pairs` in the house_plant
+`model_manifest.json`; the logic is in `ModelScoreMapper`. When a result's **raw top-1 resolves to
+`pilea-peperomioides`**, the verdict is forced to the `LowConfidencePicker` with **both** Pilea and
+pothos (`epipremnum-aureum`) surfaced as candidates. It is scoped to top-1 = Pilea, so a correct
+**pothos-dominant (top-1 = pothos)** result keeps its direct card — correct pothos is not regressed.
+Full rationale + rejected alternatives (A pairwise-delta, C elevated per-species threshold, D
+TTA-only) in `docs/sprints/evidence/PLANTPOTTING-0012/boundary-gating-decision.md`.
+
+**Why a fail-safe (not a direct Pilea card).** The baseline eval (`baseline-pre-pilea-eval.csv`)
+showed pothos raw top-1 = Pilea @ **0.9661** under squash/center_crop (no second-place mass, so the
+0011 abstain margin cannot bite) — *above any plausible confidence threshold*. So a "permit a direct
+Pilea card above bar X" rule (Candidate C) cannot reliably block the pothos→Pilea hit. The fail-safe
+routes every top-1 = Pilea result to the picker. Accepted cost: a **true** Pilea photo loses its
+direct card and appears as a candidate instead (the 6 CC0 Pilea fixtures all raw-predict Pilea
+@ ~0.99–1.00, so they route to the picker with Pilea visible). A direct Pilea card would require
+author-separated / held-out evidence not granted this sprint.
+
+**Measured result (Phase 6, `post-pilea-gated-summary.md`).** Adding Pilea behind the gate is
+**confident-wrong-neutral**: Δ vs. the pre-Pilea baseline = **+0** on clean fixtures, all
+perturbations, AND the pothos/Pilea subset (all three modes) — vs. **+2 / +9 / +6** for a naive
+gateless mapping. Correct-pothos low-confidence route-rate delta = **+0** (the gate never fires on
+top-1 = pothos). **0** pothos fixtures surface a direct Pilea card; all 6 true-Pilea fixtures route
+to the picker with Pilea visible & first. Pilea ships **strict-picker** (no direct card this sprint;
+a direct card would need author-separated / held-out evidence).
+
+**TTA (Phase 7, `tta-sweep-decision.md`): `tta` stays 6.** A grid-tiling sweep (base 6 vs +2×2 vs
++2×2+3×3, gated) found no real win: 2×2 left clean confident-wrong flat with slightly worse top-1;
+2×2+3×3 cut confident-wrong only by crashing top-1 (0.417→0.317) + abstaining 63%, and busted the
+~2 s latency cap. Grid tiles are out-of-distribution for this whole-image classifier, so they dilute
+confidence rather than add signal. The gate (not TTA) fixes the boundary.
+
+**AIY coverage row.** A dormant `Pilea peperomioides` row was added to the AIY map to keep
+`mappingCoversEveryBundledKbSpecies` green (AIY is not the active model; the gate governs production).

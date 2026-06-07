@@ -28,9 +28,9 @@ class KbContentSpeciesTest {
     private val archetypeIds: Set<String> by lazy { archetypes.map { it.id }.toSet() }
 
     @Test
-    fun bundlesExactlyFortyFourSpecies() {
-        // PLANTPOTTING-0010: 32 (0009) + 12 popular-slice delta species = 44.
-        assertThat(species).hasSize(44)
+    fun bundlesExactlyFortyFiveSpecies() {
+        // PLANTPOTTING-0010: 32 (0009) + 12 popular-slice delta = 44. PLANTPOTTING-0012: +1 (pilea-peperomioides) = 45.
+        assertThat(species).hasSize(45)
     }
 
     /** PLANTPOTTING-0010 delta species → expected archetype id. */

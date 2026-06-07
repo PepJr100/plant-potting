@@ -334,3 +334,84 @@ cycas-revoluta__01.jpg  (cycas-revoluta)
   Rosie Bibby, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/471752890/original.jpg
 yucca__01.jpg  (yucca)
   terrifricker, CC0, via iNaturalist. https://inaturalist-open-data.s3.amazonaws.com/photos/609022027/original.jpg
+
+
+================================================================================
+PLANTPOTTING-0012 §Phase 1 — pothos<->Pilea boundary fixture expansion (CC0 only)
+================================================================================
+
+Nineteen fixtures support the pothos<->Pilea boundary work: +5 pothos and +6 NEW
+Pilea peperomioides base photos (the boundary pair), and one base photo for each
+of the 8 previously-untested mapped species. Every fixture is CC0 (iNaturalist
+open-data); the four pre-existing CC BY-SA fixtures above stay grandfathered. All
+were visually vetted for species correctness + houseplant context (botanical
+plates, watermarked, multi-species-cluttered, duplicate, and CC-BY/CC-BY-SA
+candidates were rejected and logged), then centre-cropped to square, scaled to
+480x480 and re-encoded JPEG q80 to match the existing fixtures. Test-only assets
+under app/src/androidTest/ — NOT bundled into the production APK. Machine-readable
+provenance is in fixture-manifest.tsv; the full search/accept/reject log (incl.
+reason codes and the 8-untested outcome table) is in
+docs/sprints/evidence/PLANTPOTTING-0012/fixture-sourcing-log.md.
+
+-- pothos + Pilea boundary pair --
+
+pilea-peperomioides__01.jpg  (Pilea peperomioides (Chinese money plant), windowsill)
+  dinomariobob, CC0, via iNaturalist. https://www.inaturalist.org/observations/359518103
+
+pilea-peperomioides__02.jpg  (Pilea peperomioides, top-down indoor)
+  Tiago Lubiana, CC0, via iNaturalist. https://www.inaturalist.org/observations/343957760
+
+pilea-peperomioides__03.jpg  (Pilea peperomioides, green pot, plain ground)
+  Olsza Borys, CC0, via iNaturalist. https://www.inaturalist.org/observations/104571297
+
+pilea-peperomioides__04.jpg  (Pilea peperomioides, white pot on wood)
+  Daniel Atha, CC0, via iNaturalist. https://www.inaturalist.org/observations/19419839
+
+pilea-peperomioides__05.jpg  (Pilea peperomioides, top-down outdoor blue table)
+  dmagdee, CC0, via iNaturalist. https://www.inaturalist.org/observations/30726140
+
+pilea-peperomioides__06.jpg  (Pilea peperomioides, blue pot, windowsill)
+  Curran Dwyer, CC0, via iNaturalist. https://www.inaturalist.org/observations/206040961
+
+epipremnum-aureum__02.jpg  (pothos, green form climbing a trunk)
+  natalie, CC0, via iNaturalist. https://www.inaturalist.org/observations/104746694
+
+epipremnum-aureum__03.jpg  (pothos, golden-variegated, climbing)
+  Carter Dorscht, CC0, via iNaturalist. https://www.inaturalist.org/observations/323067999
+
+epipremnum-aureum__04.jpg  (pothos, mature fenestrated + variegated)
+  Al Kordesch, CC0, via iNaturalist. https://www.inaturalist.org/observations/19283352
+
+epipremnum-aureum__05.jpg  (pothos, green/gold-flecked foliage close-up)
+  Ben Keen, CC0, via iNaturalist. https://www.inaturalist.org/observations/140623857
+
+epipremnum-aureum__06.jpg  (pothos, trailing heart-leaf vine)
+  Stuart, CC0, via iNaturalist. https://www.inaturalist.org/observations/250918513
+
+
+-- 8 previously-untested mapped species (one base photo each) --
+
+saintpaulia-ionantha__01.jpg  (African violet (Streptocarpus/Saintpaulia ionanthus), bloom + fuzzy leaves)
+  Agnes Trekker, CC0, via iNaturalist. https://www.inaturalist.org/observations/197677998
+
+chamaedorea-elegans__01.jpg  (parlor palm, pinnate frond)
+  Diego Blanco, CC0, via iNaturalist. https://www.inaturalist.org/observations/265957956
+
+beaucarnea-recurvata__01.jpg  (ponytail palm, swollen base + strappy leaves)
+  Jenny Christianson, CC0, via iNaturalist. https://www.inaturalist.org/observations/15836863
+
+alocasia__01.jpg  (Alocasia, large arrow-shaped leaves)
+  Richard Fuller, CC0, via iNaturalist. https://www.inaturalist.org/observations/274191561
+
+dracaena__01.jpg  (Dracaena fragrans (corn plant), strappy rosette)
+  葉子, CC0, via iNaturalist. https://www.inaturalist.org/observations/298657464
+
+begonia__01.jpg  (Begonia, asymmetric leaf + flower)
+  Alfredo F. Fuentes Claros, CC0, via iNaturalist. https://www.inaturalist.org/observations/177733418
+
+ctenanthe__01.jpg  (Ctenanthe, herringbone-patterned leaf)
+  Alex Fernando, CC0, via iNaturalist. https://www.inaturalist.org/observations/201422905
+
+schlumbergera-bridgesii__01.jpg  (Schlumbergera (Christmas/Thanksgiving cactus), magenta bloom)
+  Agnes Trekker, CC0, via iNaturalist. https://www.inaturalist.org/observations/195709223
+

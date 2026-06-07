@@ -89,6 +89,11 @@ object OnDeviceIdentifyProvidersModule {
     @PerSpeciesThresholds
     fun providePerSpeciesThresholds(manifest: ModelManifest): Map<String, Float> = manifest.perSpeciesThresholds
 
+    // PLANTPOTTING-0012 — pothos↔Pilea boundary gate config (distinct List type; no qualifier needed).
+    @Provides
+    @Singleton
+    fun provideBoundaryPairs(manifest: ModelManifest): List<ModelManifest.BoundaryPair> = manifest.boundaryPairs
+
     @Provides
     @Singleton
     fun provideInterpreterFacade(

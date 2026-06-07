@@ -7,7 +7,9 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Test
@@ -137,9 +139,9 @@ class HousePlantClassMapValidationTest {
     }
 
     @Test
-    fun mapsExactlyThirtyEightClasses() {
-        // 10 (0007) + 16 (0009) + 12 (0010) — guards against both accidental extras and silent drops.
-        assertThat(mappingRows()).hasSize(38)
+    fun mapsExactlyThirtyNineClasses() {
+        // 10 (0007) + 16 (0009) + 12 (0010) + 1 (0012: Pilea) — guards both accidental extras and silent drops.
+        assertThat(mappingRows()).hasSize(39)
     }
 
     @Test
@@ -167,8 +169,33 @@ class HousePlantClassMapValidationTest {
     }
 
     @Test
-    fun pileaIsNotMapped() {
-        // PLANTPOTTING-0009 Pilea deferral guard: must stay unmapped until the boundary-fix sprint.
-        assertThat(mappingRows().keys).doesNotContain("Chinese Money Plant (Pilea peperomioides)")
+    fun pileaMapsToPileaPeperomioides() {
+        // PLANTPOTTING-0012: the 0009 deferral is lifted — Pilea is now mapped (in lockstep with the gate).
+        val row = mappingRows()["Chinese Money Plant (Pilea peperomioides)"]
+        assertWithMessage("Pilea mapping row present").that(row).isNotNull()
+        assertThat(row!!["kbSpeciesId"]!!.jsonPrimitive.content).isEqualTo("pilea-peperomioides")
+    }
+
+    @Test
+    fun pileaMappingRequiresBoundaryGate() {
+        // PLANTPOTTING-0012 bind-mapping-to-gate guard: IF Pilea is mapped, the production manifest
+        // MUST carry a pothos↔Pilea boundary rule that routes a top-1 = pilea-peperomioides result to
+        // the picker. A tree that maps Pilea without the gate (the confidently-wrong window the sprint
+        // exists to close) turns this red.
+        val pileaMapped =
+            mappingRows()["Chinese Money Plant (Pilea peperomioides)"]
+                ?.get("kbSpeciesId")
+                ?.jsonPrimitive
+                ?.content == "pilea-peperomioides"
+        if (!pileaMapped) return // vacuously satisfied if Pilea is ever un-mapped again
+
+        val manifestRaw = String(readAsset("model_manifest.json"), Charsets.UTF_8)
+        val pairs: JsonArray =
+            json.parseToJsonElement(manifestRaw).jsonObject["boundary_pairs"]?.jsonArray ?: JsonArray(emptyList())
+        val triggers =
+            pairs.map { it.jsonObject["top1_kb_species_id"]!!.jsonPrimitive.content }
+        assertWithMessage("mapping Pilea requires a boundary_pairs rule with top1=pilea-peperomioides")
+            .that(triggers)
+            .contains("pilea-peperomioides")
     }
 }

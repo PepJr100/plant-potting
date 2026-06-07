@@ -123,21 +123,55 @@ class ImagePreprocessor
             return Bitmap.createBitmap(bitmap, x, y, side, side)
         }
 
-        // Centre full square + four corner squares (0.8× the short side) + the full frame (no crop),
-        // deterministic geometry. The full-frame view is last so `take(5)` keeps the crop-only set.
+        // Deterministic TTA ensemble, built so `take(6)` is byte-for-byte the shipped tta6 set and
+        // higher counts only APPEND views (production stays unchanged at tta=6):
+        //   views 1–6   centre + 4 corners (0.8×) + full frame  (the shipped set)
+        //   views 7–10  2×2 uniform grid tiles                  (PLANTPOTTING-0012 sweep → ×10)
+        //   views 11–19 3×3 uniform grid tiles                  (PLANTPOTTING-0012 sweep → ×19)
+        // The grid tiles cover regions the centre/corner set under-samples WITHOUT re-scoring the
+        // same zones (each tile is a distinct, non-overlapping cell of the frame, squashed to the
+        // model input). Only the first `ttaCropCount` are materialised. Fixed geometry, no RNG.
         private fun cropVariants(bitmap: Bitmap): List<Bitmap> {
+            val n = manifest.ttaCropCount
             val shortSide = min(bitmap.width, bitmap.height)
             val corner = (shortSide * CORNER_CROP_FRACTION).roundToInt().coerceAtLeast(1)
             val maxX = bitmap.width - corner
             val maxY = bitmap.height - corner
-            return listOf(
-                centerSquare(bitmap),
-                Bitmap.createBitmap(bitmap, 0, 0, corner, corner), // top-left
-                Bitmap.createBitmap(bitmap, maxX, 0, corner, corner), // top-right
-                Bitmap.createBitmap(bitmap, 0, maxY, corner, corner), // bottom-left
-                Bitmap.createBitmap(bitmap, maxX, maxY, corner, corner), // bottom-right
-                bitmap, // full frame (no crop) — toTensor() squashes it to the model input
-            ).take(manifest.ttaCropCount)
+            val base =
+                listOf(
+                    centerSquare(bitmap),
+                    Bitmap.createBitmap(bitmap, 0, 0, corner, corner), // top-left
+                    Bitmap.createBitmap(bitmap, maxX, 0, corner, corner), // top-right
+                    Bitmap.createBitmap(bitmap, 0, maxY, corner, corner), // bottom-left
+                    Bitmap.createBitmap(bitmap, maxX, maxY, corner, corner), // bottom-right
+                    bitmap, // full frame (no crop) — toTensor() squashes it to the model input
+                )
+            if (n <= base.size) return base.take(n)
+
+            // --- experiment-only extension (PLANTPOTTING-0012 Phase 7); never reached at tta<=6 ---
+            val views = base.toMutableList()
+            views += gridTiles(bitmap, 2) // 7–10: 2×2 grid
+            if (n > views.size) views += gridTiles(bitmap, 3) // 11–19: 3×3 grid
+            return views.take(n)
+        }
+
+        // k×k uniform, non-overlapping tiles of the frame (row-major). Each tile is squashed to the
+        // model input by toTensor(), like the full-frame view — new spatial coverage, no re-score.
+        private fun gridTiles(
+            bitmap: Bitmap,
+            k: Int,
+        ): List<Bitmap> {
+            val tiles = ArrayList<Bitmap>(k * k)
+            for (r in 0 until k) {
+                for (c in 0 until k) {
+                    val x0 = bitmap.width * c / k
+                    val y0 = bitmap.height * r / k
+                    val w = (bitmap.width * (c + 1) / k) - x0
+                    val h = (bitmap.height * (r + 1) / k) - y0
+                    tiles += Bitmap.createBitmap(bitmap, x0, y0, w.coerceAtLeast(1), h.coerceAtLeast(1))
+                }
+            }
+            return tiles
         }
 
         private fun ensureMutableArgb(bitmap: Bitmap): Bitmap =

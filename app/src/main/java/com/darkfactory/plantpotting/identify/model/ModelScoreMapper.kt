@@ -31,6 +31,8 @@ class ModelScoreMapper
         private val kb: KnowledgeBase,
         private val thresholds: ModelManifest.Thresholds,
         @PerSpeciesThresholds private val perSpeciesThresholds: Map<String, Float> = emptyMap(),
+        // PLANTPOTTING-0012 Phase 4 — targeted pothos↔Pilea boundary gate (default empty = no-op).
+        private val boundaryPairs: List<ModelManifest.BoundaryPair> = emptyList(),
     ) {
         fun map(scores: FloatArray): MappedScore {
             require(scores.size == labels.size) {
@@ -84,6 +86,22 @@ class ModelScoreMapper
             val abstainOnNarrowMargin =
                 (bestProb - secondProb) < thresholds.highConfidenceAbstainMargin
 
+            // PLANTPOTTING-0012 Phase 4 — pothos↔Pilea boundary gate (Candidate B). If the raw top-1
+            // resolves to a boundary trigger species (e.g. pilea-peperomioides), force the picker and
+            // guarantee both pair members are visible — independent of confidence, because the target
+            // error (pothos→Pilea @ 0.9661) has no second-place mass for the abstain margin to bite.
+            // Scoped to top-1 = trigger, so a pothos-dominant (correct) result is never affected.
+            val boundaryPair = bestEntry?.let { be -> boundaryPairs.firstOrNull { it.top1KbSpeciesId == be.kbSpeciesId } }
+            if (boundaryPair != null) {
+                return lowConfidence(
+                    candidates = boundaryCandidates(boundaryPair, mappedCandidates, ranked, scores),
+                    topLabel = topLabel,
+                    topProbability = bestProb,
+                    topIsMapped = topIsMapped,
+                    topIsConfidentUnmapped = topIsConfidentUnmapped,
+                )
+            }
+
             return if ((highConfDirect || highConfMargin) && !abstainOnNarrowMargin) {
                 val species =
                     kb.findSpecies(bestEntry!!.kbSpeciesId)
@@ -111,6 +129,32 @@ class ModelScoreMapper
                     topIsConfidentUnmapped = topIsConfidentUnmapped,
                 )
             }
+        }
+
+        /**
+         * Candidate bundle for a fired boundary gate: the existing top-K mapped candidates (so the
+         * true raw-top — e.g. Pilea — stays first and is not buried), plus any [BoundaryPair]
+         * `surfaceKbSpeciesIds` member that fell outside top-K (e.g. pothos at a low rank), appended
+         * at its own best score. De-duplicated by speciesId so a pair member already present in top-K
+         * is never duplicated.
+         */
+        private fun boundaryCandidates(
+            pair: ModelManifest.BoundaryPair,
+            topKCandidates: List<Candidate>,
+            ranked: List<Int>,
+            scores: FloatArray,
+        ): List<Candidate> {
+            val present = topKCandidates.mapTo(mutableSetOf()) { it.speciesId }
+            val out = topKCandidates.toMutableList()
+            for (kbId in pair.surfaceKbSpeciesIds) {
+                if (kbId in present) continue
+                val idx = ranked.firstOrNull { mapping.lookup(labels[it])?.kbSpeciesId == kbId } ?: continue
+                candidateForIndex(idx, scores[idx])?.let {
+                    out += it
+                    present += kbId
+                }
+            }
+            return out
         }
 
         private fun candidateForIndex(

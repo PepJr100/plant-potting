@@ -20,6 +20,7 @@
   "mapping_asset": "ml/house_plant_species_mobilenetv2/plant_class_map.json",
   "preprocess_mode": "squash",
   "tta": 6,
+  "_comment_tta_0012": "PLANTPOTTING-0012 Phase 7 — grid-tiling TTA sweep (base 6 vs +2x2 grid vs +2x2+3x3 grid; gated pipeline; evidence: docs/sprints/evidence/PLANTPOTTING-0012/tta-sweep-decision.md). 2x2 left clean confident-wrong flat (0.117) with slightly worse top-1; 2x2+3x3 cut confident-wrong to 0.050 only by crashing top-1 (0.417->0.317) + abstaining 63%, and busted the ~2s worst-case cap (2686ms). Grid tiles are out-of-distribution for this whole-image classifier (a 3x3 tile is ~one leaf) so they dilute confidence rather than add signal. tta stays 6; the pothos<->Pilea gate (not TTA) fixes the boundary.",
   "_comment_preprocessing": "PLANTPOTTING-0011 Phase 2 (evidence: docs/sprints/evidence/PLANTPOTTING-0011/preprocessing-decision.md; 41-fixture/30-species eval set). center_crop measured IDENTICAL to squash (no benefit) -> DROPPED, mode stays 'squash'. Multi-crop TTA ADOPTED at 6 views (centre + 4 corners + full-frame): confident-wrong 0.382 -> 0.226 at ~6x latency (20->125ms median) on a one-shot identify. Default tta=1 (off) for any other model; only this production model is locked to 6.",
   "thresholds": {
     "high_confidence_plain": 0.55,
@@ -31,6 +32,14 @@
   "_comment_thresholds": "Identical to AIY (PLANTPOTTING-0003 §4.3) EXCEPT high_confidence_abstain_margin=0.30, added in PLANTPOTTING-0011 Phase 3: a high-confidence verdict whose top1-top2 margin is < 0.30 is downgraded to the picker. Tuned on the locked tta6 pipeline (evidence: docs/sprints/evidence/PLANTPOTTING-0011/abstention-before-after.md). With TTA-6 it cuts confident-wrong 0.382->0.179 overall and 0.268->0.098 on clean photos, for an accepted pick-manually rise to ~0.323. Held-out (tune-on-clean/eval-on-perturbation) cw=0.186; leave-one-species-out 0.167-0.188 stable. Do NOT lower the plain/margin gates to flatter a candidate (0006 discipline).",
   "per_species_thresholds": {},
   "_comment_per_species_thresholds": "Empty by design until the Phase 3 swap-eval probe shows an in-vocab species fails the global threshold by a margin a per-class override would cleanly close. Never seed to bless a weak prediction.",
+  "boundary_pairs": [
+    {
+      "top1_kb_species_id": "pilea-peperomioides",
+      "route": "low_confidence",
+      "surface_kb_species_ids": ["pilea-peperomioides", "epipremnum-aureum"]
+    }
+  ],
+  "_comment_boundary_pairs": "PLANTPOTTING-0012 Phase 4 — pothos<->Pilea disambiguation gate (Candidate B; see docs/sprints/evidence/PLANTPOTTING-0012/boundary-gating-decision.md). The production model confidently confuses pothos with Pilea (pothos top-1 = 'Chinese Money Plant (Pilea peperomioides)' @ 0.9661, NO second-place mass, so high_confidence_abstain_margin cannot catch it). When a result's raw top-1 resolves to pilea-peperomioides, ModelScoreMapper forces the LowConfidencePicker and surfaces BOTH pilea-peperomioides and epipremnum-aureum as candidates. Scoped to top-1 = Pilea, so a correct pothos-dominant (top-1 = pothos) result is never affected — correct, confident, direct pothos cards are preserved. This gate is the precondition for mapping Pilea at all (CI-bound by HousePlantClassMapValidationTest.pileaMappingRequiresBoundaryGate); the mapping and this block must land/stay together.",
   "_comment_coverage": "RECOMPUTE in Phase 4 from the model's actual 47 labels: 10 of 47 mapping entries resolve to KB species; 10 of 16 KB species covered (8 exact + 2 coarse: Orchid->phalaenopsis, Calathea->goeppertia-orbifolia). Headline coverage delta vs AIY: 2/16 -> 10/16. 6 KB species remain out-of-vocab (monstera-adansonii, philodendron-hederaceum, philodendron-pink-princess, ficus-lyrata, chlorophytum-comosum, hoya-carnosa) and route to LowConfidencePicker as before.",
   "_comment_conversion": "Converted 2026-06-05 from upstream model/20240921-2014-full-image-set-mobilenetv2-Adam.h5 (sha256 866f6251beb25cef1d02bf6143701a0a6ac39e3458f80ec098f08070d2f16f8f) via convert_house_plant_model.py --quant float16 (TF 2.21.0, tf-keras 2.21.0, tensorflow-hub 0.16.1, TF_USE_LEGACY_KERAS=1). Offline dev step; no app runtime dependency added."
 }

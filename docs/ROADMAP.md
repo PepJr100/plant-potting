@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-07
-through_sid: PLANTPOTTING-0011
+through_sid: PLANTPOTTING-0012
 ---
 
 # ROADMAP
@@ -10,6 +10,31 @@ in [`docs/sprints/`](sprints/); this file is the current view.
 
 > Maintained by the `/roadmap` skill (INIT / REFRESH / BUMP). The frontmatter above is
 > parsed by routing — `last_updated` and `through_sid` drive when a REFRESH is due.
+
+## Current state (post-PLANTPOTTING-0012)
+
+**Pilea now ships — safely — behind a pothos↔Pilea disambiguation gate; the confident-wrong boundary
+is closed without re-opening it.** The production model confidently confuses pothos with Pilea (pothos
+raw top-1 = *Chinese Money Plant (Pilea peperomioides)* @ **0.9661**, no second-place mass, so the 0011
+abstain margin can't catch it). Pilea was safe only because it was unmapped (the top-1 fell through to
+the picker); naively mapping it would have turned that silent miss into a *confidently-wrong Pilea card*.
+PLANTPOTTING-0012 (behind the frozen seam, **no model swap, no training**) sourced **+19 CC0 fixtures**
+(6 new Pilea + 5 pothos + the 8 previously-untested mapped species — `identify-fixtures` now **60 photos
+/ 39 species**), measured the boundary, then landed — **atomically** — the Pilea KB entry + class mapping
+(**38 → 39**) **and** a `ModelScoreMapper` boundary gate (Candidate B): when raw top-1 resolves to
+`pilea-peperomioides` the verdict is forced to the `LowConfidencePicker` with Pilea **and** pothos
+surfaced. It is scoped to top-1 = Pilea, so **correct pothos-dominant cards are preserved**. A CI guard
+(`pileaMappingRequiresBoundaryGate`) makes a Pilea-without-gate tree red. **Result:** adding Pilea is
+**confident-wrong-neutral** — Δ vs. baseline **+0** on clean, perturbations, and the pothos/Pilea subset
+(vs. +2/+9/+6 naive); correct-pothos picker-rate Δ **+0**; **0** pothos→direct-Pilea-card; all 6 true-Pilea
+route to the picker with Pilea visible. Pilea ships **strict-picker** (no direct card — a 0.9661 pothos
+hit clears any threshold, so a direct card is unsafe without held-out evidence). A **TTA grid-tiling sweep**
+(base 6 vs +2×2 vs +2×2+3×3) found no real win — fine tiles are out-of-distribution for the whole-image
+model, diluting confidence into abstention and busting the ~2 s cap — so **`tta` stays 6** (the gate, not
+TTA, fixes the boundary). Version **v0.6.0**; frozen seam + AIY anchor unchanged; all gates GREEN; debug
+APK delivered.
+
+---
 
 ## Current state (post-PLANTPOTTING-0011)
 
@@ -152,12 +177,12 @@ the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in l
 
 | Layer | Status | Notes |
 | --- | --- | --- |
-| KB (species.json, archetypes.json, plant_class_map.json) | ✓ expanded (0010) | **44 species, 9 archetypes**. The active model's `plant_class_map.json` now resolves **38 of 47** model classes (was 26 after 0009, 10 before). Pilea deliberately unmapped (CI-enforced). 0009+0010 delta mappings unprobed (editorial coverage). |
+| KB (species.json, archetypes.json, plant_class_map.json) | ✓ expanded (0012) | **45 species, 9 archetypes**. The active model's `plant_class_map.json` resolves **39 of 47** model classes (was 38 after 0010, 26 after 0009, 10 before). **Pilea now mapped (0012) — only in lockstep with the pothos↔Pilea boundary gate** (CI-bound by `pileaMappingRequiresBoundaryGate`). 0009+0010 delta mappings unprobed (editorial coverage). |
 | Persistence (DataStore) | ✓ shipped (0010) | App's first local-persistence layer. One DataStore document, two collections (`identifiedPlants` N-capped + `addPlantRequests` tally) via `PlantLogStore`; injectable `TimeProvider`. Local-only (`verifyNoNetworking` GREEN). **Does not survive uninstall** (principal request logged for next sprint). |
 | Home / My Plants / Add-this-plant UI | ✓ shipped (0010) | Home/landing (2×2 tiles + recent carousel) is now the start destination; My Plants (Save, de-dup, remove, thumbnails, restart-persistent); Add-this-plant wireframe routes confident-but-unmapped classes and logs a tally. Shared bottom Home button on every screen. |
 | Confidence display | ✓ shipped (0010) | Numeric %+`LinearProgressIndicator` on `ResultScreen` via an optional `confidencePct` nav arg off `CandidateProvider` (seam untouched); degrades gracefully (no %/bar) on stub flows. |
 | Reference images | ✓ all-photo (0011) | 44 images (one per species) under `res/drawable-nodpi/` via `PlantImageResolver` + placeholder fallback; manifest + cross-check test. **All 11 botanical plates now swapped to real photos** (0011: pink-princess under strict CC0; the rest under CC-BY/Unsplash/Pexels with an in-app Image-credits screen). No plates remain. |
-| Accuracy eval harness | ✓ shipped (0011) | `AccuracyEvalTest` (GMD/local `pixel6Api34`) runs every fixture + 11 deterministic synthetic perturbations × 3 preprocessing modes → rich per-row `accuracy-eval.csv` + summary; CC0/PD/CC-BY fixture set **41 photos / 30 species** with license + integrity + CSV-schema guard tests. The project's first reproducible scorecard. |
+| Accuracy eval harness | ✓ extended (0012) | `AccuracyEvalTest` (GMD/local `pixel6Api34`) runs every fixture + 11 deterministic synthetic perturbations × 3 preprocessing modes → rich per-row `accuracy-eval.csv` + summary; CC0/PD fixture set **60 photos / 39 species** (0012: +19 — 6 Pilea, 5 pothos, 8 untested-species) with license + integrity + CSV-schema guard tests. 0012 added a gated `sweepTtaLevelsEmitCsv` (behind `-e ttaSweep true`) for the grid-tiling TTA sweep. |
 | Model bundle (active / baseline) | ✓ swapped (0007) | **Active default: `house_plant_species_mobilenetv2`** (MobileNetV2, 47 classes, Apache-2.0, float16, 10.42 MiB). AIY V1/3 retained as the bundled regression anchor. One `ACTIVE_MODEL_ROOT` switch selects between them. |
 | Identifier (interface + on-device impl + stub) | ✓ shipped | `OnDevicePlantIdentifier` is production. Seam **unchanged** through the 0007 swap (candidate `[1,47]` FLOAT32 fits existing mapper + preprocessor). |
 | Confidence calibration | ✓ abstention-backed (0011) | Mechanism shipped (`perSpeciesThresholds` + new `high_confidence_abstain_margin`, default `0f`). **0011 set the production margin to 0.30** on the locked TTA-6 pipeline: confident-wrong **0.382 → 0.179** (0.098 clean), top-1 ~flat, held-out validated; pick-manually cost 0.089 → 0.323. `per_species_thresholds` still **empty by design** (no species met the 0006 bar). Routing honesty preserved. |
