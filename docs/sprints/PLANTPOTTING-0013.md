@@ -157,13 +157,13 @@ git tag pushed so a public GitHub Release with the APK is published.
 
 ## Ship — version, gates, APK, release tag (last)
 
-- [ ] Bump `app/build.gradle.kts` to `versionCode = 7`, `versionName = "0.7.0"`.
-- [ ] Run `.\gradlew.bat verifyNoNetworking`.
-- [ ] Run `pwsh scripts/check-stub-isolation.sh`.
-- [ ] Run `.\gradlew.bat ktlintCheck` **before pushing** (CI-only gate; on Windows autocrlf churns ~76 files — stage only real changes; run `ktlintFormat` if needed).
-- [ ] Run `.\gradlew.bat lintDebug` (abortOnError) and fix findings.
-- [ ] Run `.\gradlew.bat testDebugUnitTest` (incl. `ModelScoreMapper*`, `HousePlantClassMapValidationTest`, `ModelManifestTest`, `PerSpeciesThresholds*`, `FixtureLicenseManifestTest`, `FixtureIntegrityTest`, `AccuracyEvalCsvSchemaTest`).
-- [ ] Run the established local `pixel6Api34` GMD/androidTest command for `AccuracyEvalTest` + on-device regressions; confirm `OnDeviceModelRealInterpreterTest` still pins the AIY V1/3 regression anchor.
+- [x] Bump `app/build.gradle.kts` to `versionCode = 7`, `versionName = "0.7.0"`.
+- [x] Run `.\gradlew.bat verifyNoNetworking`. *(green)*
+- [x] Run `pwsh scripts/check-stub-isolation.sh`. *(stub isolation OK)*
+- [x] Run `.\gradlew.bat ktlintCheck` **before pushing** (CI-only gate; on Windows autocrlf churns ~76 files — stage only real changes; run `ktlintFormat` if needed). *(green; only real changes staged)*
+- [x] Run `.\gradlew.bat lintDebug` (abortOnError) and fix findings. *(green)*
+- [x] Run `.\gradlew.bat testDebugUnitTest` (incl. `ModelScoreMapper*`, `HousePlantClassMapValidationTest`, `ModelManifestTest`, `PerSpeciesThresholds*`, `FixtureLicenseManifestTest`, `FixtureIntegrityTest`, `AccuracyEvalCsvSchemaTest`). *(277 tests green, incl. the updated `CandidateBundleContractTest`.)*
+- [x] Run the established local `pixel6Api34` GMD/androidTest command for `AccuracyEvalTest` + on-device regressions; confirm `OnDeviceModelRealInterpreterTest` still pins the AIY V1/3 regression anchor. *(AccuracyEvalTest 66-fixture run done; `OnDeviceModelRealInterpreterTest` green — 3 tests, AIY V1/3 anchor intact.)*
 - [ ] **Update `docs/ROADMAP.md`** with the 0013 result (direct-Pilea-card decision SHIP/FALL-BACK + `T_pilea`, Thread B fixture-count delta + refreshed headline number, remaining limitations) — **before** the final gate run and tag so the released state is documented.
 - [ ] Build a debug APK, copy it to `C:\Users\robev\Dropbox\Curser codeing\Plant_potting_APKs\` as `plantpotting-v0.7.0-debug.apk`, and **verify via PowerShell from the user's terminal** that the file actually landed — record **filename, size, and timestamp** (the Windows sandbox overlay can silently swallow writes outside the project tree).
 - [ ] **Push the `v0.7.0` git tag** (after gates pass) so `release.yml` publishes the public GitHub Release with the APK — a `versionName` bump alone never publishes; the workflow fires only on a pushed `v*` tag.
