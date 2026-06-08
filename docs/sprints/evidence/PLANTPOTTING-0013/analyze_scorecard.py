@@ -36,21 +36,30 @@ def main():
     base = load(BASE) if os.path.exists(BASE) else None
     print(f"post rows={len(post)}  base rows={len(base) if base else 'n/a'}\n")
 
-    # ---- +0 confident-wrong bar vs baseline, per mode ----
-    print("=== confident-wrong: post (direct-card) vs baseline (strict-picker) ===")
+    # ---- +0 confident-wrong bar vs baseline, per mode (GATE-ISOLATED) ----
+    # The gate refinement only changes routing for Pilea-top-1 rows; Thread B added 6 NEW non-Pilea
+    # fixtures. To isolate the gate effect from the fixture-set growth, restrict `post` to the SAME
+    # base images as the baseline before comparing. (The pothos/Pilea subset is identical in both sets
+    # regardless, so its delta is always gate-only.)
+    print("=== confident-wrong: gate-isolated (post restricted to the 60 baseline fixtures) vs baseline ===")
+    print("    binding bar: Δ must be +0 on the SHIPPED (tta6) pipeline")
+    base_imgs = {r["base_image"] for r in base} if base else set()
+    postR = [r for r in post if r["base_image"] in base_imgs] if base else post
     for mode in ("squash", "center_crop", "tta6"):
         shipped = "  <-- SHIPPED" if mode == "tta6" else ""
-        pc = cw_counts(post, mode)
+        pc = cw_counts(postR, mode)
         line = f"mode={mode}{shipped}"
         for surf in ("clean", "allpert", "pothosPilea"):
             pcw, pn = pc[surf]
             if base:
                 bc = cw_counts(base, mode)[surf]
-                delta = pcw - bc[0]
-                line += f"  {surf}={pcw}/{pn}(Δ{delta:+d})"
+                line += f"  {surf}={pcw}/{pn}(Δ{pcw - bc[0]:+d})"
             else:
                 line += f"  {surf}={pcw}/{pn}"
         print(line)
+    if base:
+        print(f"  (isolation check: post-restricted fixtures={len({r['base_image'] for r in postR})}, "
+              f"baseline fixtures={len(base_imgs)} — must match)")
 
     # ---- invariant 1: no pothos fixture surfaces a direct Pilea card (tta6 clean) ----
     print("\n=== invariant: pothos fixtures never → direct Pilea card (tta6 clean) ===")
