@@ -34,3 +34,7 @@ docs/sprints/drafts/_*.txt
 
 # Build/test artifacts produced by integration scripts
 artifacts/
+
+# alt-drafter eval — keep only the write-ups; raw drafts/critiques/logs/harness are local-only
+docs/future-ideas/alt-drafter-models-eval/round2/*
+!docs/future-ideas/alt-drafter-models-eval/round2/EVALUATION.md

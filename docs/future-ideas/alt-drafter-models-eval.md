@@ -1,14 +1,15 @@
 # Evaluation: NVIDIA NIM & OpenRouter free models as sprint drafters / critiquers
 
-**Status:** DRAFT proposal (idea-funnel). Experiment run 2026-06-07.
+**Status:** Experiment run 2026-06-07. **Pattern-B config wired + tested 2026-06-08** (codex + OpenRouter
+DeepSeek V4 Pro: smoke + repo-grounding + file-write all green — see §7D). Model-selection picks added (§7D).
 **Author:** Claude (Opus 4.8), at principal request.
 **Decision asked of reader:** whether to fold any of the *Proposed skill updates* (§7) into the
 `sprint-planner` (and `sprint-execute` / `sprint-review`) skills. **No skill files were changed by this
 experiment** — this is an evaluation + proposal only.
 
-Raw artifacts (every prompt, draft, critique, metric) live in
-[`alt-drafter-models-eval/`](alt-drafter-models-eval/). Reproduce with the harness there
-(`run_models.py`, keys via 1Password — see §8).
+Raw round-1 artifacts (prompts, drafts, critiques, metrics, the `run_models.py` harness) were **not retained
+on `main`** — this write-up is the record. (They were produced on a since-deleted experiment branch;
+reproduction method + keys are in §8.)
 
 ---
 
@@ -25,7 +26,7 @@ The honest question underneath: *do these endpoints add real planning value, or 
 ## 2. Method
 
 To make it a **fair, like-for-like test**, every drafter received the **identical** self-contained
-brief ([`alt-drafter-models-eval/brief.txt`](alt-drafter-models-eval/brief.txt)) — the same
+brief — the same
 PLANTPOTTING-0012 pothos↔Pilea sprint context the real `codex`/`claude` drafts were built from,
 condensed to remove the "go read the repo" instruction (the API models *can't* read the repo, so
 leaving it in would have been an unfair tax). For parity, `codex` and `claude` were **re-run as fresh
@@ -173,7 +174,7 @@ breadth* and *drafter resilience*, not replacing the incumbents.
 1. **Add a wrapper helper to the skill** — `scripts/api-model.py` (or similar) that takes
    `(provider, model, prompt-file, out-file)`, reads the key from 1Password, POSTs to the OpenAI-compatible
    endpoint, and writes the response. This is the missing piece that lets a non-agentic model participate.
-   The experiment's `run_models.py` is a working prototype to adapt.
+   The experiment's completion-wrapper script (Pattern A) is the prototype to adapt.
    - [ ] Decide whether to ship this wrapper in the skill.
 
 2. **Add cheap API models as *extra critiquers* (recommended, highest ROI).** After the three CLI drafts,
@@ -211,15 +212,28 @@ options (June 2026):
    `~/.codex/config.toml`; add a provider block and select it per invocation. This is the lowest-friction
    route because the skills already invoke `codex`.
    ```toml
-   [model_providers.nvidia]
-   base_url = "https://integrate.api.nvidia.com/v1"
-   env_key = "NVIDIA_API_KEY"          # never hard-code the key
-   wire_api = "chat"                    # gateways implement /chat/completions, not /responses
+   [model_providers.openrouter]
+   base_url = "https://openrouter.ai/api/v1"
+   env_key = "OPENROUTER_API_KEY"       # never hard-code the key
+   wire_api = "responses"               # see CAVEAT below — "chat" no longer works on codex 0.137+
    requires_openai_auth = false         # key isn't an sk- prefix
-   # (OpenRouter variant: base_url = "https://openrouter.ai/api/v1")
+   # (NVIDIA NIM variant: base_url = "https://integrate.api.nvidia.com/v1", env_key = "NVIDIA_API_KEY")
    ```
-   Invoke: `codex --config model_provider=nvidia --config model=qwen/qwen3.5-397b-a17b exec "<prompt>"`.
+   Invoke: `codex --config model_provider=openrouter --config model=deepseek/deepseek-v4-pro exec "<prompt>"`.
    Reserved provider IDs are `openai`/`ollama`/`lmstudio` — use a different name.
+
+   > **⚠️ CAVEAT (verified 2026-06-08, codex-cli 0.137.0) — the original `wire_api = "chat"` above is now WRONG.**
+   > codex 0.137+ **removed** the chat-completions wire API and hard-errors on it
+   > (`wire_api = "chat" is no longer supported … set wire_api = "responses"`,
+   > [openai/codex#7782](https://github.com/openai/codex/discussions/7782)). The fix is `wire_api = "responses"`.
+   > **OpenRouter exposes a Responses-compatible endpoint** (`POST https://openrouter.ai/api/v1/responses` → HTTP 200,
+   > `object: "response"`) so codex-over-OpenRouter works. **NVIDIA NIM's `/responses` support is UNVERIFIED** — so the
+   > eval's *primary* Pattern-B pick ("codex + NIM `qwen3.5-397b`") may need re-verification on codex 0.137+; the
+   > **verified-working path is codex + OpenRouter** (see §7D). Two non-fatal quirks on the OpenRouter path:
+   > (a) codex's model-list refresh fails to parse OpenRouter's catalog (expects a `models` field; OpenRouter returns
+   > `data`) and dumps ~0.4–1.5 MB to stderr — **harmless, the `exec` still succeeds**; judge success by the written
+   > draft *file*, not stdout (same discipline already used for `agy`). (b) Resolve the 1Password key once per shell
+   > into `OPENROUTER_API_KEY` before invoking.
    - [ ] Approve a **codex-with-NVIDIA-`qwen3.5-397b` profile as the `agy`-quota fallback drafter**
      (preferred over the Pattern-A item 3, because it's repo-grounded).
 
@@ -280,6 +294,77 @@ backend): a grounded, high-quality drafter.
 - [ ] **Do not** spend on paid Pattern-A *drafting* — same hallucination ceiling as the free models.
 - [ ] Mind the **20 RPM** ceiling (fine for the skills' handful-of-calls-per-phase pattern; only a concern under heavy fan-out).
 
+### 7D. Pattern-B WIRED & TESTED (2026-06-08) + OpenRouter model selection
+
+The `[model_providers.openrouter]` block (above, with the `wire_api = "responses"` fix) is now live in the
+principal's `~/.codex/config.toml`. Three tests through **codex + OpenRouter → `deepseek/deepseek-v4-pro`**, all green:
+
+| Test | Result | Tokens |
+|---|---|---|
+| Smoke (`PONG`) | ✅ routed via OpenRouter, replied correctly | 4.6k |
+| **Repo-grounding** | ✅ agentically explored the real tree (PowerShell recurse + grep) and named **3 real paths, 0 hallucinations** (`app/build.gradle.kts:32` `ACTIVE_MODEL_ROOT`, real `…/house_plant_species_mobilenetv2/plant_class_map.json`, real `HousePlantClassMapValidationTest.kt`) | 46k |
+| **File-write** | ✅ wrote a repo file in the agentic loop, verified on disk | 9.6k |
+
+This **closes the Pattern-A hallucination gap** (§5) empirically: as an agent it reads the repo and cites real
+paths, unlike the completion wrapper that invented `assets/fixtures/` etc. Cost: **< $0.05 total** for all three runs.
+
+#### Model picks — published data (June 2026), split by role and tier
+
+Roles need different things. A **drafter** (Pattern B, agentic) needs reliable **tool-calling**, agent training,
+and generous timeouts (OpenRouter has them — this is why DeepSeek V4 Pro runs here despite 504-ing on NIM's
+~300 s ceiling). A **critiquer** (Pattern A, completion) only reasons over a supplied artifact — tool-calling
+is irrelevant, so go **cheaper and more diverse** from the drafter/incumbents. For *both* roles, **diversity from
+the `claude`/`codex` incumbents** matters, so prefer a **DeepSeek / Qwen / GLM / Kimi** family over another GPT/Claude.
+
+Published standings used below — *Artificial Analysis Intelligence Index (open weights):* Kimi K2.6 **54**,
+DeepSeek V4 Pro (reasoning) **52**, GLM-5.1 **51**, MiniMax M2.7 ~**49.6**. *Agentic/coding:* DeepSeek V4 Pro leads
+Terminal-Bench (**67.9%**) & LiveCodeBench (**93.5%**); Qwen 3.7 Max SWE-bench Pro **60.6%** (beats GPT-5.5);
+GLM-5.1 SWE-bench Pro **58.6**, #3 Code Arena (1530 Elo), 94.6% of Opus-4.6 coding; Qwen3-Coder(-Next) **>70%**
+SWE-bench Verified, best tool-calling of the *free* options. Prices are OpenRouter $/M (in → out).
+
+**DRAFTER (agentic, Pattern B) — top 3:**
+
+| Tier | # | Model | $/M (in→out) | Why |
+|---|---|---|---|---|
+| **Paid** | 1 | `deepseek/deepseek-v4-pro` | 0.43 → 0.87 (cache 0.004) | **The pick.** Cheapest strong agent, 1M ctx, Terminal-Bench/LiveCodeBench leader, OpenRouter timeouts neutralise the NIM 300 s ceiling. Already wired+tested. |
+| | 2 | `qwen/qwen3.7-max` | 1.25 → 3.75 (cache 0.25) | Strongest agent-tuned; SWE-bench Pro 60.6%; 1M ctx; 90% cache discount makes repeat-context runs cheap. Pricier out. |
+| | 3 | `z-ai/glm-5.1` | 0.98 → 3.08 | Proven Claude-Code-style agent integration; #3 Code Arena. `z-ai/glm-4.7` (0.40→1.75) is the cheaper near-substitute. |
+| **Free** | 1 | `qwen/qwen3-coder:free` | 0 | Agent-trained, >70% SWE-bench Verified, **best free tool-calling**, 1M ctx. Best free drafter. |
+| | 2 | `openai/gpt-oss-120b:free` | 0 | Eval-proven **reliable**; fine for routine drafts (but reverted to margin-gating on the tricky 0012 design — weak on subtle problems). |
+| | 3 | `nvidia/nemotron-3-super-120b-a12b:free` | 0 | 1M ctx + tools; steadier than the `:free` Ultra/Kimi that 502/504'd in the eval. |
+
+**CRITIQUER (completion, Pattern A) — top 3:**
+
+| Tier | # | Model | $/M (in→out) | Why |
+|---|---|---|---|---|
+| **Paid** | 1 | `minimax/minimax-m2.1` | 0.29 → 0.95 | Cheapest strong reasoner — critique is cheap-models'-strong-suit (§5); great diverse second opinion. |
+| | 2 | `deepseek/deepseek-v4-pro` | 0.43 → 0.87 | Top-tier reasoning (Index 52) at low cost; if it's *also* your drafter, swap to a different family here for diversity. |
+| | 3 | `moonshotai/kimi-k2.6` | 0.68 → 3.42 | **Highest open-weights Index (54)**; distinct family → genuinely independent critique. |
+| **Free** | 1 | `openai/gpt-oss-120b:free` | 0 | **Eval-proven critiquer** — reliably surfaced the same real gaps as the repo-grounded incumbents. |
+| | 2 | `qwen/qwen3-next-80b-a3b-instruct:free` | 0 | Strong reasoning, reliable Qwen family, 262K ctx. Closest free echo of the eval's NIM `qwen3.5-397b` standout. |
+| | 3 | `nvidia/nemotron-3-super-120b-a12b:free` | 0 | 1M ctx reasoner; reasonable third free voice. |
+
+> **Round-2 empirical test (2026-06-08) — these picks were then road-tested.** A full mock draft+critique
+> round (5 candidates + Claude/Codex incumbents, Pattern-B grounded drafting) is written up in
+> [`alt-drafter-models-eval/round2/EVALUATION.md`](alt-drafter-models-eval/round2/EVALUATION.md). Key result
+> that **updates the table above**: under Pattern B, **only the paid candidates self-wrote a draft — all 3
+> free models failed the agentic write** (gateway flakiness or weak tool-calling), so for *drafting* free is
+> off the table, not merely off the critical path. `deepseek/deepseek-v4-pro` produced a draft competitive
+> with the incumbents at ~$0.03. For *critique* (Pattern A) the free models were fine — `gpt-oss-120b:free`
+> and `nemotron-3-super:free` gave useful critiques at $0. **`qwen/qwen3-coder:free` failed 3/3 today**
+> (drafting ×2, critique ×1, all gateway/rate-limit) — currently unusable on the free tier despite its
+> on-paper strength.
+
+**Caveats that gate the free tier:** reliability, not quality, is the constraint. Keep `:free` models **off the
+critical drafting path**; use them as *bonus* critiquers with retry-and-skip (same rule as the agy fallback). The
+$10 credit raised the free ceiling to **1000 req/day** but a **20 RPM** cap remains. `kimi-k2.6:free` and
+`nemotron-3-ultra:free` were flaky (429 / 502 / 504) in the eval — they're omitted from the picks above on purpose.
+*Sources for the standings:* [Artificial Analysis — DeepSeek V4](https://artificialanalysis.ai/articles/deepseek-is-back-among-the-leading-open-weights-models-with-v4-pro-and-v4-flash),
+[AA index comparison](https://artificialanalysis.ai/models/comparisons/deepseek-v4-pro-vs-glm-5-1),
+[CodingFleet V4-Pro vs GLM-5.1](https://codingfleet.com/blog/deepseek-v4-pro-max-vs-glm-5-1/),
+[Qwen3-Coder-Next report](https://qwen.ai/blog?id=qwen3-coder-next),
+[The Batch — Kimi K2.6](https://www.deeplearning.ai/the-batch/kimi-k2-6-matches-open-qwen3-6-max-anddeepseek-v4-falls-just-behind-top-closed-models).
+
 ## 8. Reproduce / appendix
 
 - Keys: 1Password items `Nvidia_DarkFactoryProjectAIKey` and `Openrouter_DarkFactoryProjectAIKey`,
@@ -287,11 +372,11 @@ backend): a grounded, high-quality drafter.
   integration authorizes per command; `op whoami` may say "not signed in" yet item reads still work).
 - Endpoints (both OpenAI-compatible `/chat/completions`):
   `https://integrate.api.nvidia.com/v1` (NVIDIA), `https://openrouter.ai/api/v1` (OpenRouter).
-- Harness: [`alt-drafter-models-eval/run_models.py`](alt-drafter-models-eval/run_models.py)
-  (`draft` / `critique` modes; per-tag filtering; metrics JSON).
-- Outputs: [`alt-drafter-models-eval/drafts/`](alt-drafter-models-eval/drafts/),
-  [`alt-drafter-models-eval/critiques/`](alt-drafter-models-eval/critiques/),
-  `metrics-*.json`.
+- Harness (round 1): a `run_models.py` completion-wrapper (`draft` / `critique` modes; per-tag filtering;
+  metrics JSON). **Round-1 raw artifacts — harness, drafts, critiques, `metrics-*.json` — were not retained
+  on `main`** (write-ups-only policy); the findings above are the record. Round 2 used the repo-grounded
+  Pattern-B codex+OpenRouter path instead — see [`codex-openrouter-agentic-setup.md`](codex-openrouter-agentic-setup.md)
+  and [`alt-drafter-models-eval/round2/EVALUATION.md`](alt-drafter-models-eval/round2/EVALUATION.md).
 - One-line bottom line: **Adopt `qwen3.5-397b` (NVIDIA) as an extra critiquer now (Pattern A); for the
   agy fallback *drafter*, prefer Pattern B — a codex CLI custom-provider profile pointed at NIM
   `qwen3.5-397b` — so the fallback is repo-grounded. Skip the flaky free OpenRouter models on the critical
