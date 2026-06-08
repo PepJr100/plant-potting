@@ -1,0 +1,7 @@
+fold_held_out,held_out_author,tuning_authors,author_separated,selected_T_pilea,held_out_top1_score,held_out_route,held_out_correct,confident_wrong_count,pothos_sentinel,fold_pass
+pilea-peperomioides__01,dinomariobob,Tiago Lubiana|Olsza Borys|Daniel Atha|dmagdee|Curran Dwyer,True,0.9700,0.9940,direct-card,True,0,none cross,True
+pilea-peperomioides__02,Tiago Lubiana,dinomariobob|Olsza Borys|Daniel Atha|dmagdee|Curran Dwyer,True,0.9700,1.0000,direct-card,True,0,none cross,True
+pilea-peperomioides__03,Olsza Borys,dinomariobob|Tiago Lubiana|Daniel Atha|dmagdee|Curran Dwyer,True,0.9700,1.0000,direct-card,True,0,none cross,True
+pilea-peperomioides__04,Daniel Atha,dinomariobob|Tiago Lubiana|Olsza Borys|dmagdee|Curran Dwyer,True,0.9700,1.0000,direct-card,True,0,none cross,True
+pilea-peperomioides__05,dmagdee,dinomariobob|Tiago Lubiana|Olsza Borys|Daniel Atha|Curran Dwyer,True,0.9700,0.9979,direct-card,True,0,none cross,True
+pilea-peperomioides__06,Curran Dwyer,dinomariobob|Tiago Lubiana|Olsza Borys|Daniel Atha|dmagdee,True,0.9700,1.0000,direct-card,True,0,none cross,True
