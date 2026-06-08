@@ -73,7 +73,7 @@ sprints:
     updated: "2026-06-07T22:41:49+00:00"
   - id: PLANTPOTTING-0013
     title: Direct Pilea care card behind elevated held-out gate + broad CC0 fixture growth + doc cleanup
-    status: in-review
+    status: done
     executor: opus (claude-opus-4-8)
     created: "2026-06-08T11:55:21+00:00"
-    updated: "2026-06-08T16:38:41+00:00"
+    updated: "2026-06-08T17:53:59+00:00"
