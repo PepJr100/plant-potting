@@ -149,9 +149,9 @@ git tag pushed so a public GitHub Release with the APK is published.
 
 ## Doc cleanup (parallel; finalise the 0013 note after the A4 verdict)
 
-- [ ] In `docs/kb/ml-mapping-notes.md`, correct the **0009 section** (≈ line 270, "Pilea deferral (deliberate, CI-enforced)… `pileaIsNotMapped` enforces the deferral"): mark it **historical** (e.g. retitle "Pilea deferral (0009–0011, LIFTED in 0012)", change present-tense claims to past tense, cross-reference the 0012 section). Do **not** delete the paragraph — the history of *why* it was deferred is valuable.
-- [ ] In `docs/kb/ml-mapping-notes.md`, correct the **0010 section** (≈ line 331, "Pilea … stays **unmapped** … the pothos↔Pilea boundary fix is still deferred"): replace the absolute-present-tense "still deferred / still unmapped" claim with a historical marker pointing at the 0012 section. Leave the other deliberate-non-mapping notes (Rattlesnake Plant, Iron Cross begonia, seasonal bulbs) unchanged — still accurate.
-- [ ] In the existing **0012 section**, add a short PLANTPOTTING-0013 note recording the direct-card decision (SHIP with `T_pilea = …`, or FALL-BACK with the measured gap) and the Thread B fixture-count refresh.
+- [x] In `docs/kb/ml-mapping-notes.md`, correct the **0009 section** (≈ line 270, "Pilea deferral (deliberate, CI-enforced)… `pileaIsNotMapped` enforces the deferral"): mark it **historical** (e.g. retitle "Pilea deferral (0009–0011, LIFTED in 0012)", change present-tense claims to past tense, cross-reference the 0012 section). Do **not** delete the paragraph — the history of *why* it was deferred is valuable.
+- [x] In `docs/kb/ml-mapping-notes.md`, correct the **0010 section** (≈ line 331, "Pilea … stays **unmapped** … the pothos↔Pilea boundary fix is still deferred"): replace the absolute-present-tense "still deferred / still unmapped" claim with a historical marker pointing at the 0012 section. Leave the other deliberate-non-mapping notes (Rattlesnake Plant, Iron Cross begonia, seasonal bulbs) unchanged — still accurate.
+- [x] In the existing **0012 section**, add a short PLANTPOTTING-0013 note recording the direct-card decision (SHIP with `T_pilea = …`, or FALL-BACK with the measured gap) and the Thread B fixture-count refresh. *(Added a new 0013 section: SHIP with `T_pilea = 0.98`, the safety rationale, and a Thread B pointer to the coverage table + expanded scorecard.)*
 
 ---
 

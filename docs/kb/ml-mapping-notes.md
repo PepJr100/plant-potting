@@ -434,3 +434,33 @@ confidence rather than add signal. The gate (not TTA) fixes the boundary.
 
 **AIY coverage row.** A dormant `Pilea peperomioides` row was added to the AIY map to keep
 `mappingCoversEveryBundledKbSpecies` green (AIY is not the active model; the gate governs production).
+
+---
+
+## PLANTPOTTING-0013 — direct Pilea card (conditional) + honest CC0/PD sample-count growth
+
+**Direct Pilea card SHIPPED.** The 0012 strict-picker was too conservative (a real Pilea IDs at ~98%
+with no pothos competing, yet still landed in the picker). 0013 refines the `boundary_pairs`
+early-return in `ModelScoreMapper`: a top-1 = Pilea result now yields a **direct** Pilea care card
+**when** `bestProb ≥ per_species_thresholds["pilea-peperomioides"]` (**`T_pilea = 0.98`**), and still
+routes to the `LowConfidencePicker` below it. The elevated bar **composes with** the boundary rule —
+it never replaces it, and the margin-over-second is explicitly **not** the separator (both real-Pilea
+and pothos-misread have huge margins; the only separating lever is the absolute Pilea top-1 value).
+
+**Why `T_pilea` is safe (and CI-bound).** Production runs the **tta6** pipeline. On it, every
+pothos→Pilea misread averages down to ≤ **0.9063** (the worst, a synthetic 90°-rotated pothos), while
+every real-Pilea fixture stays ≥ **0.9940** — a clean **+0.0877** separation gap. `T_pilea = 0.98` sits
+above the pothos ceiling with margin and admits all 6 real-Pilea fixtures. Leave-one-out +
+author-separation over the 6 Pilea fixtures (all distinct authors) = **+0 confident-wrong on every
+fold**. A config CI bind (`HousePlantClassMapValidationTest.pileaDirectCardThresholdMustExceedPothosCeiling`)
+fails the build if `T_pilea ≤ 0.9661` (the documented pothos ceiling), so a pothos misread as Pilea
+can never reach a direct card. (On the **non-shipped** single-crop diagnostic modes `squash`/`center_crop`
+a synthetic-perturbed pothos can reach 0.9997 — documented residual risk; production never feeds
+single-crop scores to the gate.) Full evidence:
+`docs/sprints/evidence/PLANTPOTTING-0013/pilea-direct-card-decision.md`.
+
+**Honest sample-count growth (Thread B).** The 8 previously-single-photo mapped species were deepened
+with additional **CC0/PD** fixtures where license-clean supply allowed; **Pilea was deliberately NOT
+deepened** (we do not source Pilea photos to flatter its own gate). See the Thread B coverage table in
+`docs/sprints/evidence/PLANTPOTTING-0013/fixture-sourcing-log.md` for per-species start/added/end counts
+and supply ceilings, and `expanded-scorecard.csv` for the refreshed honest headline accuracy number.
