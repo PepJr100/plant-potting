@@ -70,6 +70,7 @@ Ten sprints landed on `main`:
 | PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh, persistence, My Plants, "Add this plant", +12 KB species (→38 mapped), CC0/PD reference photos | done (v0.4.0) |
 | PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness (41 fixtures/30 species), TTA-6 + margin-abstention (confident-wrong 0.38→0.18), thicker confidence bar, all reference plates → photos + Image-credits screen | done (v0.5.0) |
 | PLANTPOTTING-0012 | Pothos↔Pilea boundary fix: ship Pilea behind a disambiguation gate (mapped 38→39, +19 CC0 fixtures → 60/39); proven confident-wrong-neutral; TTA grid sweep (tta stays 6) | done (v0.6.0) |
+| PLANTPOTTING-0013 | Direct Pilea care card behind an elevated, CI-bound bar (`per_species_thresholds["pilea-peperomioides"]=0.98` > the 0.9661 pothos ceiling); LOO + author-separated eval, +0 confident-wrong on the shipped tta6 pipeline; +6 CC0 fixtures (→66/39); doc cleanup | done (v0.7.0) |
 
 What you can do today:
 
@@ -82,7 +83,9 @@ What you can do today:
   bundled in `app/src/main/assets/ml/house_plant_species_mobilenetv2/` —
   PLANTPOTTING-0007). It maps **39 of its 47** model classes to KB care cards
   (PLANTPOTTING-0009 took it 10→26; PLANTPOTTING-0010 added 12 more popular-slice
-  species; PLANTPOTTING-0012 added Pilea behind the pothos↔Pilea boundary gate),
+  species; PLANTPOTTING-0012 added Pilea behind the pothos↔Pilea boundary gate;
+  PLANTPOTTING-0013 let a confident, correct Pilea earn a *direct* care card above an
+  elevated CI-bound bar while the pothos→Pilea misread still routes to the picker),
   vs the AIY Plants V1/3 baseline's 5 — which stays bundled
   in `app/src/main/assets/ml/aiy_plants_v1/` as the regression anchor; the active model
   is selected by the `ACTIVE_MODEL_ROOT` `BuildConfig` switch. Inference runs entirely

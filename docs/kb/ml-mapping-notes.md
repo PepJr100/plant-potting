@@ -267,12 +267,15 @@ acidic amendment + bark). Boston Fern reuses `moisture-retentive` and Areca Palm
 `standard-houseplant` — dedicated `fern-*`/`palm-*` archetypes were considered and rejected as
 redundant for this sprint.
 
-**Pilea deferral (deliberate, CI-enforced).** `Chinese Money Plant (Pilea peperomioides)` is in
-`labels.csv` but is **intentionally left unmapped** this sprint. PLANTPOTTING-0007's probe showed
-the model confidently confuses **pothos with Pilea** (Pothos top-1 = Pilea @ 0.9661). Mapping Pilea
-now would risk surfacing a wrong-but-confident card on that confusion. It ships in a later sprint
-bundled with the pothos↔Pilea boundary fix. `HousePlantClassMapValidationTest.pileaIsNotMapped`
-enforces the deferral so it can't be added by accident.
+**Pilea deferral (0009–0011 — LIFTED in 0012; see the PLANTPOTTING-0012 section below).** *Historical:*
+during 0009–0011 `Chinese Money Plant (Pilea peperomioides)` was in `labels.csv` but **intentionally
+left unmapped**, because PLANTPOTTING-0007's probe showed the model confidently confuses **pothos with
+Pilea** (Pothos top-1 = Pilea @ 0.9661); mapping Pilea then would have risked a wrong-but-confident
+card. That deferral was **lifted in PLANTPOTTING-0012**: Pilea is now mapped to `pilea-peperomioides`
+behind a pothos↔Pilea boundary gate, and `HousePlantClassMapValidationTest.pileaIsNotMapped` was
+replaced by `pileaMapsToPileaPeperomioides` + `pileaMappingRequiresBoundaryGate`. PLANTPOTTING-0013 then
+permitted a **direct** Pilea card above an elevated `per_species_thresholds["pilea-peperomioides"]`
+(CI-bound > 0.9661) on the shipped tta6 pipeline. See the 0012 / 0013 sections below for the current state.
 
 **AIY coverage rows (coverage-invariant maintenance).** `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`
 asserts every bundled KB species is reachable from the **AIY** map. Adding 16 KB species would red
@@ -328,9 +331,12 @@ species-rank label, so it is **not** an `alias` row — but its mapping to `aroi
 so the bark-led chunky-airy mix is far closer than a gritty desert-cactus mix. There is no
 dedicated epiphytic-cactus archetype this sprint; the `_note` records the coarse fit.
 
-**Deliberate non-mappings preserved.** `Chinese Money Plant (Pilea peperomioides)` stays **unmapped**
-(CI-enforced by `pileaIsNotMapped`; the pothos↔Pilea boundary fix is still deferred) and serves as
-the live confident-but-unmapped fixture for PLANTPOTTING-0010's "Add this plant" routing.
+**Deliberate non-mappings preserved.** *As of 0010,* `Chinese Money Plant (Pilea peperomioides)` was
+**unmapped** (CI-enforced by `pileaIsNotMapped`) and served as the live confident-but-unmapped fixture
+for PLANTPOTTING-0010's "Add this plant" routing. **This is no longer current — Pilea was mapped behind
+the pothos↔Pilea boundary gate in PLANTPOTTING-0012 (deferral LIFTED), and a direct Pilea card was
+permitted in PLANTPOTTING-0013; see those sections below.** The remaining deliberate non-mappings below
+are still accurate.
 `Rattlesnake Plant (Calathea lancifolia)` stays unmapped (different species from goeppertia-orbifolia).
 `Iron Cross begonia (Begonia masoniana)` is left unmapped (rex-type, distinct moisture preference)
 rather than folded into the coarse `begonia` row. Seasonal flowering bulbs/outdoor classes
@@ -428,3 +434,33 @@ confidence rather than add signal. The gate (not TTA) fixes the boundary.
 
 **AIY coverage row.** A dormant `Pilea peperomioides` row was added to the AIY map to keep
 `mappingCoversEveryBundledKbSpecies` green (AIY is not the active model; the gate governs production).
+
+---
+
+## PLANTPOTTING-0013 — direct Pilea card (conditional) + honest CC0/PD sample-count growth
+
+**Direct Pilea card SHIPPED.** The 0012 strict-picker was too conservative (a real Pilea IDs at ~98%
+with no pothos competing, yet still landed in the picker). 0013 refines the `boundary_pairs`
+early-return in `ModelScoreMapper`: a top-1 = Pilea result now yields a **direct** Pilea care card
+**when** `bestProb ≥ per_species_thresholds["pilea-peperomioides"]` (**`T_pilea = 0.98`**), and still
+routes to the `LowConfidencePicker` below it. The elevated bar **composes with** the boundary rule —
+it never replaces it, and the margin-over-second is explicitly **not** the separator (both real-Pilea
+and pothos-misread have huge margins; the only separating lever is the absolute Pilea top-1 value).
+
+**Why `T_pilea` is safe (and CI-bound).** Production runs the **tta6** pipeline. On it, every
+pothos→Pilea misread averages down to ≤ **0.9063** (the worst, a synthetic 90°-rotated pothos), while
+every real-Pilea fixture stays ≥ **0.9940** — a clean **+0.0877** separation gap. `T_pilea = 0.98` sits
+above the pothos ceiling with margin and admits all 6 real-Pilea fixtures. Leave-one-out +
+author-separation over the 6 Pilea fixtures (all distinct authors) = **+0 confident-wrong on every
+fold**. A config CI bind (`HousePlantClassMapValidationTest.pileaDirectCardThresholdMustExceedPothosCeiling`)
+fails the build if `T_pilea ≤ 0.9661` (the documented pothos ceiling), so a pothos misread as Pilea
+can never reach a direct card. (On the **non-shipped** single-crop diagnostic modes `squash`/`center_crop`
+a synthetic-perturbed pothos can reach 0.9997 — documented residual risk; production never feeds
+single-crop scores to the gate.) Full evidence:
+`docs/sprints/evidence/PLANTPOTTING-0013/pilea-direct-card-decision.md`.
+
+**Honest sample-count growth (Thread B).** The 8 previously-single-photo mapped species were deepened
+with additional **CC0/PD** fixtures where license-clean supply allowed; **Pilea was deliberately NOT
+deepened** (we do not source Pilea photos to flatter its own gate). See the Thread B coverage table in
+`docs/sprints/evidence/PLANTPOTTING-0013/fixture-sourcing-log.md` for per-species start/added/end counts
+and supply ceilings, and `expanded-scorecard.csv` for the refreshed honest headline accuracy number.

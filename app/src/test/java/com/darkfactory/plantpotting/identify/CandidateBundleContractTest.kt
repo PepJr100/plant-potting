@@ -68,10 +68,16 @@ class CandidateBundleContractTest {
     }
 
     @Test
-    fun licenseIsApache20AndPerSpeciesThresholdsEmpty() {
+    fun licenseIsApache20AndPerSpeciesThresholdsHoldOnlyThePileaDirectCardBar() {
         assertThat(manifestJson()["license"]!!.jsonPrimitive.content).isEqualTo("Apache-2.0")
-        // 0006 discipline: ships empty by design (see ml-mapping-notes.md / model-swap-eval-summary.md).
-        assertThat(manifestJson()["per_species_thresholds"]!!.jsonObject).isEmpty()
+        // PLANTPOTTING-0013: empty until 0012; now carries exactly the Pilea direct-card bar
+        // (pilea-peperomioides > 0.9661, see ml-mapping-notes.md + evidence/PLANTPOTTING-0013/). The
+        // 0006 "never seed to bless a weak prediction" discipline still holds — this is an *elevated*
+        // bar above the pothos→Pilea ceiling, not a relaxation, and is CI-bound > 0.9661 by
+        // HousePlantClassMapValidationTest.pileaDirectCardThresholdMustExceedPothosCeiling.
+        val perSpecies = manifestJson()["per_species_thresholds"]!!.jsonObject
+        assertThat(perSpecies.keys).containsExactly("pilea-peperomioides")
+        assertThat(perSpecies["pilea-peperomioides"]!!.jsonPrimitive.content.toFloat()).isGreaterThan(0.9661f)
     }
 
     @Test

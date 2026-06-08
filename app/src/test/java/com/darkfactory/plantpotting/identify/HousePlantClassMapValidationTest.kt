@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.float
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -197,5 +198,23 @@ class HousePlantClassMapValidationTest {
         assertWithMessage("mapping Pilea requires a boundary_pairs rule with top1=pilea-peperomioides")
             .that(triggers)
             .contains("pilea-peperomioides")
+    }
+
+    @Test
+    fun pileaDirectCardThresholdMustExceedPothosCeiling() {
+        // PLANTPOTTING-0013 config-level CI bind (the tripwire that makes "pothos→Pilea can never reach
+        // a direct Pilea card" enforceable below the on-device eval). IF the manifest carries an
+        // elevated direct-card threshold for Pilea, it MUST be strictly above the documented pothos→Pilea
+        // ceiling of 0.9661 — so a pothos misread as Pilea @ 0.9661 can never clear it. Absent (the
+        // strict-picker default) is also valid. See docs/sprints/evidence/PLANTPOTTING-0013/.
+        val manifestRaw = String(readAsset("model_manifest.json"), Charsets.UTF_8)
+        val perSpecies =
+            json.parseToJsonElement(manifestRaw).jsonObject["per_species_thresholds"]?.jsonObject
+        val pileaThreshold = perSpecies?.get("pilea-peperomioides")?.jsonPrimitive?.float
+        if (pileaThreshold != null) {
+            assertWithMessage(
+                "per_species_thresholds[pilea-peperomioides] must be > 0.9661 (the documented pothos→Pilea ceiling)",
+            ).that(pileaThreshold).isGreaterThan(0.9661f)
+        }
     }
 }
