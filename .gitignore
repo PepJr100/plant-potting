@@ -38,3 +38,6 @@ artifacts/
 # alt-drafter eval — keep only the write-ups; raw drafts/critiques/logs/harness are local-only
 docs/future-ideas/alt-drafter-models-eval/round2/*
 !docs/future-ideas/alt-drafter-models-eval/round2/EVALUATION.md
+
+# Sprint evidence: staged sourcing candidates (large originals, not committed)
+docs/sprints/evidence/**/_staging/
