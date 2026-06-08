@@ -91,15 +91,31 @@ class ModelScoreMapper
             // guarantee both pair members are visible — independent of confidence, because the target
             // error (pothos→Pilea @ 0.9661) has no second-place mass for the abstain margin to bite.
             // Scoped to top-1 = trigger, so a pothos-dominant (correct) result is never affected.
+            //
+            // PLANTPOTTING-0013 Phase A3 — conditional direct card. The boundary route is now refined:
+            // it fires (→ picker) UNLESS the trigger species has an elevated per-species threshold
+            // `T_pilea` that `bestProb` clears, in which case control FALLS THROUGH to the normal
+            // high-confidence/abstain path below (which emits a direct card). The elevated bar composes
+            // WITH the boundary rule — it never replaces it. The dormant-safe default: with no
+            // per-species threshold for the trigger (the production state until A4 activates it), the
+            // gate is byte-for-byte the 0012 strict-picker. `T_pilea` is CI-bound > 0.9661 (the
+            // documented pothos→Pilea ceiling), so a pothos misread as Pilea @ 0.9661 can never clear it
+            // and never reach a direct Pilea card. See docs/sprints/evidence/PLANTPOTTING-0013/.
             val boundaryPair = bestEntry?.let { be -> boundaryPairs.firstOrNull { it.top1KbSpeciesId == be.kbSpeciesId } }
             if (boundaryPair != null) {
-                return lowConfidence(
-                    candidates = boundaryCandidates(boundaryPair, mappedCandidates, ranked, scores),
-                    topLabel = topLabel,
-                    topProbability = bestProb,
-                    topIsMapped = topIsMapped,
-                    topIsConfidentUnmapped = topIsConfidentUnmapped,
-                )
+                val directCardAllowed =
+                    perSpeciesThresholds[boundaryPair.top1KbSpeciesId]?.let { bestProb >= it } == true
+                if (!directCardAllowed) {
+                    return lowConfidence(
+                        candidates = boundaryCandidates(boundaryPair, mappedCandidates, ranked, scores),
+                        topLabel = topLabel,
+                        topProbability = bestProb,
+                        topIsMapped = topIsMapped,
+                        topIsConfidentUnmapped = topIsConfidentUnmapped,
+                    )
+                }
+                // else: bestProb ≥ T_pilea — fall through to the high-conf/abstain path, which emits the
+                // direct card via the per-species `plainThreshold` already computed above.
             }
 
             return if ((highConfDirect || highConfMargin) && !abstainOnNarrowMargin) {

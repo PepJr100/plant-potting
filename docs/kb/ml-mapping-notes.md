@@ -267,12 +267,15 @@ acidic amendment + bark). Boston Fern reuses `moisture-retentive` and Areca Palm
 `standard-houseplant` — dedicated `fern-*`/`palm-*` archetypes were considered and rejected as
 redundant for this sprint.
 
-**Pilea deferral (deliberate, CI-enforced).** `Chinese Money Plant (Pilea peperomioides)` is in
-`labels.csv` but is **intentionally left unmapped** this sprint. PLANTPOTTING-0007's probe showed
-the model confidently confuses **pothos with Pilea** (Pothos top-1 = Pilea @ 0.9661). Mapping Pilea
-now would risk surfacing a wrong-but-confident card on that confusion. It ships in a later sprint
-bundled with the pothos↔Pilea boundary fix. `HousePlantClassMapValidationTest.pileaIsNotMapped`
-enforces the deferral so it can't be added by accident.
+**Pilea deferral (0009–0011 — LIFTED in 0012; see the PLANTPOTTING-0012 section below).** *Historical:*
+during 0009–0011 `Chinese Money Plant (Pilea peperomioides)` was in `labels.csv` but **intentionally
+left unmapped**, because PLANTPOTTING-0007's probe showed the model confidently confuses **pothos with
+Pilea** (Pothos top-1 = Pilea @ 0.9661); mapping Pilea then would have risked a wrong-but-confident
+card. That deferral was **lifted in PLANTPOTTING-0012**: Pilea is now mapped to `pilea-peperomioides`
+behind a pothos↔Pilea boundary gate, and `HousePlantClassMapValidationTest.pileaIsNotMapped` was
+replaced by `pileaMapsToPileaPeperomioides` + `pileaMappingRequiresBoundaryGate`. PLANTPOTTING-0013 then
+permitted a **direct** Pilea card above an elevated `per_species_thresholds["pilea-peperomioides"]`
+(CI-bound > 0.9661) on the shipped tta6 pipeline. See the 0012 / 0013 sections below for the current state.
 
 **AIY coverage rows (coverage-invariant maintenance).** `ModelLabelMappingValidationTest.mappingCoversEveryBundledKbSpecies`
 asserts every bundled KB species is reachable from the **AIY** map. Adding 16 KB species would red
@@ -328,9 +331,12 @@ species-rank label, so it is **not** an `alias` row — but its mapping to `aroi
 so the bark-led chunky-airy mix is far closer than a gritty desert-cactus mix. There is no
 dedicated epiphytic-cactus archetype this sprint; the `_note` records the coarse fit.
 
-**Deliberate non-mappings preserved.** `Chinese Money Plant (Pilea peperomioides)` stays **unmapped**
-(CI-enforced by `pileaIsNotMapped`; the pothos↔Pilea boundary fix is still deferred) and serves as
-the live confident-but-unmapped fixture for PLANTPOTTING-0010's "Add this plant" routing.
+**Deliberate non-mappings preserved.** *As of 0010,* `Chinese Money Plant (Pilea peperomioides)` was
+**unmapped** (CI-enforced by `pileaIsNotMapped`) and served as the live confident-but-unmapped fixture
+for PLANTPOTTING-0010's "Add this plant" routing. **This is no longer current — Pilea was mapped behind
+the pothos↔Pilea boundary gate in PLANTPOTTING-0012 (deferral LIFTED), and a direct Pilea card was
+permitted in PLANTPOTTING-0013; see those sections below.** The remaining deliberate non-mappings below
+are still accurate.
 `Rattlesnake Plant (Calathea lancifolia)` stays unmapped (different species from goeppertia-orbifolia).
 `Iron Cross begonia (Begonia masoniana)` is left unmapped (rex-type, distinct moisture preference)
 rather than folded into the coarse `begonia` row. Seasonal flowering bulbs/outdoor classes

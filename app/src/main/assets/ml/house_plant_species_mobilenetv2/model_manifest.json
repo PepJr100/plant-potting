@@ -30,8 +30,8 @@
     "high_confidence_abstain_margin": 0.30
   },
   "_comment_thresholds": "Identical to AIY (PLANTPOTTING-0003 §4.3) EXCEPT high_confidence_abstain_margin=0.30, added in PLANTPOTTING-0011 Phase 3: a high-confidence verdict whose top1-top2 margin is < 0.30 is downgraded to the picker. Tuned on the locked tta6 pipeline (evidence: docs/sprints/evidence/PLANTPOTTING-0011/abstention-before-after.md). With TTA-6 it cuts confident-wrong 0.382->0.179 overall and 0.268->0.098 on clean photos, for an accepted pick-manually rise to ~0.323. Held-out (tune-on-clean/eval-on-perturbation) cw=0.186; leave-one-species-out 0.167-0.188 stable. Do NOT lower the plain/margin gates to flatter a candidate (0006 discipline).",
-  "per_species_thresholds": {},
-  "_comment_per_species_thresholds": "Empty by design until the Phase 3 swap-eval probe shows an in-vocab species fails the global threshold by a margin a per-class override would cleanly close. Never seed to bless a weak prediction.",
+  "per_species_thresholds": { "pilea-peperomioides": 0.98 },
+  "_comment_per_species_thresholds": "Empty by design until evidence shows an override is warranted; never seed to bless a weak prediction (0006 discipline). PLANTPOTTING-0013: pilea-peperomioides=0.98 is the elevated direct-card bar that lets a top-1=Pilea result yield a DIRECT Pilea care card instead of routing to the picker, but ONLY when it clears 0.98 — composed WITH the boundary_pairs gate (ModelScoreMapper falls through to the high-conf path only above this bar). Set strictly above the documented pothos->Pilea ceiling of 0.9661 (CI-bound > 0.9661 by HousePlantClassMapValidationTest.pileaDirectCardThresholdMustExceedPothosCeiling), so a pothos misread as Pilea @ 0.9661 can NEVER reach a direct Pilea card. On the shipped tta6 pipeline the pothos->Pilea ceiling is 0.9063 and the real-Pilea floor is 0.9940 (gap +0.0877); LOO + author-separation over the 6 Pilea fixtures = +0 confident-wrong on every fold. Evidence: docs/sprints/evidence/PLANTPOTTING-0013/pilea-direct-card-decision.md.",
   "boundary_pairs": [
     {
       "top1_kb_species_id": "pilea-peperomioides",
