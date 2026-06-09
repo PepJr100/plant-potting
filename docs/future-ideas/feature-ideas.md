@@ -1,5 +1,5 @@
 ---
-through_sid: PLANTPOTTING-0010
+through_sid: PLANTPOTTING-0013
 ---
 
 # Feature ideas — async funnel
@@ -13,19 +13,19 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-- would like a spike on monetisation ideas. Obvious idea are 1. Targeted ads in app 2. small cost on play store (for pro / no adds version) 3. subscription (for pro / no adds version) 4. link-up with substrate supplier (vereral revenue) 5 . vertical intergration (sell substrate myself) 6. Horizontal partnerships. e.g. plantpots / plant supplies through referal links
-  - would like to idea other ideas (think of 40 refine to top 5 "Easiest to implement" top 5 "Biggest potential profit return")
-  - score the two "top 5" and my ideas on ease to impliment / potential revenue 2x2 
+_(none open — monetisation moved to `idea decisions → accepted` below: folded into the roadmap as a deferred Known Gap + V3 milestone sketch, gated behind the free Launch.)_
 
 ## developed idea
 
-_(none open)_
+_(none open — the Play Store publishing/licensing idea was accepted into the roadmap; see `idea decisions → accepted` below.)_
 
 ## idea decisions
 
 ### accepted and added to roadmap or sprint
 
-_(none open — once a sprint ships, its accept-record moves to the DONE section below)_
+- **Accepted 2026-06-09 (`/roadmap refresh` through 0013) — Launch track: publish to the Google Play Store + license the source (PolyForm Noncommercial).** Folded into `docs/ROADMAP.md`: a new **Launch — Google Play Store public release** milestone (parallel to V1, does not block it), a detailed **`PLANTPOTTING-0014 — release readiness`** Next block (code/config track + Play-process track), two Layer-Status rows (Licensing & legal; Release engineering / signing / distribution), two Known Gaps (★ not release-ready: targetSdk 34 < Play min 35 / no signing / debug-APK-only / placeholder icon / R8 off; and no project LICENSE / no privacy policy), and the targetSdk 34→35 standing-lock lift. Principal decisions: **public repo, PolyForm Noncommercial 1.0.0**; **Personal** Play account (12-tester / 14-day closed-test gate applies); **free launch**. Licensing already commercial-clean (both ML models Apache-2.0; all 44 reference photos Unsplash/Pexels/CC0; no copyleft; `verifyNoNetworking` holds). Full write-up: [`play-store-publishing.md`](play-store-publishing.md). _Next step: `/sprint-planner` on PLANTPOTTING-0014 once this refresh PR merges._
+
+- **Accepted 2026-06-09 (`/roadmap refresh` through 0013) — monetisation spike (DEFERRED, recorded only).** Raw idea #1 (40 ideas → top-5 easiest + top-5 biggest-profit → 2×2 ease-vs-revenue scoring; levers: in-app ads, paid/pro Play tier, subscription, substrate-supplier affiliate, vertical integration, horizontal referral partnerships) was recorded in the roadmap as **Known Gap 7** plus a **V3 — Sustainable product / monetisation** milestone sketch. **Not scoped as a sprint** — it is gated behind shipping the free Launch (0014). Revisit for `/sprint-planner` only after the free Play release is live.
 
 ### declined
 
