@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-06-09
+last_updated: 2026-06-10
 through_sid: PLANTPOTTING-0013
 ---
 
@@ -14,29 +14,15 @@ in [`docs/sprints/`](sprints/); this file is the current view.
 ## Current state (post-PLANTPOTTING-0013)
 
 **A confident, correct Pilea now gets a *direct* care card — without re-opening the pothos→Pilea
-confident-wrong boundary.** The 0012 strict-picker was too conservative: the at-home review found a real
-Pilea identified at 98% (no pothos competing) yet still demoted to the picker. PLANTPOTTING-0013 (behind
-the frozen seam, **no model swap, no training**, `tta` stays 6) refines the `ModelScoreMapper` boundary
-gate so a top-1 = Pilea result yields a **direct** Pilea card **only** when it clears an elevated,
-Pilea-specific bar `per_species_thresholds["pilea-peperomioides"] = 0.98`, and still routes to the picker
-below it. The bar is composed *with* — never replacing — the boundary rule, and is **CI-bound > 0.9661**
-(the documented pothos→Pilea ceiling) by `HousePlantClassMapValidationTest`, so a pothos misread as Pilea
-can never reach a direct card. The crux (stated in A0): real-Pilea and pothos-misread are
-near-identical in score *shape* (both huge margins), so the **only** separator is the absolute Pilea
-top-1 — and on the shipped **tta6** pipeline 6-crop averaging crushes every pothos→Pilea misread to
-**≤ 0.9063** while real-Pilea stays **≥ 0.9940** (a clean +0.088 gap). A pre-registered **leave-one-out +
-author-separated** sweep over the 6 Pilea fixtures (all distinct authors) passed **+0 confident-wrong on
-every fold**; the principal confirmed SHIP. **On-device result (66 fixtures):** gate-isolated
-**Δ+0 confident-wrong** on the shipped pipeline (clean / all perturbations / pothos-Pilea subset), **0**
-pothos→direct-Pilea cards, and **all 6 real-Pilea fixtures now get a correct direct card** (were 0/6).
-Per-base clean top-1 rose **0.417 → 0.530**. (Residual risk, documented: in the *non-shipped* single-crop
-diagnostic modes a synthetic-perturbed pothos can reach 0.9997 > 0.98; production never feeds single-crop
-scores to the gate.) **Thread B** grew the honest sample count: **+6 CC0 fixtures** across 6 of the 8
-single-photo species (`identify-fixtures` **60 → 66 photos / 39 species**); **Begonia + Schlumbergera hit
-documented license-clean supply ceilings** (wild-only Begonia; only *S. truncata* ≠ the KB's *bridgesii*).
-Confident-wrong stayed flat — honest measurement, not deep per-species calibration (31 of 39 species still
-on 1–2 photos). Version **v0.7.0**; frozen seam + AIY V1/3 anchor unchanged; all gates GREEN; debug APK
-delivered.
+confident-wrong boundary** (v0.7.0; frozen seam; no model swap, no training; `tta` stays 6). The
+`ModelScoreMapper` gate routes a top-1 = Pilea result to a direct card only above
+`per_species_thresholds["pilea-peperomioides"] = 0.98` (**CI-bound > 0.9661**), composed *with* — never
+replacing — the 0012 boundary rule. Validated by a pre-registered LOO + author-separated sweep (+0
+confident-wrong every fold) and on-device over 66 fixtures: **Δ+0 confident-wrong, 0 pothos→direct-Pilea,
+6/6 real-Pilea direct cards**; per-base clean top-1 rose **0.417 → 0.530**. Fixtures grew **60 → 66 photos
+/ 39 species** (Begonia + Schlumbergera at documented license-clean supply ceilings); 31 of 39 species
+still rest on 1–2 photos. AIY V1/3 anchor unchanged; all gates GREEN; debug APK delivered. Full detail:
+the 0013 Sprint History row + [`docs/sprints/PLANTPOTTING-0013.md`](sprints/PLANTPOTTING-0013.md).
 
 > **The window in one arc (0006 → 0013):** AIY V1/3 was swapped out for the houseplant-tuned
 > `house_plant_species_mobilenetv2` (0007); a data spike gated fine-tuning to PARTIAL-GO under a
@@ -62,7 +48,7 @@ the 0005 manual-GMD-walkthrough items the user accepted code + JVM coverage in l
 | Persistence (DataStore) | ✓ shipped (0010) | App's first local-persistence layer. One DataStore document, two collections (`identifiedPlants` N-capped + `addPlantRequests` tally) via `PlantLogStore`; injectable `TimeProvider`. Local-only (`verifyNoNetworking` GREEN). **Does not survive uninstall** (principal request logged — candidate for V2). |
 | Home / My Plants / Add-this-plant UI | ✓ shipped (0010) | Home/landing (2×2 tiles + recent carousel) is now the start destination; My Plants (Save, de-dup, remove, thumbnails, restart-persistent); Add-this-plant wireframe routes confident-but-unmapped classes and logs a tally. Shared bottom Home button on every screen. |
 | Confidence display | ✓ shipped (0010) | Numeric %+`LinearProgressIndicator` on `ResultScreen` via an optional `confidencePct` nav arg off `CandidateProvider` (seam untouched); degrades gracefully (no %/bar) on stub flows. |
-| Reference images | ✓ all-photo (0011) | 44 images (one per species) under `res/drawable-nodpi/` via `PlantImageResolver` + placeholder fallback; manifest + cross-check test. **All 11 botanical plates swapped to real photos** (0011). **Gap:** Pilea — promoted to a direct card in 0013 — is the only mapped species still on the placeholder (Known Gap 3). |
+| Reference images | ✓ all-photo (0011) | 44 images covering 44 of 45 KB species under `res/drawable-nodpi/` via `PlantImageResolver` + placeholder fallback; manifest + cross-check test. **All 11 botanical plates swapped to real photos** (0011). **Gap:** Pilea — promoted to a direct card in 0013 — is the only mapped species still on the placeholder (Known Gap 3). |
 | Accuracy eval harness | ✓ extended (0013) | `AccuracyEvalTest` (GMD/local `pixel6Api34`) runs every fixture + 11 deterministic synthetic perturbations × 3 preprocessing modes → rich per-row `accuracy-eval.csv` + summary; CC0/PD fixture set **66 photos / 39 species** (0013: +6 second-photos across 6 of the 8 single-photo species; Begonia + Schlumbergera supply-ceilinged) with license + integrity + CSV-schema guard tests. Gated `sweepTtaLevelsEmitCsv` (behind `-e ttaSweep true`) for the grid-tiling TTA sweep (0012). |
 | Model bundle (active / baseline) | ✓ swapped (0007) | **Active default: `house_plant_species_mobilenetv2`** (MobileNetV2, 47 classes, Apache-2.0, float16, 10.42 MiB). AIY V1/3 retained as the bundled regression anchor. One `ACTIVE_MODEL_ROOT` switch selects between them. |
 | Identifier (interface + on-device impl + stub) | ✓ shipped | `OnDevicePlantIdentifier` is production. Seam **unchanged** through the 0007 swap (candidate `[1,47]` FLOAT32 fits existing mapper + preprocessor). |
@@ -89,7 +75,7 @@ calibration state — rebuilt post-0012/0013.
 | KB species OOV in active model | **6** | monstera-adansonii, both Philodendrons, ficus-lyrata, chlorophytum-comosum, hoya-carnosa → route to `LowConfidencePicker`. 0008 confirmed CC fine-tune data for 5 of 6 (pink-princess NO-GO); fine-tune **deferred** (gap 4). |
 | Fixture set (honest eval) | **66 photos / 39 species** | 8 → 41 (0011) → 60 (0012, +19) → **66 (0013, +6)** CC0/PD/CC-BY, with license + integrity + CSV-schema guard tests. **31 of 39 species still rest on 1–2 photos** (the principal's ≥3-per-species ask, gap 0). Begonia + Schlumbergera at 1 each — documented license-clean supply ceilings (wild-only Begonia; CC0 Schlumbergera all *S. truncata* ≠ KB *bridgesii*). |
 | Real-photo accuracy | per-base clean top-1 **0.417 → 0.530**; confident-wrong **0.179** | Confident-wrong 0.382 → **0.179** (0.098 clean) via TTA-6 + 0.30 abstain margin (0011), held-out validated (LOSO 0.167–0.188). Per-base clean top-1 rose **0.417 → 0.530** (0013) — mainly the 6 real-Pilea fixtures flipping picker → correct direct card (+ new Thread-B second-photos); confident-wrong stayed flat (clean 0.117 → 0.121, perturbation 0.221 → 0.210). |
-| Probe results (8 in-vocab fixtures) | 6 high-conf correct | monstera 1.0000, snake 1.0000, calathea 1.0000, orchid 1.0000, ZZ 0.9350, jade 0.5825; weak peace lily 0.4468 (correct, sub-threshold). The original pothos→Pilea confusion is now gated. |
+| Probe results (8 in-vocab fixtures) | 5 high-conf correct | monstera 1.0000, snake 1.0000, calathea 1.0000, orchid 1.0000, ZZ 0.9350. Correct but picker-routed: jade 0.5825 (0.58/0.42 vs money-tree trips the 0.30 abstain margin since 0011 — CI-asserted in `ModelSwapEvaluationTest`) and peace lily 0.4468 (sub-threshold). The original pothos→Pilea confusion is now gated. |
 | Routing | threshold-gated + abstention + Pilea direct-card bar | Top-1 vs per-class threshold falling back to the 0.55 global, then the 0.30 abstain margin, then the top-1=Pilea boundary gate / 0.98 direct-card bar → `ResultScreen` or `LowConfidencePicker`. |
 | Latency | **~125 ms median (TTA-6)** | Single-crop ~20 ms; production runs 6 TTA views (centre + 4 corners + full-frame), 125 ms median / 539 ms worst on a one-shot identify. TTA stayed 6 through 0012/0013 (grid tiling went OOD; 3×3 busted the ~2 s cap at 2686 ms). |
 | Calibration | ✓ abstention-backed (0011) + one Pilea direct-card threshold (0013) | `high_confidence_abstain_margin = 0.30` downgrades low-margin verdicts to the picker; `per_species_thresholds` holds **exactly one entry — `pilea-peperomioides = 0.98`** (the elevated direct-card bar above the pothos→Pilea ceiling), **never** seeded to bless a weak prediction (0006 anti-overfit discipline holds). |
@@ -102,21 +88,21 @@ set that still under-represents messy phone captures and rests **31/39 species o
 
 ## Sprint history
 
-| SID | Title | Status | Headline outcome |
-| --- | --- | --- | --- |
-| PLANTPOTTING-0001 | Android scaffold + end-to-end stub flow with KB | done | Camera → result → recommendation flow on stub identifier; KB + Hilt + Compose scaffolding; integration-flow manifest baseline. |
-| PLANTPOTTING-0002 | Fix sprint for PLANTPOTTING-0001 review bugs | done | Settings round-trip recovery (Bug 4); permission rationale wording; bind-pending overlay. |
-| PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | done | `OnDevicePlantIdentifier` wired to AIY V1/3; source-driven `ResultScreen` badge; `LowConfidencePicker` v1; `_comment_coverage` (2 of 16 species in-vocab). |
-| PLANTPOTTING-0004 | Fix sprint for PLANTPOTTING-0003 review bugs | done | UINT8 preprocessor branch (Bug 1); `testTagsAsResourceId` bridge (Bug 2); `OnDeviceModelRealInterpreterTest` lands. |
-| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | done | LowConfidencePicker polished; bottom-anchored Failure banner; `TestIdentifyModule` deleted (7 tests migrated to `@BindValue`); `LowConfidenceFlowTest` + un-`@Ignore`'d PermissionDenied; `perSpeciesThresholds` mechanism + real-photo probe (*Monstera deliciosa* @ 0.8984, high-conf; map empty by design); accuracy assertion in CI; integration-flow cold/warm/buildonly GREEN. |
-| PLANTPOTTING-0006 | Second in-vocab calibration probe (`crassula-ovata`) + two UX fixes | done | V0.1 multi-species sweep complete — *Crassula ovata* (jade) probes @ 0.1055 (low-conf), honest-fallback assertion in CI; `perSpeciesThresholds` stays empty by design. Two UX fixes: subtitle de-jargoned; `(0%)` chips drop the suffix, stay selectable. **Review surfaced the model-swap milestone — AIY V1/3 recognises wild flora, not houseplants.** |
-| PLANTPOTTING-0007 | Houseplant model swap (V1 entry) — survey, eval harness, running prototype | done | **Model swapped: `house_plant_species_mobilenetv2` (MobileNetV2, Apache-2.0) replaces AIY as the production default.** Coverage 2/16 → **10/16**; top-1 high-conf 1 → 6; latency 43 → 33 ms. Single `ACTIVE_MODEL_ROOT` switch; seam unchanged; live `pixel6Api34` + real-device prototype. AIY kept as regression anchor. Known residue: 6 OOV species + pothos→Pilea confusion → next is a data-availability spike. |
-| PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + shutter-on-return UX fix | done | **Assess-only CC-imagery spike → PARTIAL-GO.** 5 OOV species GO (CC counts ~257–790), pothos/Pilea boundary CONDITIONAL (pothos ~1470 / Pilea ~76), pink-princess NO-GO (cultivar-proven ~5–15). Only 1.0–6.8% of iNat houseplant imagery is license-clean. Text-only deliverables; no images/model/KB committed. Plus a shutter-on-return UX fix. **Review re-pointed V1:** the no-self-shot constraint kills the pink-princess + Pilea-balance fallbacks; the 47-class / 10-mapped delta makes a **text-only KB-expansion the next sprint**, fine-tune deferred. |
-| PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | done (opus) | **Pure content/config, zero ML.** `species.json` **16 → 32**; house-plant `plant_class_map.json` **10 → 26 of 47** classes; **+1 archetype** (`carnivorous-peat-sand`, Venus Flytrap). New `HousePlantClassMapValidationTest`. Pilea left unmapped (CI-enforced). Free win: AIY now resolves 5 of 32. **Known gap:** the 16 new mappings are unprobed (editorial coverage). |
-| PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh + add-this-plant wireframe + KB expansion | done (opus) | **"Make it feel like an app" — behind the frozen seam.** First local-persistence layer (**DataStore**); **Home/landing**; **My Plants**; **confidence %+bar**; **contained search**; **"Add this plant"** wireframe; **44 CC0/PD reference photos**; shared bottom **Home button**; KB **32 → 44 species / 26 → 38-of-47 mapped**. Theme switcher built then removed (default LEAF). v0.4.0. **Review clean — no bugs.** Headline finding (not a regression): real-world ID accuracy is poor (snake plant ~1/3 correct, confidently wrong otherwise) → calibration is the next move. |
-| PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness + confidence abstention + no-training accuracy levers | done (opus) | **Confronted the 0010 confident-wrong finding behind the frozen seam — no model swap, no training.** `AccuracyEvalTest` scorecard (local `pixel6Api34`); CC0/PD/CC-BY fixtures **8 → 41 photos / 30 species**. **MEASURE** BEFORE confident-wrong **0.382**. **IMPROVE**: **TTA-6** adopted (center-crop dropped). **ABSTAIN**: new `high_confidence_abstain_margin=0.30` → **AFTER confident-wrong 0.179** (0.098 clean), top-1 ~flat, held-out validated. Plus thicker confidence bar, **all 11 botanical plates → real photos** + in-app **Image-credits**. v0.5.0. |
-| PLANTPOTTING-0012 | Pothos↔Pilea boundary fix: ship Pilea KB entry behind disambiguation gating + fixture/TTA support | done (opus) | **The 0009 Pilea deferral LIFTED — Pilea mapped, but only in lockstep with a pothos↔Pilea gate.** +19 CC0 fixtures → **60 photos / 39 species**; class-map **38 → 39**. Gate in `ModelScoreMapper`: top-1=Pilea → `LowConfidencePicker` with Pilea + pothos surfaced. CI-bound by `pileaMappingRequiresBoundaryGate`. **Adding Pilea = +0 confident-wrong on every surface** (vs +2/+9/+6 naive); 0 pothos→direct-Pilea. Pilea ships **strict-picker (no direct card)**. TTA stays ×6. v0.6.0. **Review surfaced the next move:** real Pilea ID'd correctly @ 98% but lands in the picker → next = a direct Pilea card under an elevated bar. |
-| PLANTPOTTING-0013 | Direct Pilea care card behind elevated held-out gate + broad CC0 fixture growth + doc cleanup | done (opus) | **A confident, correct Pilea now gets a direct card** without re-opening the pothos→Pilea boundary. `ModelScoreMapper` gate refined: top-1=Pilea → direct card **only** when `bestProb ≥ per_species_thresholds["pilea-peperomioides"]=0.98`, else picker; CI-bound **> 0.9661**. Decision via a pre-registered **LOO + author-separated** sweep (shipped tta6: pothos ≤ 0.9063, real-Pilea ≥ 0.9940, **+0 confident-wrong every fold**). **On-device (66 fixtures): Δ+0 confident-wrong**, **0 pothos→direct-Pilea**, **6/6 real-Pilea → correct direct card**; per-base clean top-1 **0.417 → 0.530**. **Thread B:** +6 CC0 fixtures (60 → 66); Begonia + Schlumbergera supply-ceilinged. `tta` stays 6. v0.7.0. **Review clean** — one cosmetic bug (no Pilea hero image, gap 3). |
+| SID | Title | Executor | Date | Headline outcome |
+| --- | --- | --- | --- | --- |
+| PLANTPOTTING-0001 | Android scaffold + end-to-end stub flow with KB | opus | 2026-05-14 | Camera → result → recommendation flow on stub identifier; KB + Hilt + Compose scaffolding; integration-flow manifest baseline. |
+| PLANTPOTTING-0002 | Fix sprint for PLANTPOTTING-0001 review bugs | opus | 2026-05-14 | Settings round-trip recovery (Bug 4); permission rationale wording; bind-pending overlay. |
+| PLANTPOTTING-0003 | On-device ML identifier + Bug A fix + source-driven badge | opus | 2026-05-15 | `OnDevicePlantIdentifier` wired to AIY V1/3; source-driven `ResultScreen` badge; `LowConfidencePicker` v1; `_comment_coverage` (2 of 16 species in-vocab). |
+| PLANTPOTTING-0004 | Fix sprint for PLANTPOTTING-0003 review bugs | opus | 2026-05-15 | UINT8 preprocessor branch (Bug 1); `testTagsAsResourceId` bridge (Bug 2); `OnDeviceModelRealInterpreterTest` lands. |
+| PLANTPOTTING-0005 | Post-shutter polish + un-defer carry-forward from 0003/0004 | opus | 2026-06-04 | LowConfidencePicker polished; bottom-anchored Failure banner; `TestIdentifyModule` deleted (7 tests migrated to `@BindValue`); `LowConfidenceFlowTest` + un-`@Ignore`'d PermissionDenied; `perSpeciesThresholds` mechanism + real-photo probe (*Monstera deliciosa* @ 0.8984, high-conf; map empty by design); accuracy assertion in CI; integration-flow cold/warm/buildonly GREEN. |
+| PLANTPOTTING-0006 | Second in-vocab calibration probe (`crassula-ovata`) + two UX fixes | opus | 2026-06-04 | V0.1 multi-species sweep complete — *Crassula ovata* (jade) probes @ 0.1055 (low-conf), honest-fallback assertion in CI; `perSpeciesThresholds` stays empty by design. Two UX fixes: subtitle de-jargoned; `(0%)` chips drop the suffix, stay selectable. **Review surfaced the model-swap milestone — AIY V1/3 recognises wild flora, not houseplants.** |
+| PLANTPOTTING-0007 | Houseplant model swap (V1 entry) — survey, eval harness, running prototype | opus | 2026-06-04 | **Model swapped: `house_plant_species_mobilenetv2` (MobileNetV2, Apache-2.0) replaces AIY as the production default.** Coverage 2/16 → **10/16**; top-1 high-conf 1 → 6; latency 43 → 33 ms. Single `ACTIVE_MODEL_ROOT` switch; seam unchanged; live `pixel6Api34` + real-device prototype. AIY kept as regression anchor. Known residue: 6 OOV species + pothos→Pilea confusion → next is a data-availability spike. |
+| PLANTPOTTING-0008 | Training-data availability spike (gates fine-tuning) + shutter-on-return UX fix | opus | 2026-06-05 | **Assess-only CC-imagery spike → PARTIAL-GO.** 5 OOV species GO (CC counts ~257–790), pothos/Pilea boundary CONDITIONAL (pothos ~1470 / Pilea ~76), pink-princess NO-GO (cultivar-proven ~5–15). Only 1.0–6.8% of iNat houseplant imagery is license-clean. Text-only deliverables; no images/model/KB committed. Plus a shutter-on-return UX fix. **Review re-pointed V1:** the no-self-shot constraint kills the pink-princess + Pilea-balance fallbacks; the 47-class / 10-mapped delta makes a **text-only KB-expansion the next sprint**, fine-tune deferred. |
+| PLANTPOTTING-0009 | Text-only KB-expansion: +16 delta species (10→26 mapped), Pilea deferred | opus | 2026-06-05 | **Pure content/config, zero ML.** `species.json` **16 → 32**; house-plant `plant_class_map.json` **10 → 26 of 47** classes; **+1 archetype** (`carnivorous-peat-sand`, Venus Flytrap). New `HousePlantClassMapValidationTest`. Pilea left unmapped (CI-enforced). Free win: AIY now resolves 5 of 32. **Known gap:** the 16 new mappings are unprobed (editorial coverage). |
+| PLANTPOTTING-0010 | App-experience sprint: UI/UX refresh + add-this-plant wireframe + KB expansion | opus | 2026-06-06 | **"Make it feel like an app" — behind the frozen seam.** First local-persistence layer (**DataStore**); **Home/landing**; **My Plants**; **confidence %+bar**; **contained search**; **"Add this plant"** wireframe; **44 CC0/PD reference photos**; shared bottom **Home button**; KB **32 → 44 species / 26 → 38-of-47 mapped**. Theme switcher built then removed (default LEAF). v0.4.0. **Review clean — no bugs.** Headline finding (not a regression): real-world ID accuracy is poor (snake plant ~1/3 correct, confidently wrong otherwise) → calibration is the next move. |
+| PLANTPOTTING-0011 | Accuracy & trust: real-photo eval harness + confidence abstention + no-training accuracy levers | opus | 2026-06-07 | **Confronted the 0010 confident-wrong finding behind the frozen seam — no model swap, no training.** `AccuracyEvalTest` scorecard (local `pixel6Api34`); CC0/PD/CC-BY fixtures **8 → 41 photos / 30 species**. **MEASURE** BEFORE confident-wrong **0.382**. **IMPROVE**: **TTA-6** adopted (center-crop dropped). **ABSTAIN**: new `high_confidence_abstain_margin=0.30` → **AFTER confident-wrong 0.179** (0.098 clean), top-1 ~flat, held-out validated. Plus thicker confidence bar, **all 11 botanical plates → real photos** + in-app **Image-credits**. v0.5.0. |
+| PLANTPOTTING-0012 | Pothos↔Pilea boundary fix: ship Pilea KB entry behind disambiguation gating + fixture/TTA support | opus | 2026-06-07 | **The 0009 Pilea deferral LIFTED — Pilea mapped, but only in lockstep with a pothos↔Pilea gate.** +19 CC0 fixtures → **60 photos / 39 species**; class-map **38 → 39**. Gate in `ModelScoreMapper`: top-1=Pilea → `LowConfidencePicker` with Pilea + pothos surfaced. CI-bound by `pileaMappingRequiresBoundaryGate`. **Adding Pilea = +0 confident-wrong on every surface** (vs +2/+9/+6 naive); 0 pothos→direct-Pilea. Pilea ships **strict-picker (no direct card)**. TTA stays ×6. v0.6.0. **Review surfaced the next move:** real Pilea ID'd correctly @ 98% but lands in the picker → next = a direct Pilea card under an elevated bar. |
+| PLANTPOTTING-0013 | Direct Pilea care card behind elevated held-out gate + broad CC0 fixture growth + doc cleanup | opus | 2026-06-08 | **A confident, correct Pilea now gets a direct card** without re-opening the pothos→Pilea boundary. `ModelScoreMapper` gate refined: top-1=Pilea → direct card **only** when `bestProb ≥ per_species_thresholds["pilea-peperomioides"]=0.98`, else picker; CI-bound **> 0.9661**. Decision via a pre-registered **LOO + author-separated** sweep (shipped tta6: pothos ≤ 0.9063, real-Pilea ≥ 0.9940, **+0 confident-wrong every fold**). **On-device (66 fixtures): Δ+0 confident-wrong**, **0 pothos→direct-Pilea**, **6/6 real-Pilea → correct direct card**; per-base clean top-1 **0.417 → 0.530**. **Thread B:** +6 CC0 fixtures (60 → 66); Begonia + Schlumbergera supply-ceilinged. `tta` stays 6. v0.7.0. **Review clean** — one cosmetic bug (no Pilea hero image, gap 3). |
 
 ## Known gaps
 
@@ -139,6 +125,8 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    The license-clean supply ceiling is the blocker (0008's 1.0–6.8% figure; Begonia + Schlumbergera already
    hit documented ceilings — see gap 2). Fine-tuning stays **deferred** (gap 4).
    `feedback/PLANTPOTTING-0011/feedback.md`, `feedback/PLANTPOTTING-0013/feedback.md`.
+   **Why it matters:** per-species accuracy claims aren't trustworthy at 1–2 photos, and messy captures
+   are the real use case. **Likely sprint:** the V1 accuracy continuation (SID TBD).
 
 1. **The 28 delta mappings (0009's 16 + 0010's 12) are unprobed — editorial coverage, not real-photo
    calibrated.** Mapped coverage moved **10 → 26 → 38 → 39 of 47**, but the new rows' per-class confidence
@@ -147,16 +135,11 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    it needs imagery/probing — folds into the gap-0 fixture-depth work. **8 model classes remain
    deliberately unmapped** (route through `LowConfidencePicker` / the 0010 "Add this plant" flow). Further
    text-only expansion over the remaining slice is still cheap and available.
+   **Why it matters:** a coarse/genus row could fire a confident-but-marginal card unnoticed.
+   **Likely sprint:** folds into the gap-0 fixture-depth work (V1 accuracy continuation).
 
-2. **Pilea boundary + direct card SHIPPED (0012 gate → 0013 direct card) — CLOSED; residual tuning open.**
-   The 0009 deferral is lifted: 0012 mapped Pilea (38→39) only in lockstep with a `ModelScoreMapper`
-   boundary gate (top-1 = Pilea → picker with Pilea + pothos surfaced; CI-bound by
-   `pileaMappingRequiresBoundaryGate`), and 0013 added a **direct** Pilea card above an elevated
-   `per_species_thresholds["pilea-peperomioides"] = 0.98`, composed with — never replacing — the gate and
-   **CI-bound > 0.9661** by `HousePlantClassMapValidationTest`. Validated by a pre-registered leave-one-out
-   + author-separated sweep (6 distinct-author fixtures, +0 confident-wrong every fold) and **confirmed in
-   the wild** (0013 review: real Pilea → correct direct card; 6/6 real-Pilea fixtures, 0 pothos→direct-Pilea).
-   The headline gap is closed. **Residual / open pieces from the 0013 review**
+2. **Pilea residual tuning (0013 review).** The boundary + direct card themselves are **CLOSED** — see
+   "Closed this window" below. Three residuals stay open
    (`feedback/PLANTPOTTING-0013/feedback.md`):
    - **(a) Re-derive a lower-but-safe `T_pilea`** to admit more genuine Pilea. ~0.97 stays CI-green: the
      `> 0.9661` floor is the *single-crop diagnostic* pothos ceiling, while the **shipped tta6** ceiling is
@@ -172,6 +155,10 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
      66-fixture set; a better framing may be **agreement-as-confidence** than AIY override. Must clear the
      same +0-confident-wrong held-out bar Pilea was held to.
 
+   **Why it matters:** (a) admits more genuine Pilea to the direct card; (b) bespoke rules are tech-debt
+   the next promoted species will copy; (c) could recover abstentions without training.
+   **Likely sprint:** the V1 accuracy continuation (SID TBD, alongside the Launch track).
+
 3. **★ Pilea direct card shows NO hero image (placeholder only) — found in 0013 review.** Among the 39
    mapped species, `pilea-peperomioides` is the **only one** with no CC0/PD `.webp` in `res/drawable-nodpi/`
    — `PlantImageResolver` falls back to `ic_plant_placeholder`. Pilea was strict-picker until 0013, so its
@@ -179,7 +166,7 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    only guards image→manifest (license), not species→image, so nothing went red. **Close:** source a CC0/PD
    Pilea photo via the `/reference-photos` skill + manifest + `docs/licenses/`, and add a test binding
    card-reachable species → non-placeholder drawable so a newly-promoted species can't regress. Small,
-   self-contained.
+   self-contained. **Likely sprint:** ride-along on any sprint, via `/reference-photos`.
 
 4. **6 KB species remain out-of-vocab + the fine-tune is DEFERRED (training-bound).** The 0008 spike
    answered the data question — **PARTIAL-GO**: 5 OOV species (chlorophytum-comosum, philodendron-hederaceum,
@@ -190,6 +177,7 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    alone but is **deferred behind the cheaper KB/accuracy/release levers** as lower ROI per effort. Reusable
    when revisited: the `finetune-sprint-outline.md` approach (47→52, float16 export, `ModelSwapEvaluationTest`,
    `ACTIVE_MODEL_ROOT`). `feedback/PLANTPOTTING-0008/feedback.md`.
+   **Likely sprint:** none scheduled — re-evaluate after the Launch track ships.
 
 5. **★ Not release-ready for the Google Play Store (blocks publication) — net-new this pass (fold-in A).**
    Licensing is already commercial-clean (gap 6); the blockers are engineering/process. (1) `targetSdk`/
@@ -209,7 +197,7 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    public URL. **Licensing is already commercial-clean:** both bundled ML models are Apache-2.0, all 44
    reference photos are Unsplash/Pexels/CC0 (CC-BY-SA banned by policy), no GPL/copyleft, `verifyNoNetworking`
    holds — so PolyForm binds *licensees*, not the principal, and a free launch now keeps later monetisation /
-   dual-licensing open.
+   dual-licensing open. **Likely sprint:** PLANTPOTTING-0014 (with gap 5).
 
 7. **Monetisation options unexplored — DEFERRED, gated behind the free Launch (0014) — fold-in B.** Raw idea
    #1 in the inbox: a monetisation-options spike (brainstorm ~40 levers → top-5 easiest-to-implement + top-5
@@ -218,6 +206,7 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
    horizontal referral partnerships (pots / supplies). **Not scoped this pass** — recorded as a single
    forward-looking gap + a V3 milestone sketch; it is gated behind shipping the free Launch and is **not** a
    sprint yet. `docs/future-ideas/feature-ideas.md` (raw idea #1).
+   **Likely sprint:** a V3 monetisation spike — only after the free Launch ships.
 
 ### Standing non-goals (carried from 0005 §2.4)
 
@@ -243,7 +232,14 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
 - ~~**0005/0006 UX calibration cleanup.**~~ Closed in 0006: Crassula probe landed honestly at 0.1055
   low-confidence; subtitle de-jargoned; `(0%)` chips drop the suffix and stay selectable.
 - ~~**Pilea silently unmapped / pothos↔Pilea confident-wrong boundary.**~~ Closed across 0012 (gate) + 0013
-  (direct card) — see gap 2; only residual tuning remains.
+  (direct card). The 0009 deferral was lifted safely: 0012 mapped Pilea (38→39) only in lockstep with a
+  `ModelScoreMapper` boundary gate (top-1 = Pilea → picker with Pilea + pothos surfaced; CI-bound by
+  `pileaMappingRequiresBoundaryGate`); 0013 added a **direct** Pilea card above
+  `per_species_thresholds["pilea-peperomioides"] = 0.98`, composed with — never replacing — the gate and
+  CI-bound > 0.9661 by `HousePlantClassMapValidationTest`. Validated by a pre-registered leave-one-out +
+  author-separated sweep (6 distinct-author fixtures, +0 confident-wrong every fold) and confirmed in the
+  wild (6/6 real-Pilea fixtures → correct direct card; 0 pothos→direct-Pilea). Residual tuning lives on as
+  gap 2.
 
 ### Accepted as-is (recorded, not an open gap)
 
@@ -255,25 +251,6 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
 
 ### Active horizon (detailed)
 
-#### Shipped — window 0006 → 0013 (all reviewed clean; one-liners)
-- **0006 — V0.1 calibration close:** Crassula probe added (0.1055, honest low-conf), subtitle + `(0%)` chip
-  UX fixed; review elevated the model-swap milestone.
-- **0007 — V1 entry / model swap:** `house_plant_species_mobilenetv2` became the production default; AIY kept
-  as the regression anchor; seam unchanged.
-- **0008 — data-availability spike:** fine-tune feasibility PARTIAL-GO; the no-self-shot constraint re-pointed
-  work to text-only KB expansion; shutter-on-return UX fixed.
-- **0009 — KB-expansion 1 (text-only):** species **16 → 32**, mapped **10 → 26 of 47**, +`carnivorous-peat-sand`
-  archetype; Pilea deliberately deferred. v0.3.0.
-- **0010 — app experience:** DataStore, Home, My Plants, confidence bar, "Add this plant", 44 reference
-  photos, contained search; KB **32 → 44 / 38-of-47**. v0.4.0. **Review surfaced confident-wrong as the headline.**
-- **0011 — accuracy & trust:** scorecard + TTA-6 + 0.30 abstain margin cut confident-wrong **0.382 → 0.179**;
-  all botanical plates → real photos. v0.5.0.
-- **0012 — Pilea mapped safely:** class-map **38 → 39**, Pilea strict-picker behind the pothos↔Pilea gate,
-  **+0 confident-wrong** vs naive +2/+9/+6; +19 CC0 fixtures (→60/39); TTA stays 6. v0.6.0.
-- **0013 — direct Pilea card:** direct Pilea at `T_pilea = 0.98` (LOO + author-separated, +0 cw, CI-bound
-  > 0.9661); **6/6 real-Pilea → correct direct card**, 0 pothos→direct-Pilea; fixtures **60 → 66**; per-base
-  clean top-1 0.417 → 0.530. v0.7.0 released. **Review: clean** — one cosmetic bug (no Pilea hero image, gap 3).
-
 #### Next — PLANTPOTTING-0014: release readiness (Launch track) — *detailed; fold-in A*
 - **Intent:** make PlantPotting publishable as a **free** Google Play release without changing the frozen
   identifier seam, KB, model, or training state. Runs **parallel** to V1 accuracy/fixture work — it does not
@@ -281,27 +258,20 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
 - **Entry conditions:** 0013 `status: done` and its review PR merged to `origin/main` (✓); this refresh
   merged; principal decisions locked (public repo, PolyForm Noncommercial 1.0.0; **Personal** Play account;
   **free launch**, monetisation deferred).
-- **Code / config track:**
-  1. Root `LICENSE` = PolyForm Noncommercial 1.0.0 (filled licensor line) + short README licensing section;
-     keep per-asset licenses.
-  2. Bump `targetSdk`/`compileSdk` **34 → 35** (eval 36) + fix API-35 edge-to-edge / predictive-back Compose
-     regressions.
-  3. Release `signingConfig` + Play App Signing; keystore + secrets **out of the repo**.
-  4. `bundleRelease` → signed **AAB** (Play no longer accepts APKs for new apps).
-  5. Enable R8 (`isMinifyEnabled = true`) + TFLite keep rules (`org.tensorflow.**`); **verify inference +
-     `AccuracyEvalTest` on the minified release variant** (TFLite + reflection can break under R8) — ship
-     minify-off for v1 if fragile.
-  6. Real launcher icon (replace placeholder `ic_launcher_foreground.xml`) + 512×512 Play icon.
-  7. `docs/PRIVACY.md` (on-device classification; camera only during ID; images not retained/transmitted;
-     local records; no analytics) at a public URL (GitHub Pages).
-  8. Version → **v1.0.0** (`versionCode 8`); keep gates green (`ktlintFormat` first per the Windows autocrlf
-     note). NB: `release.yml` publishes a GitHub Release **only on a pushed `v*` tag** — a `versionName` bump
-     alone never publishes.
-- **Play-process track (plan-tracked, not code):** $25 Personal account + ID verification; Data Safety =
-  *none collected*; content rating (IARC, likely Everyone); store-listing assets (512×512 icon, 1024×500
-  feature graphic, ≥2 phone screenshots, descriptions, category); the **12-tester / 14-continuous-day closed
-  test** (Personal accounts post-Nov-2023 — recruit testers **first**, it's the schedule long pole). The
-  existing tag-triggered `release.yml` (debug APK → GitHub) can stay for side-loaders, separate from Play.
+- **Scope hints** (full task breakdown — the planner's input — lives in
+  [`docs/future-ideas/play-store-publishing.md`](future-ideas/play-store-publishing.md)):
+  - Project licensing + privacy: root `LICENSE` (PolyForm Noncommercial 1.0.0) + README licensing section +
+    `docs/PRIVACY.md` (on-device only; no analytics) hosted at a public URL.
+  - `targetSdk`/`compileSdk` **34 → 35** (eval 36) + fix API-35 edge-to-edge / predictive-back Compose
+    regressions.
+  - Release signing + Play App Signing (keystore/secrets out of the repo); `bundleRelease` → signed **AAB**;
+    R8 with TFLite keep rules, verified by `AccuracyEvalTest` on the minified variant (ship minify-off for
+    v1 if fragile).
+  - Real adaptive launcher icon + 512×512 Play icon + store-listing assets; version → **v1.0.0** (a GitHub
+    Release still requires the pushed `v*` tag).
+  - Play process (plan-tracked, not code): $25 Personal account + ID verification; Data Safety = *none
+    collected*; IARC content rating; the **12-tester / 14-continuous-day closed test** — recruit testers
+    **first**, it's the schedule long pole.
 - **Exit criteria:** signed release **AAB** of a min-API-35 build; PolyForm-Noncommercial-licensed public
   repo; privacy policy live; icon/store assets ready; Data Safety + content rating complete; closed-test gate
   passed; production rollout ready.
@@ -327,14 +297,12 @@ release-readiness.** Re-prioritized after the 0013 ship/review and the two accep
 
 ### Milestone ladder (skeleton — sprints become detailed as they approach)
 
-#### MVP — On-device ID + KB-driven potting-mix recommendation — *(shipped ~PLANTPOTTING-0003)*
-Camera → on-device identification → routing decision → KB-driven recipe, network-free, for the bundled
-species set.
+#### MVP — On-device ID + KB-driven potting-mix recommendation — *(shipped at PLANTPOTTING-0003, 2026-05-15)*
+Camera → on-device identification → routing decision → KB-driven recipe, network-free, for the bundled species set.
 
-#### V0.1 — Trustworthy confidence calibration — *(met ~PLANTPOTTING-0006)*
-- **Met:** real-photo probes for both in-vocab species (*Monstera deliciosa* @ 0.8984, high-conf;
-  *Crassula ovata* @ 0.1055, low-conf) with accuracy assertions in CI; the per-species threshold mechanism
-  wired and `perSpeciesThresholds` empty by design. Further depth required the V1 model swap.
+#### V0.1 — Trustworthy confidence calibration — *(met at PLANTPOTTING-0006, 2026-06-04)*
+Real-photo probes for both in-vocab species with CI accuracy assertions; `perSpeciesThresholds` wired,
+empty by design. Further depth required the V1 model swap.
 
 #### V1 — Broad species coverage — *(active since PLANTPOTTING-0007, substantially advanced)*
 - **Exit criteria:** most common houseplants identify directly so the low-confidence path is the exception,
@@ -348,6 +316,8 @@ species set.
   ~~KB-expansion (0009 ✓)~~; ~~accuracy & trust (0011 ✓)~~; ~~pothos↔Pilea gate + direct card (0012/0013 ✓)~~;
   **next → ≥3-photos/species fixture deepening + lower-but-safe `T_pilea` + rule harmonisation + AIY-cascade
   spike + Pilea hero image**; *deferred* → fine-tune for the 5 GO OOV classes (CC data only, no self-shot).
+- **Estimated sprints to ship:** ~2–3 (fixture deepening + `T_pilea` re-derivation, then rule
+  harmonisation + the AIY-cascade spike; the deferred fine-tune excluded).
 
 #### Launch — Google Play Store public release — *(new this pass; parallel to V1, does not block it)*
 - **Exit criteria:** a signed release **AAB** of a min-API-35 build, a PolyForm-Noncommercial-licensed public
@@ -358,6 +328,8 @@ species set.
   holds) — the work is release-engineering + Play process, behind the frozen seam.
 - **Skeleton sprints:** `PLANTPOTTING-0014` release readiness; then a 0014-review + closed-test-management
   follow-up if the tester gate surfaces issues.
+- **Estimated sprints to ship:** 1–2 (0014, plus the follow-up if needed; the 14-continuous-day closed
+  test is wall-clock, not sprint effort).
 
 #### V2 — Richer care guidance
 - **Exit criteria:** beyond the one-shot recipe — repotting schedule, care reminders, or personalization to
@@ -365,18 +337,31 @@ species set.
 - **Skeleton sprints:** care-profile model; reminder UX; plant-collection persistence/backup
   (My-Plants-survives-uninstall via Auto Backup or local export lands here unless Launch forces the
   backup/privacy decision earlier).
+- **Estimated sprints to ship:** ~3 (rough; re-estimated when promoted into the active horizon).
 
 #### V3 — Sustainable product / monetisation — *(deferred; gated behind the free Launch — gap 7)*
 - **Only after the free Launch ships.** A monetisation-options spike (40 ideas → top-5 ease + top-5 profit →
   2×2 ease-vs-revenue scoring) and any chosen commercial levers (ads / paid-pro tier / subscription /
   substrate affiliate / vertical integration / referral partnerships). Kept entirely separate from the 0014
   free release. **Sketch only** — not scoped.
+- **Estimated sprints to ship:** TBD (spike first; gated behind the free Launch).
 
 #### Beyond V3 — Plant-health diagnostics
 - Identify stress / pest / over-watering signs from the same photo pipeline (sketch only).
 
 ## Changelog
 
+- 2026-06-10 — **schema-conformance pass** (no content refresh; `through_sid` unchanged). Sprint History →
+  the skill's five-column format (Executor + Date backfilled from the ledger; the dead Status column
+  dropped — every row is `done` by definition). Corrected the stale probe row: jade has routed **low-conf**
+  since the 0011 abstain margin (0.58/0.42 vs money-tree, CI-asserted) but was still listed high-conf.
+  Shrank the Current-state narrative to a summary + derived stats (it's the BUMP-owned mechanical section);
+  removed the "Shipped — window" recap (duplicated Sprint History row-for-row). Known Gaps → explicit
+  Why-it-matters / Likely-sprint markers, with gap 2's closure narrative moved to "Closed this window"
+  (residuals 2a–c remain the gap). 0014 block → 5 scope hints (full task list defers to
+  `docs/future-ideas/play-store-publishing.md`); MVP/V0.1 collapsed per the milestone-promotion rule;
+  estimated-sprints lines added to the ladder; "44 images (one per species)" corrected to 44 of 45 KB
+  species (Pilea missing, gap 3).
 - 2026-06-09 — **refreshed through PLANTPOTTING-0013** (first true REFRESH since 0005 — 0006→0012 close-outs
   were BUMP-only, so the heavy sections had drifted). **Rebuilt Species/Model Coverage** (was stale at
   44/38; now **45 species / 39-of-47 mapped**, Pilea direct card at `=0.98`, fixtures **66/39**, per-base
