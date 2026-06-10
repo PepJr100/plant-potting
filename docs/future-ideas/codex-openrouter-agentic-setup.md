@@ -35,7 +35,15 @@ Round-2 proof: under Pattern B, `deepseek-v4-pro` cited only **real** paths (the
   **~$0.03 per grounded draft**). A one-time **$10 top-up** also raises the free-tier limit to 1000 req/day,
   but the fallback drafter itself is the paid DeepSeek route. Key lives in 1Password:
   item `Openrouter_DarkFactoryProjectAIKey`, field `credential`.
-- **`op` (1Password CLI)** signed in (desktop-app integration authorizes per command).
+- **`OPENROUTER_API_KEY` persisted as a user environment variable** — the **preferred** path (see §3.5).
+  Codex reads the key from this env var (`env_key`), so once it's a persistent user-env var, every shell —
+  **including the non-interactive background shells the `sprint-*` / `roadmap` skills spawn** — inherits it
+  with no per-call auth. This is what makes the fallback reliable.
+- **`op` (1Password CLI)** signed in — needed **only once**, to seed the env var from 1Password (§3.5). It is
+  *not* on the per-invocation hot path. ⚠️ Do **not** put `op item get` inside a background/non-interactive
+  shell: the desktop-app integration prompts per command and a headless shell can't answer it → `op` returns
+  `authorization timeout`, the key is empty, and codex dies with `Missing environment variable:
+  OPENROUTER_API_KEY` (observed 2026-06-09).
 
 ## 3. The config block
 
@@ -60,13 +68,29 @@ requires_openai_auth = false  # key isn't an sk- prefix
 
 Reserved provider IDs are `openai` / `ollama` / `lmstudio` — don't reuse those names.
 
+## 3.5 One-time setup — persist the key (preferred over per-call `op`)
+
+Run this **once**, interactively, in a normal terminal (so the 1Password desktop prompt can be answered).
+`setx` writes the value to the Windows user environment without echoing it:
+
+```powershell
+# PowerShell — fetch from 1Password and persist as a user env var (value is NOT printed)
+setx OPENROUTER_API_KEY "$(op item get 'Openrouter_DarkFactoryProjectAIKey' --fields credential --reveal)"
+```
+
+After this, the `op` call is gone from the hot path — codex picks the key up from the env var in every new
+shell. **Caveats:** (1) `setx` only affects *newly launched* processes, so **restart Claude Code and any open
+terminals once** for it to take effect (already-running processes keep their old environment block).
+(2) The key is stored **plaintext in the user registry** (readable by your own processes) — acceptable for a
+low-value, rotatable key on a single-user machine, so **set an OpenRouter spend cap and rotate periodically**.
+To rotate: issue a new key in the OpenRouter dashboard, update the 1Password item, re-run the `setx` line,
+restart. **Never** commit the key to the repo or paste it into a tracked file / the auto-memory.
+
 ## 4. Invocation
 
-Resolve the key **once per shell** (parallel `op` calls can race to an empty key), then invoke:
+With the env var persisted (§3.5), the invocation is just:
 
 ```bash
-export OPENROUTER_API_KEY="$(op item get "Openrouter_DarkFactoryProjectAIKey" --fields credential --reveal)"
-
 codex --config model_provider=openrouter \
       --config model=deepseek/deepseek-v4-pro \
       exec --dangerously-bypass-approvals-and-sandbox "<your prompt — tell it to write its file>"
@@ -74,6 +98,13 @@ codex --config model_provider=openrouter \
 
 The prompt should instruct the model to **explore the repo and write its output to a specific file path**
 (the same prompt you'd give `codex`/`agy`), because success is judged by the **written file**, not stdout.
+
+**Fallback if the env var isn't persisted** (e.g. a fresh machine before §3.5): resolve the key once per
+shell **in the foreground only** — never inside a background task — then invoke as above:
+
+```bash
+export OPENROUTER_API_KEY="$(op item get 'Openrouter_DarkFactoryProjectAIKey' --fields credential --reveal)"
+```
 
 ## 5. Two non-fatal quirks to expect
 
@@ -104,7 +135,8 @@ The prompt should instruct the model to **explore the repo and write its output 
 ## 7. Verify the setup (3 quick tests)
 
 ```bash
-export OPENROUTER_API_KEY="$(op item get "Openrouter_DarkFactoryProjectAIKey" --fields credential --reveal)"
+# (skip the export if you completed §3.5 — the env var is already persisted)
+export OPENROUTER_API_KEY="$(op item get 'Openrouter_DarkFactoryProjectAIKey' --fields credential --reveal)"
 cd <your repo>
 # 1. Smoke — connectivity/auth/wire_api:
 codex --config model_provider=openrouter --config model=deepseek/deepseek-v4-pro exec \
