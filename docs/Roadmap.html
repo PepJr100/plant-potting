@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="en-GB" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlantPotting — Outcome Roadmap</title>
+<!--
+  PlantPotting — Outcome Roadmap
+  ------------------------------
+  An interpretation of docs/ROADMAP.md through the Outcome Roadmap Framework Spec
+  (.claude/skills/outcome-roadmaps/).
+
+  §1-§4 of the spec are medium-agnostic and are what this file implements:
+    - horizontal axis  = delivery-status bands (NOW / NEXT / LATER / DONE-far-right)
+    - within LATER     = ranked left-to-right by value x confidence
+    - vertical axis    = Outcome / Why / Initiative / Metrics / Key Features
+    - colour           = state (except the Outcome tint, which is column identity)
+  §5 is the tldraw canvas renderer and does not apply here; where the two differ,
+  this file follows the framework proper. Notably metrics keep a light card with an
+  overlaid green tick / purple +1 badge (§2 Row 4) rather than §5C's flat colour-pair
+  workaround, which exists only because tldraw cannot overlay stickers.
+
+  BOARD (below) is the §4 structured spec and is the canonical content.
+  Edit the data, not the DOM. Palette derived from the app's LEAF theme
+  (app/src/main/java/com/darkfactory/plantpotting/ui/theme/Color.kt).
+
+  Reconciled against the repo on 2026-08-13, not just against ROADMAP.md:
+  ledger.yaml (13 sprints, all done), git log (review PR #42, refresh #43,
+  conformance #45 all merged; no sprint branch open), and the absence of
+  LICENSE / docs/PRIVACY.md / docs/sprints/PLANTPOTTING-0014.md, plus
+  targetSdk = 34 and isMinifyEnabled = false in app/build.gradle.kts.
+  That is why the NOW band is rendered empty rather than hidden.
+-->
+<style>
+/* ---- Palette: PlantPotting LEAF theme (Color.kt) --------------------------
+   Leaf green = accent chrome, bark brown = the Initiative row, cream = ground.
+   The seven feature-state hues stay semantically where the spec puts them. */
+:root, [data-mode="light"] {
+  --bg:#f6f3e7; --surface:#fffdf7; --panel:#edeade; --panel-2:#e5e1d1;
+  --ink:#1d2a1e; --muted:#59674f; --faint:#8a9482;
+  --line:#e2ddcc; --line-strong:#cdc7b2;
+  --accent:#2f6b34; --accent-strong:#1b5e20; --accent-soft:#e4eee2; --on-accent:#ffffff;
+  --accent-2:#8a5a3b;                        /* Epic Theme header — bark */
+  --accent-2-soft:#f4e9df;                   /* Epic Story body           */
+  --accent-2-deep:#6d4c41;
+  --shadow:0 1px 3px rgba(29,42,30,.06), 0 10px 26px rgba(29,42,30,.07);
+
+  --font-ui:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-serif:Georgia,"Times New Roman",serif;   /* the Why row: rationale, not work */
+  --font-mono:ui-monospace,Consolas,Menlo,monospace;
+  --radius-card:12px; --radius-pill:999px;
+
+  /* Feature state (spec §2 Row 5). Colour = state. */
+  --s-todo-ink:#8a6a24; --s-todo-bg:#f7efd6; --s-todo-line:#e7d5a2;  /* yellow */
+  --s-next-ink:#985f31; --s-next-bg:#f7e7d5; --s-next-line:#eccbab;  /* orange */
+  --s-prog-ink:#26697f; --s-prog-bg:#e0eef2; --s-prog-line:#b1d6df;  /* blue   */
+  --s-done-ink:#2f7d55; --s-done-bg:#e5f1e7; --s-done-line:#bedfc7;  /* green  */
+  --s-dec-ink:#5f57a0;  --s-dec-bg:#ebe9f7;  --s-dec-line:#cfcaec;   /* purple */
+  --s-blok-ink:#b0574a; --s-blok-bg:#f5e6e1; --s-blok-line:#e6c5bb;  /* pink   */
+  --s-depr-ink:#7a7183; --s-depr-bg:#eeecf1; --s-depr-line:#dbd6e1;  /* mauve  */
+
+  /* Metric family — its own hue, deliberately not a feature colour (§5C intent) */
+  --met-ink:#455a86; --met-bg:#eaeef8; --met-line:#ccd5ea;
+
+  --key-w:132px; --lane-w:250px; --band-gap:30px;
+}
+[data-mode="dark"] {
+  --bg:#131a14; --surface:#1c241d; --panel:#232c24; --panel-2:#2b362c;
+  --ink:#edf3ea; --muted:#a7b5a3; --faint:#7e8c7b;
+  --line:#2e3a2f; --line-strong:#3d4a3e;
+  --accent:#7fc08a; --accent-strong:#9ed6a6; --accent-soft:rgba(127,192,138,.16); --on-accent:#0e1a10;
+  --accent-2:#c79067; --accent-2-soft:rgba(199,144,103,.15); --accent-2-deep:#e2b18c;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px rgba(0,0,0,.42);
+
+  --s-todo-ink:#e8cf8a; --s-todo-bg:#33290f; --s-todo-line:#6a5623;
+  --s-next-ink:#e0a878; --s-next-bg:#38230f; --s-next-line:#704a26;
+  --s-prog-ink:#8ec9e2; --s-prog-bg:#122b34; --s-prog-line:#2b5566;
+  --s-done-ink:#7fd8a3; --s-done-bg:#14311e; --s-done-line:#295f3c;
+  --s-dec-ink:#b3a9f0;  --s-dec-bg:#241f3d;  --s-dec-line:#443b6e;
+  --s-blok-ink:#f0a99a; --s-blok-bg:#341f19; --s-blok-line:#6e3f37;
+  --s-depr-ink:#b6adc2; --s-depr-bg:#272430; --s-depr-line:#453f52;
+  --met-ink:#aebde6; --met-bg:#1a1f33; --met-line:#343e63;
+}
+
+/* ---- Structure ---------------------------------------------------------- */
+* { box-sizing:border-box; }
+html { height:100%; }
+body {
+  margin:0; min-height:100%; background:var(--bg); color:var(--ink); font-family:var(--font-ui);
+  -webkit-font-smoothing:antialiased; display:flex; flex-direction:column;
+}
+
+header {
+  flex:none; display:flex; align-items:flex-start; gap:18px;
+  padding:14px 22px; border-bottom:1px solid var(--line); background:var(--surface); z-index:10;
+}
+.brand { display:flex; align-items:center; gap:11px; flex:none; }
+.brand svg { width:30px; height:30px; color:var(--accent); flex:none; }
+.brand h1 {
+  margin:0; font-family:var(--font-serif); font-weight:500; font-size:20px;
+  letter-spacing:-.02em; white-space:nowrap;
+}
+.brand h1 span { color:var(--faint); font-style:italic; }
+.tagline {
+  margin:3px 0 0; font-size:12.5px; color:var(--muted); line-height:1.5; max-width:430px;
+  border-left:1px solid var(--line-strong); padding-left:18px;
+}
+.tagline em { color:var(--ink); font-style:normal; font-weight:600; }
+.meta { margin-left:auto; display:flex; align-items:flex-start; gap:8px; flex:none; }
+.chip-stack { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
+.chip {
+  font:500 11px var(--font-ui); color:var(--muted); background:var(--panel);
+  border:1px solid var(--line); border-radius:var(--radius-pill); padding:4px 10px; white-space:nowrap;
+}
+.chip b { font-family:var(--font-mono); font-weight:600; color:var(--ink); }
+.chip.long { white-space:normal; max-width:340px; line-height:1.4; text-align:left; border-radius:9px; }
+.toggle {
+  font:600 11.5px var(--font-ui); cursor:pointer; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line-strong); border-radius:var(--radius-pill); padding:5px 12px; flex:none;
+}
+.toggle:hover { border-color:var(--accent); color:var(--accent); }
+
+/* Board scrollport. The board owns BOTH scroll axes: sticky row labels (left)
+   and sticky band banners (top) resolve against the nearest scrollport — if the
+   page scrolled vertically instead, the banners would drift off the board.
+   min-height keeps the notes section below the fold rather than letting it eat
+   the board's height; the page itself scrolls to reach it. */
+.scroll { flex:1 1 auto; overflow:auto; min-height:calc(100vh - 190px); }
+
+/* No align-items:start — cells must STRETCH so every card fills its row band and
+   the five rows read straight across; vertical alignment is what carries nesting. */
+.board { display:grid; width:max-content; padding:0 26px 40px 0; position:relative; }
+.cell { padding:5px 6px; min-width:0; position:relative; z-index:1; }
+
+/* Column identity wash — lets the eye trace an Outcome column downward (§2 Row 1). */
+.wash {
+  grid-row:2 / 7; z-index:0; margin:2px 3px 10px; border-radius:14px;
+  background:color-mix(in oklab, var(--hue) 5%, transparent);
+  border:1px solid color-mix(in oklab, var(--hue) 13%, transparent);
+}
+
+/* Left-margin key (§1: the reading instructions, not content) */
+.key { position:sticky; left:0; z-index:3; background:var(--bg); padding:5px 12px 5px 22px; }
+.key-inner {
+  height:100%; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);
+  padding:11px 10px; display:flex; align-items:flex-start;
+}
+.key-inner span {
+  font:800 10px var(--font-ui); letter-spacing:.11em; text-transform:uppercase;
+  color:var(--ink); line-height:1.4;
+}
+.key-inner em {
+  font-weight:500; text-transform:none; letter-spacing:0; color:var(--faint); font-style:normal;
+}
+.key-corner { position:sticky; left:0; top:0; z-index:5; background:var(--bg); }
+.key-shadow {
+  position:sticky; left:0; grid-row:1 / 7; z-index:2;
+  width:1px; background:var(--line-strong); margin-left:-1px;
+}
+
+/* Band banners (§5H: light bars spanning their band's columns) */
+.banner-cell { position:sticky; top:0; z-index:4; background:var(--bg); padding:12px 6px 8px; }
+.banner {
+  border-radius:9px; background:var(--panel); border:1px solid var(--line-strong);
+  padding:7px 14px; display:flex; align-items:baseline; gap:10px;
+}
+.banner b { font:800 11px var(--font-ui); letter-spacing:.13em; text-transform:uppercase; color:var(--ink); }
+.banner i { font:400 10.5px var(--font-ui); font-style:normal; color:var(--faint); }
+.banner--now { background:var(--accent-soft); border-color:color-mix(in oklab, var(--accent) 35%, transparent); }
+.banner--now b { color:var(--accent-strong); }
+
+/* An empty band is rendered, not hidden — "nothing in flight" is a fact worth showing. */
+.empty {
+  grid-row:2 / 7; margin:5px 6px 10px; padding:16px 15px; border-radius:var(--radius-card);
+  border:1.5px dashed var(--line-strong); background:transparent;
+  display:flex; flex-direction:column; justify-content:center; gap:7px;
+}
+.empty b { font:700 12.5px var(--font-ui); color:var(--ink); }
+.empty span { font:400 11.5px/1.55 var(--font-ui); color:var(--muted); }
+.empty code { font:400 10.5px var(--font-mono); color:var(--accent); background:var(--accent-soft); padding:1px 4px; border-radius:4px; }
+
+/* Row 1 · Outcome */
+.outcome {
+  border-radius:var(--radius-card); padding:11px 13px 12px; height:100%;
+  background:color-mix(in oklab, var(--hue) 16%, var(--surface));
+  border:1px solid color-mix(in oklab, var(--hue) 42%, var(--surface));
+  border-bottom:3px solid color-mix(in oklab, var(--hue) 62%, var(--surface));
+}
+.outcome-top { display:flex; align-items:baseline; gap:7px; margin-bottom:5px; }
+.outcome h2 { margin:0; font:700 14.5px var(--font-ui); letter-spacing:-.015em; line-height:1.25; }
+.outcome .id { font:600 11px var(--font-mono); color:var(--ink); opacity:.5; }
+.outcome .scope { display:block; font:500 11.5px var(--font-ui); color:var(--muted); margin-top:2px; }
+.outcome-foot { display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
+.tag {
+  font:700 9px var(--font-ui); letter-spacing:.08em; text-transform:uppercase;
+  border-radius:var(--radius-pill); padding:3px 8px;
+  background:color-mix(in oklab, var(--ink) 7%, transparent); color:var(--muted);
+}
+.tag--status { background:color-mix(in oklab, var(--hue) 55%, var(--surface)); color:var(--ink); }
+.tag--rank { font-family:var(--font-mono); letter-spacing:0; }
+.tag--sid { font-family:var(--font-mono); letter-spacing:0; }
+
+/* Row 2 · Why (neutral — the only row that isn't "doing", §2 Row 2) */
+.why {
+  border-radius:var(--radius-card); background:var(--panel); border:1px solid var(--line);
+  padding:11px 13px; height:100%;
+  font:400 12.5px/1.5 var(--font-serif); color:var(--muted);
+}
+
+/* Row 3 · Initiative (Epic Theme header + Epic Story body, §2 Row 3) */
+.init {
+  border-radius:var(--radius-card); overflow:hidden; height:100%;
+  border:1px solid var(--s-next-line); background:var(--surface);
+  display:flex; flex-direction:column;
+}
+.theme {
+  background:var(--accent-2); color:#fff; padding:9px 12px; flex:none;
+  font:700 12px/1.3 var(--font-ui); letter-spacing:-.01em;
+}
+[data-mode="dark"] .theme { color:#241304; }
+.story { background:var(--accent-2-soft); padding:10px 12px; font-size:11.5px; line-height:1.5; flex:1; }
+.story .lbl {
+  font:800 9px var(--font-ui); letter-spacing:.09em; color:var(--accent-2-deep);
+  margin-right:5px; text-transform:uppercase;
+}
+.story .for { color:var(--muted); display:block; margin-bottom:4px; }
+.story .out { color:var(--ink); display:block; }
+
+/* Row 4 · Metrics — light card + overlaid badge, per §2 Row 4 */
+.stack { display:flex; flex-direction:column; gap:7px; }
+.metric {
+  display:flex; gap:9px; align-items:flex-start;
+  border-radius:10px; background:var(--met-bg); border:1px solid var(--met-line);
+  padding:8px 10px; font-size:11.5px; line-height:1.45; color:var(--met-ink);
+}
+.badge {
+  flex:none; width:16px; height:16px; border-radius:5px; margin-top:1px;
+  display:grid; place-items:center; font:700 9px var(--font-ui);
+  border:1.5px solid var(--met-line); background:transparent; color:transparent;
+}
+.metric--done .badge   { background:var(--s-done-ink); border-color:var(--s-done-ink); color:#fff; }
+.metric--flight .badge { background:var(--s-dec-ink);  border-color:var(--s-dec-ink);  color:#fff; font-size:8px; }
+.metric--done .txt { opacity:.75; }
+
+/* Row 5 · Key Features — colour = state (§2 Row 5) */
+.feat { border-radius:10px; padding:8px 10px 8px 11px; font-size:11.5px; line-height:1.45; border:1px solid; border-left-width:4px; }
+.feat .st { display:block; font:800 8.5px var(--font-ui); letter-spacing:.1em; text-transform:uppercase; opacity:.75; margin-bottom:3px; }
+.f-to_do         { background:var(--s-todo-bg); border-color:var(--s-todo-line); color:var(--s-todo-ink); border-left-color:var(--s-todo-ink); }
+.f-next          { background:var(--s-next-bg); border-color:var(--s-next-line); color:var(--s-next-ink); border-left-color:var(--s-next-ink); }
+.f-in_progress   { background:var(--s-prog-bg); border-color:var(--s-prog-line); color:var(--s-prog-ink); border-left-color:var(--s-prog-ink); }
+.f-done          { background:var(--s-done-bg); border-color:var(--s-done-line); color:var(--s-done-ink); border-left-color:var(--s-done-ink); }
+.f-tech_decision { background:var(--s-dec-bg);  border-color:var(--s-dec-line);  color:var(--s-dec-ink);  border-left-color:var(--s-dec-ink); }
+.f-blocked       { background:var(--s-blok-bg); border-color:var(--s-blok-line); color:var(--s-blok-ink); border-left-color:var(--s-blok-ink); }
+.f-deprioritised { background:var(--s-depr-bg); border-color:var(--s-depr-line); color:var(--s-depr-ink); border-left-color:var(--s-depr-ink); }
+
+/* Legend panel (§5E: right of the last column, never the left margin) */
+.legend {
+  grid-row:2 / 7; margin:5px 6px; width:300px; align-self:start;
+  border-radius:var(--radius-card); background:var(--surface);
+  border:1px solid var(--line); box-shadow:var(--shadow); padding:14px 15px;
+}
+.legend h3 { margin:0 0 4px; font:800 10px var(--font-ui); letter-spacing:.11em; text-transform:uppercase; color:var(--ink); }
+.legend .note { font:400 11px/1.5 var(--font-ui); color:var(--faint); margin:0 0 12px; }
+.legend h4 { margin:14px 0 7px; font:700 9.5px var(--font-ui); letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
+.legend h4:first-of-type { margin-top:0; }
+.sw { display:flex; gap:9px; align-items:flex-start; margin-bottom:6px; font-size:11px; line-height:1.45; }
+.sw-dot { flex:none; width:13px; height:13px; border-radius:4px; border:1px solid; margin-top:1px; }
+.sw-txt { color:var(--muted); }
+.sw-txt b { color:var(--ink); font-weight:600; }
+.sw-txt code { font:400 10px var(--font-mono); color:var(--accent); background:var(--accent-soft); padding:1px 4px; border-radius:4px; }
+.legend .rule { height:1px; background:var(--line); margin:14px 0; }
+.legend .src { font:400 10.5px/1.55 var(--font-ui); color:var(--faint); }
+.legend .src a { color:var(--accent); }
+
+/* Notes / loose ends — the twin of the idea inbox and review feedback */
+#notes { flex:none; padding:16px 22px 30px; border-top:1px solid var(--line); background:var(--surface); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" role="img" aria-label="PlantPotting">
+      <path d="M24 41 V22" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"></path>
+      <path d="M24 24 C24 15 18 9 10 8 C9 17 15 24 24 24 Z" fill="currentColor"></path>
+      <path d="M24 30 C24 23 29 18 36 17 C36.8 24.4 31.6 30 24 30 Z" fill="#8a5a3b"></path>
+    </svg>
+    <h1>PlantPotting — <span>Outcome Roadmap</span></h1>
+  </div>
+  <p class="tagline">
+    On-device houseplant identification that ends in the right potting mix. Read left&nbsp;→&nbsp;right for
+    <em>when</em>, top&nbsp;→&nbsp;bottom for <em>detail</em>: execs read Outcome&nbsp;+&nbsp;Why, delivery lives in Metrics&nbsp;+&nbsp;Features.
+  </p>
+  <div class="meta">
+    <div class="chip-stack">
+      <span class="chip">Updated <b>2026-08-13</b></span>
+      <span class="chip">Through SID <b>PLANTPOTTING-0013 (done · reviewed clean)</b></span>
+      <span class="chip">Sprints done <b>13</b> · ~14,893 Kotlin LOC</span>
+      <span class="chip">Release <b>v0.7.0 · debug APK only</b></span>
+    </div>
+    <div class="chip-stack">
+      <span class="chip long">Coverage <b>45 KB species · 39 of 47 model classes mapped · 66 fixture photos</b>, but 31 of 39 species still rest on 1–2 photos</span>
+      <span class="chip long">Accuracy <b>confident-wrong 0.382 → 0.179</b>, clean top-1 0.417 → 0.530 — measured under clean + synthetic perturbation, <b>not</b> real-world solved</span>
+    </div>
+    <button class="toggle" id="mode">Dark</button>
+  </div>
+</header>
+
+<div class="scroll"><div class="board" id="board"></div></div>
+<section id="notes"></section>
+
+<script>
+/* =============================================================================
+   The §4 structured spec — the canonical artefact. Everything below renders it.
+
+   status : done | in_progress | next | not_started   -> band (DONE / NOW / NEXT / LATER)
+   rank   : left-to-right order WITHIN the band; 1 = highest value x confidence
+   hue    : Outcome identity colour. Decorative — it never propagates down the column.
+   metric state  : not_met | in_flight | done
+   feature status: to_do | next | in_progress | done | tech_decision | blocked | deprioritised
+
+   Voice per row is the spec's §3 contract, not decoration:
+     why     -> present-tense PROBLEM   "<Persona> cannot <X>, making <Y> hard."
+     theme   -> imperative title        "<Verb> <object>"
+     story   -> persona's first person  "FOR: <persona> OUTCOME: I <achieved state>"
+     metric  -> declarative done-state, binary-checkable
+     feature -> imperative, verb-first
+   Personas, named once and reused exactly: Houseplant owners · The maintainer.
+   ============================================================================= */
+const BOARD = [
+
+/* ---- NEXT ---------------------------------------------------------------- */
+{
+  id:"5.1", name:"Publishable on Google Play", scope:"Launch track · PLANTPOTTING-0014", hue:"#2f6b34",
+  status:"next", rank:1, value:"high", confidence:"med", statusText:"Next",
+  why:"Houseplant owners cannot install PlantPotting at all — it exists only as a debug APK attached to a GitHub release, so the work has no audience.",
+  initiatives:[
+    { theme:"License the code and state the privacy position",
+      story:{ for:"The maintainer", outcome:"I can publish the repo without giving the work away." },
+      metrics:[
+        { text:"A root LICENSE names PolyForm Noncommercial 1.0.0", state:"not_met" },
+        { text:"A privacy policy is live at a public URL", state:"not_met" },
+        { text:"The README points at both", state:"not_met" }
+      ],
+      features:[
+        { text:"Add the PolyForm Noncommercial LICENSE", status:"next" },
+        { text:"Write docs/PRIVACY.md for on-device-only use", status:"next" },
+        { text:"Host the privacy policy at a public URL", status:"to_do" },
+        { text:"Append a licensing section to the README", status:"to_do" }
+      ] },
+    { theme:"Ship a signed release build",
+      story:{ for:"The maintainer", outcome:"I can hand Play a build it will accept." },
+      metrics:[
+        { text:"The app builds and runs on target SDK 35", state:"not_met" },
+        { text:"bundleRelease emits a signed AAB", state:"not_met" },
+        { text:"Accuracy eval passes on the minified variant", state:"not_met" }
+      ],
+      features:[
+        { text:"Bump target and compile SDK 34 to 35", status:"next" },
+        { text:"Fix edge-to-edge and predictive-back regressions", status:"to_do" },
+        { text:"Add release signing and Play App Signing", status:"to_do" },
+        { text:"Enable R8 with TFLite keep rules", status:"to_do" },
+        { text:"Evaluate target SDK 36 before 31 August 2026", status:"tech_decision" },
+        { text:"Draw a real adaptive launcher icon", status:"to_do" }
+      ] },
+    { theme:"Clear the Play publication gate",
+      story:{ for:"Houseplant owners", outcome:"I can install PlantPotting from the Play Store." },
+      metrics:[
+        { text:"Data Safety and content rating are complete", state:"not_met" },
+        { text:"Twelve testers run a 14-day continuous closed test", state:"not_met" },
+        { text:"Production rollout is approved", state:"not_met" }
+      ],
+      features:[
+        { text:"Open a Personal Play account and verify ID", status:"to_do" },
+        { text:"Recruit twelve closed-test testers", status:"blocked" },
+        { text:"Complete Data Safety and IARC rating", status:"to_do" },
+        { text:"Run the 14-day continuous closed test", status:"blocked" },
+        { text:"Tag v1.0.0 to publish the release", status:"to_do" }
+      ] }
+  ]
+},
+{
+  id:"2.3", name:"Per-Species Honesty", scope:"V1 accuracy continuation · SID TBD", hue:"#3d7c8c",
+  status:"next", rank:2, value:"high", confidence:"med", statusText:"Next",
+  why:"Thirty-one of thirty-nine mapped species rest on one or two photos, so no per-species accuracy claim is trustworthy and messy phone captures stay unmeasured.",
+  initiatives:[
+    { theme:"Get three photos behind every species",
+      story:{ for:"The maintainer", outcome:"I can trust a per-species number." },
+      metrics:[
+        { text:"Every mapped species has three or more fixtures", state:"not_met" },
+        { text:"Licence and integrity guards stay green", state:"not_met" },
+        { text:"Every supply ceiling is documented, not hidden", state:"in_flight" }
+      ],
+      features:[
+        { text:"Source three licence-clean photos per species", status:"next" },
+        { text:"Widen sourcing beyond iNaturalist", status:"next" },
+        { text:"Break the Begonia and Schlumbergera ceilings", status:"blocked" },
+        { text:"Remap schlumbergera-bridgesii to truncata", status:"tech_decision" },
+        { text:"Probe the 28 unprobed delta mappings", status:"to_do" }
+      ] },
+    { theme:"Re-derive a lower but safe Pilea bar",
+      story:{ for:"Houseplant owners", outcome:"My Pilea earns its card more often." },
+      metrics:[
+        { text:"T_pilea drops below 0.98 with zero confident-wrong", state:"not_met" },
+        { text:"The CI floor above 0.9661 still holds", state:"not_met" }
+      ],
+      features:[
+        { text:"Collect more real Pilea fixtures", status:"to_do" },
+        { text:"Re-run the author-separated leave-one-out sweep", status:"to_do" },
+        { text:"Lower T_pilea to the safe floor", status:"to_do" }
+      ] },
+    { theme:"Sweep test-time augmentation past six views",
+      story:{ for:"Houseplant owners", outcome:"I get a right answer from a messy photo." },
+      metrics:[
+        { text:"Confident-wrong is mapped against latency per level", state:"not_met" },
+        { text:"Worst-case identify stays under two seconds", state:"not_met" }
+      ],
+      features:[
+        { text:"Run the gated TTA sweep at 8, 10 and 20", status:"next" },
+        { text:"Add new spatial zones, not re-scored crops", status:"to_do" },
+        { text:"Pick the shipping TTA level", status:"tech_decision" }
+      ] }
+  ]
+},
+{
+  id:"4.2", name:"Every Card Shows a Real Plant", scope:"ride-along fix", hue:"#c8834f",
+  status:"next", rank:3, value:"med", confidence:"high", statusText:"Next",
+  why:"Pilea is the only card-reachable species with no photo, so a correct identification lands on a grey placeholder and reads as a bug.",
+  initiatives:[
+    { theme:"Give Pilea a hero image",
+      story:{ for:"Houseplant owners", outcome:"I see the plant I just identified." },
+      metrics:[
+        { text:"Pilea's card shows a licence-clean photo", state:"not_met" },
+        { text:"No card-reachable species falls back to the placeholder", state:"not_met" }
+      ],
+      features:[
+        { text:"Source a CC0 Pilea photo via /reference-photos", status:"next" },
+        { text:"Record it in the manifest and licence docs", status:"next" },
+        { text:"Test that card-reachable species have images", status:"to_do" }
+      ] }
+  ]
+},
+
+/* ---- LATER — ranked left→right by value × confidence ---------------------- */
+{
+  id:"2.4", name:"Calibration Without Bespoke Rules", scope:null, hue:"#5f57a0",
+  status:"not_started", rank:1, value:"high", confidence:"med", statusText:"Future",
+  why:"Pilea is the only species with hand-written routing rules, so the next promoted species will copy the tech debt rather than reuse a mechanism.",
+  initiatives:[
+    { theme:"Make per-species rules a general mechanism",
+      story:{ for:"The maintainer", outcome:"I can promote a species without writing new rules." },
+      metrics:[
+        { text:"Any species can opt into a per-pair rule", state:"not_met" },
+        { text:"The asymmetric pothos-to-Pilea guard survives", state:"not_met" }
+      ],
+      features:[
+        { text:"Design a general per-species rule mechanism", status:"tech_decision" },
+        { text:"Migrate the Pilea rules onto it", status:"to_do" }
+      ] },
+    { theme:"Test whether a second opinion recovers abstentions",
+      story:{ for:"Houseplant owners", outcome:"I get an answer where the app used to shrug." },
+      metrics:[
+        { text:"Recoverable abstentions are counted offline first", state:"not_met" },
+        { text:"Any cascade adds zero confident-wrong", state:"not_met" }
+      ],
+      features:[
+        { text:"Count recoverable abstentions on 66 fixtures", status:"to_do" },
+        { text:"Frame AIY agreement as confidence, not override", status:"tech_decision" },
+        { text:"Drop the cascade if the recovery is thin", status:"to_do" }
+      ] }
+  ]
+},
+{
+  id:"7.1", name:"Care That Continues", scope:"V2", hue:"#3f8a8a",
+  status:"not_started", rank:2, value:"high", confidence:"low", statusText:"Future",
+  why:"Houseplant owners get one recipe and nothing afterwards, so the app has no reason to be opened a second time.",
+  initiatives:[
+    { theme:"Remind an owner when care is due",
+      story:{ for:"Houseplant owners", outcome:"I know when to repot without remembering." },
+      metrics:[
+        { text:"Each saved plant carries a repotting schedule", state:"not_met" },
+        { text:"A reminder fires without any network call", state:"not_met" }
+      ],
+      features:[
+        { text:"Model a care profile per species", status:"to_do" },
+        { text:"Design the reminder experience", status:"to_do" }
+      ] },
+    { theme:"Keep My Plants through a reinstall",
+      story:{ for:"Houseplant owners", outcome:"I do not lose my plants when I reinstall." },
+      metrics:[
+        { text:"Saved plants survive an uninstall and reinstall", state:"not_met" }
+      ],
+      features:[
+        { text:"Choose Auto Backup or a local export", status:"tech_decision" },
+        { text:"Keep the no-cloud-sync non-goal intact", status:"to_do" }
+      ] }
+  ]
+},
+{
+  id:"3.3", name:"The Six Missing Species", scope:"fine-tune · deferred", hue:"#8a7f3d",
+  status:"not_started", rank:3, value:"med", confidence:"low", statusText:"Deferred",
+  why:"Six knowledge-base species sit outside the model's vocabulary, so Houseplant owners can only ever reach them through the picker.",
+  initiatives:[
+    { theme:"Fine-tune the five viable missing classes",
+      story:{ for:"Houseplant owners", outcome:"My Monstera adansonii is named, not listed." },
+      metrics:[
+        { text:"Five out-of-vocab species identify directly", state:"not_met" },
+        { text:"The swap harness clears the retrained model", state:"not_met" }
+      ],
+      features:[
+        { text:"Fine-tune on licence-clean imagery only", status:"deprioritised" },
+        { text:"Export float16 and re-run the swap evaluation", status:"deprioritised" },
+        { text:"Wait on cultivar-proven pink princess imagery", status:"blocked" }
+      ] }
+  ]
+},
+{
+  id:"6.1", name:"A Product That Pays For Itself", scope:"V3 · gated behind the free launch", hue:"#a35c6f",
+  status:"not_started", rank:4, value:"med", confidence:"low", statusText:"Future",
+  why:"PlantPotting has no revenue model, so nothing funds imagery, hosting or a paid data source once the free launch lands.",
+  initiatives:[
+    { theme:"Score the monetisation options",
+      story:{ for:"The maintainer", outcome:"I know the cheapest lever with real revenue." },
+      metrics:[
+        { text:"Options are scored on ease against revenue", state:"not_met" }
+      ],
+      features:[
+        { text:"Brainstorm around forty revenue levers", status:"to_do" },
+        { text:"Score the top five on an ease-revenue grid", status:"to_do" },
+        { text:"Hold until the free launch ships", status:"blocked" }
+      ] }
+  ]
+},
+{
+  id:"8.1", name:"Spot a Sick Plant", scope:"sketch only", hue:"#7d8a8d",
+  status:"not_started", rank:5, value:"med", confidence:"low", statusText:"Sketch",
+  why:"Houseplant owners can name a plant but still cannot tell why it is dying, which is the question they actually arrive with.",
+  initiatives:[
+    { theme:"Read stress signs from the same photo",
+      story:{ for:"Houseplant owners", outcome:"I know my plant is over-watered, not just its name." },
+      metrics:[
+        { text:"One photo yields a health signal, not only a species", state:"not_met" }
+      ],
+      features:[
+        { text:"Sketch the diagnostics pipeline", status:"to_do" }
+      ] }
+  ]
+},
+
+/* ---- DONE — parked far right, most recent at the left (§1) ---------------- */
+{
+  id:"2.2", name:"Trustworthy Verdicts", scope:"Pothos ↔ Pilea · 0012 + 0013", hue:"#4c8c4a",
+  status:"done", rank:1, value:"high", confidence:"high", statusText:"Done", sid:"0012 · 0013",
+  why:"Pothos and Pilea looked alike to the model, so mapping Pilea at all risked a confident wrong card for one of the commonest houseplants.",
+  initiatives:[
+    { theme:"Map Pilea without re-opening the boundary",
+      story:{ for:"Houseplant owners", outcome:"I never get a Pilea card for my pothos." },
+      metrics:[
+        { text:"Adding Pilea costs zero extra confident-wrong", state:"done" },
+        { text:"No pothos photo reaches a direct Pilea card", state:"done" },
+        { text:"CI fails if the mapping loses its gate", state:"done" }
+      ],
+      features:[
+        { text:"Map Pilea behind a boundary gate", status:"done" },
+        { text:"Add 19 licence-clean fixture photos", status:"done" },
+        { text:"Bind the gate in CI", status:"done" }
+      ] },
+    { theme:"Give a confident Pilea its own card",
+      story:{ for:"Houseplant owners", outcome:"My real Pilea gets a care card, not a menu." },
+      metrics:[
+        { text:"Real Pilea photos reach a direct card, six of six", state:"done" },
+        { text:"The threshold clears the pothos ceiling with margin", state:"done" },
+        { text:"Held-out folds add zero confident-wrong", state:"done" }
+      ],
+      features:[
+        { text:"Run a pre-registered leave-one-out sweep", status:"done" },
+        { text:"Set the Pilea direct-card bar at 0.98", status:"done" },
+        { text:"Compose the bar with the existing gate", status:"done" },
+        { text:"Release v0.7.0 with the direct card", status:"done" }
+      ] }
+  ]
+},
+{
+  id:"2.1", name:"Honest Confidence", scope:"measure → improve → abstain", hue:"#3f8a6a",
+  status:"done", rank:2, value:"high", confidence:"high", statusText:"Done", sid:"0011",
+  why:"The app was confidently wrong more often than it was right, so Houseplant owners could not tell a good answer from a bad one.",
+  initiatives:[
+    { theme:"Measure how often we are confidently wrong",
+      story:{ for:"The maintainer", outcome:"I have a number I can move, not a hunch." },
+      metrics:[
+        { text:"A repeatable eval scores every fixture on device", state:"done" },
+        { text:"Confident-wrong is measured at 0.382 before", state:"done" },
+        { text:"Fixtures carry licence and integrity guards", state:"done" }
+      ],
+      features:[
+        { text:"Build the accuracy-eval scorecard", status:"done" },
+        { text:"Grow fixtures to 41 licence-clean photos", status:"done" },
+        { text:"Emit a per-row CSV and a summary", status:"done" }
+      ] },
+    { theme:"Abstain instead of guessing",
+      story:{ for:"Houseplant owners", outcome:"I get a choice, not a confident wrong answer." },
+      metrics:[
+        { text:"Confident-wrong roughly halves to 0.179", state:"done" },
+        { text:"Top-1 accuracy stays flat", state:"done" },
+        { text:"The win holds on held-out species", state:"done" }
+      ],
+      features:[
+        { text:"Adopt six-view test-time augmentation", status:"done" },
+        { text:"Add a high-confidence abstain margin", status:"done" },
+        { text:"Route low-margin verdicts to the picker", status:"done" },
+        { text:"Hold the abstain margin at 0.30", status:"tech_decision" }
+      ] }
+  ]
+},
+{
+  id:"4.1", name:"A Real App, Not a Demo", scope:"persistence + experience layer", hue:"#7a63a8",
+  status:"done", rank:3, value:"high", confidence:"high", statusText:"Done", sid:"0010",
+  why:"Houseplant owners lost every identification the moment they closed the app, so the tool read as a demo rather than something to keep.",
+  initiatives:[
+    { theme:"Keep a plant after the app closes",
+      story:{ for:"Houseplant owners", outcome:"I reopen the app and my plants are still there." },
+      metrics:[
+        { text:"Saved plants survive an app restart", state:"done" },
+        { text:"Duplicate saves collapse into one entry", state:"done" },
+        { text:"Storage stays local, with no network call", state:"done" }
+      ],
+      features:[
+        { text:"Add local persistence for identified plants", status:"done" },
+        { text:"Build My Plants with remove and thumbnails", status:"done" },
+        { text:"Log unmapped species as add-plant requests", status:"done" }
+      ] },
+    { theme:"Make the app readable at a glance",
+      story:{ for:"Houseplant owners", outcome:"I can see how sure the app is." },
+      metrics:[
+        { text:"Every result shows a confidence percentage and bar", state:"done" },
+        { text:"Home is the app's start destination", state:"done" }
+      ],
+      features:[
+        { text:"Ship the Home landing screen", status:"done" },
+        { text:"Add the confidence percentage and bar", status:"done" },
+        { text:"Add 44 licence-clean reference photos", status:"done" },
+        { text:"Put a Home button on every screen", status:"done" }
+      ] }
+  ]
+},
+{
+  id:"3.2", name:"A Knowledge Base That Keeps Up", scope:"10 → 39 of 47 mapped", hue:"#6a8f5b",
+  status:"done", rank:4, value:"high", confidence:"high", statusText:"Done", sid:"0009 · 0010",
+  why:"The model knew 47 classes but the knowledge base answered for ten of them, so most correct identifications ended in a shrug.",
+  initiatives:[
+    { theme:"Fill the model-to-knowledge-base delta",
+      story:{ for:"Houseplant owners", outcome:"The plant the app recognises has a recipe waiting." },
+      metrics:[
+        { text:"The class map resolves 39 of 47 model classes", state:"done" },
+        { text:"Every mapped class resolves to a real recipe", state:"done" },
+        { text:"CI fails on an unmapped or orphaned class", state:"done" }
+      ],
+      features:[
+        { text:"Expand the species knowledge base to 45", status:"done" },
+        { text:"Add the carnivorous peat-sand archetype", status:"done" },
+        { text:"Leave eight classes deliberately unmapped", status:"tech_decision" },
+        { text:"Add class-map validation to CI", status:"done" }
+      ] }
+  ]
+},
+{
+  id:"3.1", name:"Houseplant-Literate Identification", scope:"model swap + data verdict", hue:"#b5651d",
+  status:"done", rank:5, value:"high", confidence:"high", statusText:"Done", sid:"0007 · 0008",
+  why:"The bundled model recognised wild flora, not houseplants, so most living-room plants came back as something unrelated.",
+  initiatives:[
+    { theme:"Swap in a houseplant-tuned model",
+      story:{ for:"Houseplant owners", outcome:"I get a houseplant name, not a wildflower." },
+      metrics:[
+        { text:"The active model covers 10 of 16 knowledge-base species", state:"done" },
+        { text:"The identifier seam survives the swap unchanged", state:"done" },
+        { text:"The old model stays bundled as a regression anchor", state:"done" }
+      ],
+      features:[
+        { text:"Survey candidate houseplant classifiers", status:"done" },
+        { text:"Bundle the houseplant MobileNetV2 as default", status:"done" },
+        { text:"Add one switch to select the active model", status:"done" }
+      ] },
+    { theme:"Answer the fine-tune data question",
+      story:{ for:"The maintainer", outcome:"I know whether training is worth funding." },
+      metrics:[
+        { text:"Every out-of-vocab species has a counted image supply", state:"done" },
+        { text:"The verdict is recorded as GO, CONDITIONAL or NO-GO", state:"done" }
+      ],
+      features:[
+        { text:"Count licence-clean imagery per species", status:"done" },
+        { text:"Rule pink princess NO-GO on cultivar supply", status:"done" },
+        { text:"Defer the fine-tune behind cheaper levers", status:"tech_decision" }
+      ] }
+  ]
+},
+{
+  id:"1.1", name:"Camera to Potting Recipe", scope:"MVP", hue:"#6d4c41",
+  status:"done", rank:6, value:"high", confidence:"high", statusText:"Done", sid:"0001–0006",
+  why:"Houseplant owners cannot tell which mix a plant needs, so they repot into whatever bag is nearest and the plant pays for it.",
+  initiatives:[
+    { theme:"Identify a plant from one photo",
+      story:{ for:"Houseplant owners", outcome:"I point the camera at a plant and get a name." },
+      metrics:[
+        { text:"Camera to result runs entirely on device", state:"done" },
+        { text:"No network call leaves the app", state:"done" },
+        { text:"A low-confidence result routes to a picker", state:"done" }
+      ],
+      features:[
+        { text:"Wire the camera to an on-device identifier", status:"done" },
+        { text:"Route by threshold to result or picker", status:"done" },
+        { text:"Gate the build on a network-free check", status:"done" }
+      ] },
+    { theme:"Turn a species into a potting recipe",
+      story:{ for:"Houseplant owners", outcome:"I know what to mix, in what proportions." },
+      metrics:[
+        { text:"Every knowledge-base species maps to an archetype", state:"done" },
+        { text:"Recipe proportions sum to one hundred percent", state:"done" }
+      ],
+      features:[
+        { text:"Build the species and archetype knowledge base", status:"done" },
+        { text:"Render the recipe with a source badge", status:"done" },
+        { text:"Probe two in-vocab species for real confidence", status:"done" }
+      ] }
+  ]
+}
+];
+
+/* ---------------------------- Notes / loose ends --------------------------
+   Items that fit neither an open initiative nor a new one. Triage waterfall:
+   existing initiative → new initiative → a note. Swept each refresh — recurring
+   notes graduate to an initiative, stale ones close. */
+const NOTES = [
+  { text:"Untriaged inbox idea: adopt the <code>mattpocock/skills</code> engineering set (<code>/diagnose</code>, <code>/handoff</code>, <code>/improve-codebase-architecture</code>) plus a seed <code>CONTEXT.md</code> domain glossary. Sits uncommitted in <code>docs/future-ideas/feature-ideas.md</code> and has not been folded into ROADMAP.md — tooling, not product, so it earns no column.",
+    source:"idea inbox", date:"2026-06-10", disposition:"untriaged" },
+  { text:"<code>assembleDebugAndroidTest</code> does not repackage new fixtures, so an eval run can silently score a stale APK. Force <code>mergeDebugAndroidTestAssets --rerun-tasks</code> before any accuracy run — this bites the whole of Outcome 2.3.",
+    source:"PLANTPOTTING-0013", date:"2026-06-08", disposition:"watching" },
+  { text:"<code>ktlintCheck</code> is a CI-only gate and is not in the local gate set. Run it before pushing; on Windows autocrlf churns dozens of unrelated files, so stage only the real ones.",
+    source:"PLANTPOTTING-0011", date:"2026-06-07", disposition:"watching" },
+  { text:"52 of 1,034 sprint acceptance boxes remain unticked — all the 0005 manual GMD-walkthrough items, where code plus JVM coverage was explicitly accepted in lieu. Recorded for history; not an open gap.",
+    source:"PLANTPOTTING-0005", date:"2026-06-04", disposition:"accepted" }
+];
+
+/* ---------------------------- Bands (§1: DONE parked far right) ------------ */
+const BANDS = [
+  { key:"in_progress", label:"Now / In Progress", note:"what the branch is on", keepEmpty:true,
+    emptyTitle:"Nothing in flight",
+    emptyBody:"PLANTPOTTING-0013 shipped and its review merged; no sprint branch is open and no <code>PLANTPOTTING-0014.md</code> plan exists yet. The next move is <code>/sprint-planner</code> on the Launch track (5.1)." },
+  { key:"next",        label:"Next",              note:"planned — Launch runs parallel to accuracy work" },
+  { key:"not_started", label:"Later",             note:"ranked left → right by value × confidence" },
+  { key:"done",        label:"Done",              note:"delivered — most recent at left → oldest at right" }
+];
+const ROWS = [
+  { label:"Outcome" }, { label:"Why" }, { label:"Initiative" },
+  { label:"Metrics", sub:"when are we done?" }, { label:"Key Features" }
+];
+const F_LABEL = {
+  to_do:"To do", next:"Next", in_progress:"In progress", done:"Done",
+  tech_decision:"Tech decision", blocked:"Blocked", deprioritised:"De-prioritised"
+};
+
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+const esc = s => String(s).replace(/[&<>]/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[m]));
+
+function render() {
+  const board = document.getElementById("board");
+  const cols = BANDS.map(b => ({
+    band: b,
+    outcomes: BOARD.filter(o => o.status === b.key).sort((x, y) => x.rank - y.rank)
+  })).filter(g => g.outcomes.length || g.band.keepEmpty);
+
+  /* Track list: key | (band-gap | lanes...)* | band-gap | legend.
+     An Outcome's width IS its initiative count — that's the nesting rule (§1).
+     An empty but kept band still gets one lane so its banner has a width. */
+  const tracks = ["var(--key-w)"];
+  const groups = [];
+  cols.forEach((g, gi) => {
+    if (gi) tracks.push("var(--band-gap)");
+    const start = tracks.length + 1;                    // 1-based grid line
+    if (!g.outcomes.length) tracks.push("var(--lane-w)");
+    g.outcomes.forEach(o => {
+      o._from = tracks.length + 1;
+      o.initiatives.forEach(() => tracks.push("var(--lane-w)"));
+      o._span = o.initiatives.length;
+    });
+    groups.push({ band: g.band, start, end: tracks.length + 1, empty: !g.outcomes.length });
+  });
+  tracks.push("var(--band-gap)", "auto");
+  const legendCol = tracks.length;
+  board.style.gridTemplateColumns = tracks.join(" ");
+  board.style.gridTemplateRows = "auto auto auto auto auto auto";
+
+  /* Leave gridRow alone when no row is given, so the stylesheet's own grid-row
+     (.wash, .legend, .empty) wins. Assigning undefined stringifies to "undefined",
+     clobbers the rule inline, and auto-places the item into a phantom row. */
+  const put = (node, col, row, span) => {
+    node.style.gridColumn = span ? `${col} / span ${span}` : `${col}`;
+    if (row != null) node.style.gridRow = row;
+    board.appendChild(node);
+    return node;
+  };
+
+  /* Left-margin key: all five row labels, including the two unlaned ones (§5A) */
+  put(el("div", "banner-cell key-corner"), 1, 1);
+  ROWS.forEach((r, i) => {
+    put(el("div", "cell key"), 1, i + 2).appendChild(el("div", "key-inner",
+      `<span>${esc(r.label)}${r.sub ? `<br><em>${esc(r.sub)}</em>` : ""}</span>`));
+  });
+  put(el("div", "key-shadow"), 2, 1);
+
+  /* Band banners span the full pixel width of their band's columns (§5H) */
+  groups.forEach(g => {
+    const cell = put(el("div", "banner-cell"), g.start, 1, g.end - g.start);
+    const b = el("div", "banner" + (g.band.key === "in_progress" ? " banner--now" : ""));
+    b.appendChild(el("b", null, esc(g.band.label)));
+    b.appendChild(el("i", null, esc(g.band.note)));
+    cell.appendChild(b);
+    if (g.empty) {
+      const e = put(el("div", "empty"), g.start);
+      e.appendChild(el("b", null, esc(g.band.emptyTitle)));
+      e.appendChild(el("span", null, g.band.emptyBody));
+    }
+  });
+
+  BOARD.forEach(o => {
+    if (!o._from) return;
+    put(el("div", "wash"), o._from, null, o._span).style.setProperty("--hue", o.hue);
+
+    /* Row 1 — Outcome */
+    const oc = el("div", "outcome");
+    oc.style.setProperty("--hue", o.hue);
+    oc.appendChild(el("div", "outcome-top", `<h2>${esc(o.name)}</h2><span class="id">${esc(o.id)}</span>`));
+    if (o.scope) oc.appendChild(el("span", "scope", esc(o.scope)));
+    const foot = el("div", "outcome-foot");
+    foot.appendChild(el("span", "tag tag--status", esc(o.statusText)));
+    if (o.sid) foot.appendChild(el("span", "tag tag--sid", esc(o.sid)));
+    if (o.status === "not_started") foot.appendChild(el("span", "tag tag--rank", `rank ${o.rank}`));
+    foot.appendChild(el("span", "tag", `value ${esc(o.value)} · conf ${esc(o.confidence)}`));
+    oc.appendChild(foot);
+    put(el("div", "cell"), o._from, 2, o._span).appendChild(oc);
+
+    /* Row 2 — Why: one card spanning the whole Outcome column */
+    put(el("div", "cell"), o._from, 3, o._span).appendChild(el("div", "why", esc(o.why)));
+
+    /* Rows 3–5 — one lane per Initiative. A Metric or Feature means "this serves
+       the Initiative directly above it", so never break the column. */
+    o.initiatives.forEach((ini, li) => {
+      const col = o._from + li;
+
+      const ic = el("div", "init");
+      ic.appendChild(el("div", "theme", esc(ini.theme)));
+      ic.appendChild(el("div", "story",
+        `<span class="for"><span class="lbl">for</span>${esc(ini.story.for)}</span>` +
+        `<span class="out"><span class="lbl">outcome</span>${esc(ini.story.outcome)}</span>`));
+      put(el("div", "cell"), col, 4).appendChild(ic);
+
+      const ms = el("div", "stack");
+      ini.metrics.forEach(m => {
+        const mc = el("div", "metric metric--" + (m.state === "done" ? "done" : m.state === "in_flight" ? "flight" : "todo"));
+        mc.appendChild(el("span", "badge", m.state === "done" ? "✓" : m.state === "in_flight" ? "+1" : ""));
+        mc.appendChild(el("span", "txt", esc(m.text) + (m.state === "done" ? " ✓" : "")));
+        ms.appendChild(mc);
+      });
+      put(el("div", "cell"), col, 5).appendChild(ms);
+
+      const fs = el("div", "stack");
+      ini.features.forEach(f => {
+        const fc = el("div", "feat f-" + f.status);
+        fc.appendChild(el("span", "st", F_LABEL[f.status]));
+        fc.appendChild(el("span", null, esc(f.text) + (f.status === "done" ? " ✓" : "")));
+        fs.appendChild(fc);
+      });
+      put(el("div", "cell"), col, 6).appendChild(fs);
+    });
+  });
+
+  legend(put(el("div", "legend"), legendCol));
+}
+
+/* Legend: own panel, right of the last column. Never the left margin — the row
+   labels span the full grid height and a legend stacked there collides (§5E).
+   Don't swatch Outcome or Why: the left-margin key already names them. */
+function legend(lg) {
+  const sw = (bg, line, txt) =>
+    `<div class="sw"><span class="sw-dot" style="background:${bg};border-color:${line}"></span><span class="sw-txt">${txt}</span></div>`;
+  const v = n => `var(--${n})`;
+  lg.innerHTML =
+    `<h3>How to read this board</h3>
+     <p class="note">Band = <b>when</b>. Card colour = <b>state</b>. An Outcome's tint is identity only —
+     it lets you trace a column down, and never propagates to the cards below it.</p>
+     <h4>Card types in a column</h4>` +
+    sw(v("accent-2"), v("accent-2"), `<b>Epic Theme</b> — imperative title <br><code>&lt;Verb&gt; &lt;object&gt;</code>`) +
+    sw(v("accent-2-soft"), v("s-next-line"), `<b>Epic Story</b> — the persona's own voice <br><code>FOR: … OUTCOME: I &lt;achieved state&gt;</code>`) +
+    sw(v("met-bg"), v("met-line"), `<b>Metric</b> — declarative done-state, binary-checkable <br><code>&lt;thing&gt; &lt;is in target state&gt;</code>`) +
+    `<h4>Metric badges</h4>` +
+    sw("transparent", v("met-line"), `<b>Not met</b> — the signal isn't there yet`) +
+    sw(v("s-dec-ink"), v("s-dec-ink"), `<b>+1 · in flight</b> — one step from done`) +
+    sw(v("s-done-ink"), v("s-done-ink"), `<b>✓ met</b> — a tick on the card, not a new card colour`) +
+    `<h4>Feature state</h4>` +
+    sw(v("s-todo-bg"), v("s-todo-ink"), `<b>To do</b>`) +
+    sw(v("s-next-bg"), v("s-next-ink"), `<b>Next</b>`) +
+    sw(v("s-prog-bg"), v("s-prog-ink"), `<b>In progress</b>`) +
+    sw(v("s-done-bg"), v("s-done-ink"), `<b>Done</b>`) +
+    sw(v("s-dec-bg"), v("s-dec-ink"), `<b>Tech decision</b> — a spike or decision, not a build`) +
+    sw(v("s-blok-bg"), v("s-blok-ink"), `<b>Blocked</b> — waiting on something outside the repo`) +
+    sw(v("s-depr-bg"), v("s-depr-ink"), `<b>De-prioritised</b>`) +
+    `<div class="rule"></div><p class="src"><b>Source:</b> <code>docs/ROADMAP.md</code> @ PLANTPOTTING-0013,
+     reconciled against <code>docs/sprints/ledger.yaml</code>, <code>git log</code> and the build files.
+     Structured per the Outcome Roadmap Framework Spec §1–§4
+     (<code>.claude/skills/outcome-roadmaps/</code>). Content lives in the <code>BOARD</code> array in this
+     file's source — edit the data, not the DOM.</p>`;
+}
+
+function renderNotes() {
+  const host = document.getElementById("notes");
+  if (!host || !NOTES.length) return;
+  host.innerHTML = "";
+  const head = el("div");
+  head.style.cssText = "display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 11px;";
+  const h = el("b", null, "Notes / loose ends");
+  h.style.cssText = "font:800 11px var(--font-ui);letter-spacing:.13em;text-transform:uppercase;color:var(--ink);";
+  const sub = el("span", null, "items that fit neither an open initiative nor a new one · triage: existing initiative → new initiative → a note · swept each refresh");
+  sub.style.cssText = "font:400 11px var(--font-ui);color:var(--faint);";
+  head.appendChild(h); head.appendChild(sub); host.appendChild(head);
+  NOTES.forEach(n => {
+    const row = el("div");
+    row.style.cssText = "display:flex;gap:12px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel);margin:0 0 8px;max-width:70rem;";
+    const dot = el("span", null, esc(n.disposition));
+    dot.style.cssText = "flex:0 0 auto;font:600 10px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line-strong);border-radius:var(--radius-pill);padding:2px 8px;white-space:nowrap;";
+    const body = el("div");
+    body.style.cssText = "flex:1 1 auto;font:400 12px/1.55 var(--font-ui);color:var(--ink);";
+    body.innerHTML = n.text + ` <span style="color:var(--faint)">— ${esc(n.source)} · ${esc(n.date)}</span>`;
+    row.appendChild(dot); row.appendChild(body); host.appendChild(row);
+  });
+}
+
+render();
+renderNotes();
+
+const btn = document.getElementById("mode");
+const setMode = m => {
+  document.documentElement.dataset.mode = m;
+  btn.textContent = m === "dark" ? "Light" : "Dark";
+};
+btn.onclick = () => setMode(document.documentElement.dataset.mode === "dark" ? "light" : "dark");
+setMode(matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+</script>
+</body>
+</html>
