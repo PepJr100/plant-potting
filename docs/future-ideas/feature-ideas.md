@@ -13,7 +13,25 @@ they never accept, develop, or move an entry unprompted.
 
 ## Raw ideas
 
-_(none open — monetisation moved to `idea decisions → accepted` below: folded into the roadmap as a deferred Known Gap + V3 milestone sketch, gated behind the free Launch.)_
+- **Raw 2026-06-10 — adopt the `mattpocock/skills` engineering set (diagnose / handoff / improve-codebase-architecture) + a seed `CONTEXT.md` domain glossary.** Proven on the sibling `Job_Search_accelerator` project on 2026-06-10; consider porting the same setup here. Repo: https://github.com/mattpocock/skills ("Skills for Real Engineers").
+
+  **What gets installed** (cherry-pick, not the full suite):
+  - **`/diagnose`** — a disciplined hard-bug loop (reproduce → build a fast pass/fail feedback loop → hypothesise → instrument → fix → regression-test). Reads the domain glossary + ADRs for its mental model. Ships a `scripts/hitl-loop.template.sh` helper.
+  - **`/handoff`** — compacts a long session into a handoff doc (written to the OS temp dir, not the repo) so a fresh agent can continue. Standalone, zero config.
+  - **`/improve-codebase-architecture`** — surfaces shallow→deep "deepening" refactors named in the project's own vocabulary; reads `CONTEXT.md`. Ships `LANGUAGE.md` / `DEEPENING.md` / `INTERFACE-DESIGN.md` / `HTML-REPORT.md`.
+  - **A seed `CONTEXT.md`** at repo root — an opinionated domain glossary (one canonical word per concept + `_Avoid_:` synonyms) in the mattpocock format. This is the piece that powers `improve-codebase-architecture` and the glossary step of `diagnose`. For this project it'd capture the plant domain: `PlantIdentifier` seam, species / model classes / KB entry, confidence + threshold, the network-free gate, `ACTIVE_MODEL_ROOT`, etc.
+
+  **Why these three** (and what we deliberately skipped): they fill gaps the sprint workflow doesn't — structured debugging, cross-session continuity, architecture-debt hunting. We skipped the issue-tracker skills (`to-issues` / `to-prd` / `triage`) because the sprint-doc + `ledger.yaml` already *is* the work-breakdown, and skipped the TS/Node-specific (`setup-pre-commit` = Husky/Prettier, `migrate-to-shoehorn`) and personal/writing skills as irrelevant.
+
+  **How — the exact steps we took** (replicate here):
+  1. **Ground & select.** Read the repo's `README.md` + each candidate `SKILL.md` (the GitHub `/tree/` URLs 404 via WebFetch — use `gh api repos/mattpocock/skills/git/trees/main?recursive=1` to list paths, then `raw.githubusercontent.com/.../SKILL.md`). Keep only the skills that fill a real gap vs. existing infra.
+  2. **Seed `CONTEXT.md`.** Mine the codebase's own vocabulary — module/class names, `README.md`, the ADRs, and project memory — into a tight glossary (~15–30 domain terms, no general programming concepts). Mark it `SEED` and **flag the contested terms** (where the code/docs use several words for one thing) rather than guessing.
+  3. **Principal rules the ambiguities.** Surface the contested picks via `AskUserQuestion` (recommendation first); fold the answers in, drop the SEED banner, and record the rulings as a dated "Flagged ambiguities → Resolved" log. (Matches the *calibration-is-interactive / never-auto-bake* norm — don't bake vocabulary autonomously.)
+  4. **Vendor the skills.** `curl --create-dirs` each skill's files from `raw.githubusercontent.com/mattpocock/skills/main/skills/<bucket>/<skill>/...` into `.claude/skills/<skill>/`. Sanity-check file sizes (a 404 lands as a tiny stub). They auto-register on next skill-list refresh.
+  5. **Rewire to local conventions.** Their skills assume `docs/adr/`; rewrite to this repo's ADR folder (`sed -i 's#docs/adr/#docs/<our-adr-dir>/#g'`). `improve-codebase-architecture` links to `../grill-with-docs/CONTEXT-FORMAT.md` + `ADR-FORMAT.md` — if you don't install `grill-with-docs`, **vendor those two files locally** and fix the relative links, or they dangle. Point `ADR-FORMAT.md` at this repo's existing ADR template + the **never-auto-sign** norm (Status: Proposed, signature left to principal).
+  6. **Note the platform caveat.** `diagnose` ships a **bash** HITL helper; the *discipline* is portable but on a Windows box that one script needs a pwsh twin if ever used (for an Android project the feedback loop is instrumented emulator/test runs, so the helper is rarely needed).
+
+  _Open question for when this is picked up: confirm this repo's ADR directory name (the rewire target) and whether the Kotlin/Compose codebase warrants `improve-codebase-architecture` now (the `Job_Search_accelerator` `evaluator/` package had grown large — does any package here have the same friction?)._
 
 ## developed idea
 
